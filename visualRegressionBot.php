@@ -24,4 +24,6 @@ $client = new Client(['defaults' => [
 
 $headers = include('config.php');
 $crawler = new Crawler($headers);
+echo PHP_EOL . 'Starting crawling. Date: ' . date('l jS \of F Y h:i:s A');
 $crawler->crawlSites($sitesinCSV, $client);
+echo PHP_EOL . 'Crawling finished at: ' . date('l jS \of F Y h:i:s A');
