@@ -19,20 +19,18 @@ class Crawler {
     /**
      * Crawl sites.
      *
-     * @param $sitesinCSV
+     * @param $listOfSites
      * @param $client
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function crawlSites($sitesinCSV, $client) {
-        $csvManager = new \csvManager();
-        $listOfSites = $csvManager->readCsv($sitesinCSV);
-
+    public function crawlSites($listOfSites, $client) {
         // Preparing file to be written.
+        $csvManager = new \csvManager();
         $fileToWrite = date('dmY-His') . '-output.csv';
 
         $promises = (function () use ($listOfSites, $client) {
             foreach ($listOfSites as $site) {
-                $url = $site[0];
+                $url = $site;
                 // don't forget using generator
                 echo PHP_EOL . 'querying: ' . $url;
                 yield $client->getAsync($url, $this->headers);
