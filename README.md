@@ -1,4 +1,9 @@
 
+#Requirements
+
+- PHP 7.4
+- a (maybe big) list of urls to crawl
+
 #Install
 
 ```composer.json```
