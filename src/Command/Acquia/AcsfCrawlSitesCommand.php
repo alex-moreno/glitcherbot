@@ -38,6 +38,7 @@ class AcsfCrawlSitesCommand extends CrawlSitesCommand {
     protected function getSiteList($file) {
         if (($json = file_get_contents($file)) == false) {
             $this->output->writeln("<error>Could not open file: " . $file . "</error>");
+            return [];
         }
 
         $data = json_decode($json, TRUE);
