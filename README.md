@@ -10,11 +10,23 @@
 
 #Usage
 
-Create a .csv which contains a list of urls to iterate over (see example.csv)
+Create a .csv which contains a list of urls to iterate over (see example.csv).
 
-Run like this:
+If using Acquia Site Factory, a command is supplied to generate a list of sites from a sites.json file. 
 
-```php scrapperBot.php all-sites.csv```
+You can see the available commands by running:
+
+```php bin/visual_regression_bot.php```
+
+For help with a specific command use:
+
+```php bin/visual_regression_bot.php help <command>```
+
+Whilst debugging, increase verbosity by adding a number of `-v` flags.
+
+`-v` : verbose
+`-vv` : very verbose
+`-vvv` : debug
 
 #Configuration
 

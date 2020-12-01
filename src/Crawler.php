@@ -34,7 +34,7 @@ class Crawler {
             foreach ($listOfSites as $site) {
                 $url = $site[0];
                 // don't forget using generator
-                echo PHP_EOL . 'quering: ' . $url;
+                echo PHP_EOL . 'querying: ' . $url;
                 yield $client->getAsync($url, $this->headers);
 
             }
