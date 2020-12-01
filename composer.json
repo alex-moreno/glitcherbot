@@ -1,7 +1,8 @@
 {
     "require": {
         "guzzlehttp/guzzle": "^7.2",
-        "amphp/parallel": "^1.4"
+        "amphp/parallel": "^1.4",
+        "php": ">=7.4"
     },
     "autoload": {
         "classmap": [
