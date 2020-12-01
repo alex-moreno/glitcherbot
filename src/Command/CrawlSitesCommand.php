@@ -33,7 +33,9 @@ class CrawlSitesCommand extends Command {
      * @inheritDoc
      */
     protected function execute(InputInterface $input, OutputInterface $output) {
-        $sitesinCSV = $input->getArgument('sites_csv_file');
+        $this->output = $output;
+
+        $sitesinCSV = $this->getFilePath($input);
         $destination = $input->getOption('destination_folder');
 
         // HTTP Client.
@@ -54,12 +56,38 @@ class CrawlSitesCommand extends Command {
 
         $output->writeln("Using headers: " . print_r($headers, TRUE), OutputInterface::VERBOSITY_DEBUG);
 
+        $site_list = $this->getSiteList($sitesinCSV);
+
         $crawler = new Crawler($headers);
         $output->writeln('Starting crawling. Date: ' . date('l jS \of F Y h:i:s A'), OutputInterface::VERBOSITY_VERBOSE);
-        $crawler->crawlSites($sitesinCSV, $client);
+        $crawler->crawlSites($site_list, $client);
         $output->writeln('Crawling finished. Date: ' . date('l jS \of F Y h:i:s A'), OutputInterface::VERBOSITY_VERBOSE);
 
         return Command::SUCCESS;
     }
 
+    /**
+     * @param InputInterface $input
+     * @return string|string[]|null
+     */
+    protected function getFilePath(InputInterface $input) {
+        return $input->getArgument('sites_csv_file');
+    }
+
+    /**
+     * @param $file
+     */
+    protected function getSiteList($file) {
+        $csvManager = new \csvManager();
+        $listOfSites = $csvManager->readCsv($file);
+
+        $listOfSites = array_map(
+            function($entry) {
+                return empty($entry[0]) ? '' : $entry[0];
+            },
+            $listOfSites
+        );
+
+        return $listOfSites;
+    }
 }
