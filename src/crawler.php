@@ -55,9 +55,10 @@ class Crawler {
                 $siteCrawled['footprint'] = md5($body);
                 $csvManager->writeCsvLine($siteCrawled,$fileToWrite);
             },
-            'rejected' => function ($reason, $index) use ($csvManager, $fileToWrite) {
-                // Handle promise rejected here (ie: not existing domains).
+            'rejected' => function ($reason, $index, $promise) use ($csvManager, $fileToWrite) {
+                // Handle promise rejected here (ie: not existing domains, long timeouts or too many redirects).
                 echo 'rejected: ' . $reason;
+
                 $siteCrawled = Array();
                 $siteCrawled['url'] = $index;
                 $siteCrawled['statusCode'] = 'rejected';
