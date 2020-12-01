@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Command\Acquia;
 
 use Command\CrawlSitesCommand;
