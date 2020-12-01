@@ -10,6 +10,11 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Crawl a list of sites directly from a sites.json file.
+ * 
+ * @package Command\Acquia
+ */
 class AcsfCrawlSitesCommand extends CrawlSitesCommand {
 
     protected static $defaultName = 'acquia:acsf-crawl-sites';
