@@ -33,14 +33,16 @@ class Crawler {
             foreach ($listOfSites as $site) {
                 $url = $site;
 
+                // don't forget using generator
+                echo PHP_EOL . 'querying: ' . $url;
+
                 // If default config is provided, create a new client each time.
                 if ($default_config != NULL) {
                     $config = $default_config + ['base_uri' => 'http://' . $url];
+                    $url = '';
                     $client = new Client($config);
                 }
 
-                // don't forget using generator
-                echo PHP_EOL . 'querying: ' . $url;
                 yield $client->getAsync($url, $this->headers);
 
             }
