@@ -7,6 +7,7 @@ use GuzzleHttp\Client;
 use ScrapperBot\Crawler;use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -26,7 +27,8 @@ class CrawlSitesCommand extends Command {
             ->setDescription('Crawls a supplied list of sites to scrape data.')
             ->addArgument('sites_csv_file', InputArgument::REQUIRED, 'Path to the CSV file containing URLs.')
             ->addOption('config_file', null, InputArgument::OPTIONAL, 'Path to the config file', 'config.php')
-            ->addOption('destination_folder', null, InputArgument::OPTIONAL, 'Path to the destination folder for results', '.');
+            ->addOption('destination_folder', null, InputArgument::OPTIONAL, 'Path to the destination folder for results', '.')
+            ->addOption('use_base_uri', null, InputOption::VALUE_NONE, 'If specified, ask guzzle to create a new client each time, in order to specify base URI for redirects.');
     }
 
     /**
@@ -37,11 +39,13 @@ class CrawlSitesCommand extends Command {
 
         $sitesinCSV = $this->getFilePath($input);
         $destination = $input->getOption('destination_folder');
+        $use_base_uri = $input->getOption('use_base_uri');
 
-        // HTTP Client.
-        $client = new Client(['defaults' => [
+        $default_config = ['defaults' => [
             'verify' => false
-        ]]);
+        ]];
+        // HTTP Client.
+        $client = new Client($default_config);
 
         $config_file = $input->getOption('config_file');
 
@@ -60,7 +64,13 @@ class CrawlSitesCommand extends Command {
 
         $crawler = new Crawler($headers);
         $output->writeln('Starting crawling. Date: ' . date('l jS \of F Y h:i:s A'), OutputInterface::VERBOSITY_VERBOSE);
-        $crawler->crawlSites($site_list, $client);
+
+        // Unless configured, do not ask the crawler to use a base URI.
+        if (empty($use_base_uri)) {
+            $default_config = NULL;
+        }
+
+        $crawler->crawlSites($site_list, $client, $default_config);
         $output->writeln('Crawling finished. Date: ' . date('l jS \of F Y h:i:s A'), OutputInterface::VERBOSITY_VERBOSE);
 
         return Command::SUCCESS;
