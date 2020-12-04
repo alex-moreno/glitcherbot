@@ -5,6 +5,7 @@ namespace ScrapperBot;
 
 require 'vendor/autoload.php';
 
+use GuzzleHttp\Client;
 use GuzzleHttp\Promise\EachPromise;
 use GuzzleHttp\Psr7\Response;
 
@@ -23,14 +24,21 @@ class Crawler {
      * @param $client
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function crawlSites($listOfSites, $client) {
+    public function crawlSites($listOfSites, Client $client, $default_config = NULL) {
         // Preparing file to be written.
         $csvManager = new \csvManager();
         $fileToWrite = date('dmY-His') . '-output.csv';
 
-        $promises = (function () use ($listOfSites, $client) {
+        $promises = (function () use ($listOfSites, $client, $default_config) {
             foreach ($listOfSites as $site) {
                 $url = $site;
+
+                // If default config is provided, create a new client each time.
+                if ($default_config != NULL) {
+                    $config = $default_config + ['base_uri' => 'http://' . $url];
+                    $client = new Client($config);
+                }
+
                 // don't forget using generator
                 echo PHP_EOL . 'querying: ' . $url;
                 yield $client->getAsync($url, $this->headers);
