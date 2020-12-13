@@ -23,12 +23,47 @@ class dbManager {
         $this->pdo->query($query);
     }
 
+    /**
+     * @return SQLite3Result
+     */
     public function readDB() {
-        date('dmY-His');
-        $query = sprintf("SELECT * FROM sites");
-        $this->pdo->query($query);
+        $queryString = sprintf("SELECT * FROM sites ");
+        $query = $this->pdo->query($queryString);
+        while ($row = $query->fetchArray()) {
+            $results[] = $row;
+        }
 
-        
+        return $results;
+    }
 
+    /**
+     * Get different crawls
+     *
+     * @return mixed
+     */
+    public function getTimeStamps() {
+        $queryString = sprintf("SELECT * FROM sites group by timestamp ");
+        $query = $this->pdo->query($queryString);
+        while ($row = $query->fetchArray()) {
+            $results[] = $row['timestamp'];
+        }
+
+        return $results;
+    }
+
+    /**
+     * Get results for a given date.
+     *
+     * @param $timestamp
+     * @return mixed
+     */
+    public function getRestultsbyDate($timestamp) {
+        $queryString = sprintf("SELECT * FROM sites WHERE timestamp = '%s' order by site_id", $timestamp);
+        $query = $this->pdo->query($queryString);
+        while ($row = $query->fetchArray()) {
+            $results[$timestamp][] = $row;
+        }
+
+        return $results;
     }
 }
