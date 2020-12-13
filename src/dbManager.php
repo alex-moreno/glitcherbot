@@ -22,4 +22,13 @@ class dbManager {
             $sites['url'],$sites['url'],$sites['size'],$sites['statusCode'],$sites['footprint'], $timestamp);
         $this->pdo->query($query);
     }
+
+    public function readDB() {
+        date('dmY-His');
+        $query = sprintf("SELECT * FROM sites");
+        $this->pdo->query($query);
+
+        
+
+    }
 }
