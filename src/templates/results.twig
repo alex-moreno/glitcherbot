@@ -1,0 +1,8 @@
+<h1>Hello world!</h1>
+
+<ul>
+    {% for result in results %}
+        <li>{{ result.0.timestamp }} </li>
+        <li>{{ result.0.site_id }} </li>
+    {% endfor %}
+</ul>

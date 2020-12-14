@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Command;
+namespace ScraperBot\Command;
 
 use GuzzleHttp\Client;
-use ScrapperBot\Crawler;
-use SQLite3;
+use ScraperBot\Crawler;
+use ScraperBot\CsvManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -70,7 +70,7 @@ class CrawlSitesCommand extends Command {
 
         $site_list = $this->getSiteList($sitesinCSV);
 
-        $crawler = new Crawler($headers);
+        $crawler = new Crawler(new \ScraperBot\Storage\SqlLite3Storage(), $headers);
         $output->writeln('Starting crawling. Date: ' . date('l jS \of F Y h:i:s A'), OutputInterface::VERBOSITY_VERBOSE);
 
         // Unless configured, do not ask the crawler to use a base URI.
@@ -96,7 +96,7 @@ class CrawlSitesCommand extends Command {
      * @param $file
      */
     protected function getSiteList($file) {
-        $csvManager = new \csvManager();
+        $csvManager = new CsvManager();
         $listOfSites = $csvManager->readCsv($file);
 
         $listOfSites = array_map(

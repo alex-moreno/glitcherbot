@@ -1,13 +1,11 @@
 <?php
 
-namespace Command\Acquia;
+namespace ScraperBot\Command\Acquia;
 
-use Command\CrawlSitesCommand;
-use Symfony\Component\Console\Command\Command;
+use ScraperBot\Command\CrawlSitesCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Crawl a list of sites directly from a sites.json file.
