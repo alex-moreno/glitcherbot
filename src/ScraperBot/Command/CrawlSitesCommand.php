@@ -78,7 +78,7 @@ class CrawlSitesCommand extends Command {
             $default_config = NULL;
         }
 
-        $crawler->crawlSites($site_list, $client, $default_config, date('H:i:s-d.m.Y'));
+        $crawler->crawlSites($site_list, $client, $default_config, time());
         $output->writeln('Crawling finished. Date: ' . date('l jS \of F Y h:i:s A'), OutputInterface::VERBOSITY_VERBOSE);
 
         return Command::SUCCESS;

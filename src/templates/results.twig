@@ -1,8 +1,47 @@
-<h1>Hello world!</h1>
+<!DOCTYPE html>
+<html lang="en">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+</head>
+<body>
+    <div class="container-fluid">
+        <h1>Results by date and time of crawl</h1>
+        <table class="table table-striped" style="text-align:center">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Site ID</th>
+                    {% for header in headers %}
+                    <th style="text-align:center" colspan="2">{{ header|date }}</th>
+                    {%  endfor %}
+                </tr>
+                <tr>
+                    <th></th>
+                    {% for header in headers %}
+                        <th>Size</th>
+                        <th>Status Code</th>
+                    {%  endfor %}
+                </tr>
+            </thead>
 
-<ul>
-    {% for result in results %}
-        <li>{{ result.0.timestamp }} </li>
-        <li>{{ result.0.site_id }} </li>
-    {% endfor %}
-</ul>
+            {%  for key, row in rows %}
+            <tr>
+                <td style="text-align:center">
+                    {{ key }}
+                </td>
+                {%  for column in row %}
+                {%  for rowdata in column %}
+                <td>
+                    {{ rowdata }}
+                </td>
+                {% endfor %}
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+</html>

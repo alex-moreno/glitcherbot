@@ -1,18 +1,48 @@
 <?php
 
-
-// Load our autoloader
 require_once __DIR__.'/../vendor/autoload.php';
 
-$resultsService = new \ScraperBot\Storage\SqlLite3Storage('../railerdb.sqlite3');
-$crawls = $resultsService->getTimeStamps();
+$resultsStorage = new \ScraperBot\Storage\SqlLite3Storage('../railerdb.sqlite3');
+$crawls = $resultsStorage->getTimeStamps();
 
-foreach ($crawls as $index=>$timestamp) {
+$rows = [];
+$headers = [];
+
+$index = 0;
+
+// @todo need to map empty results into columns, too
+
+foreach ($crawls as $timestamp) {
     // Get site crawl results for each timestamp.
-    $resultsByTimestamp = $resultsService->getResultsbyTimestamp($timestamp);
+    $resultsByTimestamp = $resultsStorage->getResultsbyTimestamp($timestamp);
+    $headers[$index] = $timestamp;
+
+    foreach ($resultsByTimestamp as $listOfSites) {
+        foreach ($listOfSites as $site) {
+            $site_id = $site['site_id'];
+
+            // Initialise the row for the site if it's empty.
+            if (empty($rows[$site_id][$index])) {
+                $rows[$site_id][$index] = [];
+            }
+
+            array_push($rows[$site_id][$index], $site['size'], $site['statusCode']);
+        }
+    }
+
+    $index++;
 }
 
-
+// Populate missing data for the rows and sort by index to maintain
+// column order.
+foreach ($rows as $site_id => $row) {
+    for ($i = 0; $i < $index; $i++) {
+        if (empty($rows[$site_id][$i])) {
+            $rows[$site_id][$i] = ['', ''];
+        }
+    }
+    ksort($rows[$site_id]);
+}
 
 // Specify our Twig templates location
 $loader = new \Twig\Loader\FilesystemLoader(__DIR__.'/../src/templates');
@@ -21,75 +51,4 @@ $loader = new \Twig\Loader\FilesystemLoader(__DIR__.'/../src/templates');
 $twig = new \Twig\Environment($loader);
 
 $template = $twig->load('results.twig');
-echo $template->render(['results' => $resultsByTimestamp]);
-
-//
-//require '../vendor/autoload.php';
-//require_once 'HTML/Table.php';
-//
-//const DOCROOT = '/var/www/';
-//
-//$resultsService = new \ScraperBot\Storage\SqlLite3Storage(DOCROOT . 'railerdb.sqlite3');
-//
-//// Prepare a HTML table.
-//$attrs = array('width' => '340');
-//$table = new HTML_Table();
-//$table->setAttributes($attrs);
-//
-//$crawls = $resultsService->getTimeStamps();
-//$numIndex = 0;
-//foreach ($crawls as $index=>$timestamp) {
-//    // Get site crawl results for each timestamp.
-//    $resultsByTimestamp = $resultsService->getResultsbyTimestamp($timestamp);
-//    foreach ($resultsByTimestamp as $index=>$listOfSites) {
-//        if ($numIndex == 0) {
-//            $table->addCol(range(0,sizeof($listOfSites)));
-//            $table->setHeaderContents(0, 0, 'Site ID');
-//        }
-//        $arraySizes = Array();
-//        $arraySizes[] = $timestamp;
-//        foreach ($listOfSites as $site) {
-//            $arraySizes[] = $site['size'];
-//
-//        }
-//
-//        $numIndex++;
-//        $table->addCol($arraySizes);
-//    }
-//    $numIndex++;
-//}
-//
-//$hrAttrs = array('bgcolor' => 'silver');
-//$table->setRowAttributes(0, $hrAttrs, true);
-//// Let's display the table.
-//echo $table->toHtml();
-//
-//echo '<br><br>';
-//echo '<br><br>';
-//echo '<br><br>';
-//echo '<br><br>';
-//echo '<br><br>';
-//echo '<br><br>';
-//echo '<br><br>';
-//echo '<br><br>';
-//
-//
-//echo '<br><br>All sites:';
-//$results = $resultsService->getResults();
-//foreach ($results as $row) {
-////    foreach ($row as $elem) {
-////        print_r($elem);
-//    echo 'timestamp: ' . $row['timestamp'];
-//    echo "<br>";
-//    echo 'site_id: ' . $row['site_id'];
-//    echo "<br>";
-//    echo 'url: ' . $row['url'];
-//    echo "<br>";
-//    echo 'size: ' . $row['size'];
-//    echo "<br>";
-//    echo 'statusCode: ' . $row['statusCode'];
-//    echo "<br><br>";
-////    }
-//}
-//
-//?>
+echo $template->render(['headers' => $headers, 'rows' => $rows]);
