@@ -6,20 +6,13 @@
 <body>
 <a href="index.php">Home</a>
     <div class="container-fluid">
-        <h1>Results by date and time of crawl</h1>
+        <h1>Status codes by date and time of crawl</h1>
         <table class="table table-striped" style="text-align:center">
             <thead class="thead-dark">
                 <tr>
-                    <th>Site ID</th>
+                    <th>Crawl</th>
                     {% for header in headers %}
-                    <th style="text-align:center" colspan="2">{{ header|date }}</th>
-                    {%  endfor %}
-                </tr>
-                <tr>
-                    <th></th>
-                    {% for header in headers %}
-                        <th>Size</th>
-                        <th>Status Code</th>
+                    <th style="text-align:center" colspan="1">{{ header }}</th>
                     {%  endfor %}
                 </tr>
             </thead>
@@ -27,14 +20,13 @@
             {%  for key, row in rows %}
             <tr>
                 <td style="text-align:center">
-                    {{ key }}
+                    {{ key|date }}
                 </td>
+
                 {%  for column in row %}
-                {%  for rowdata in column %}
-                <td>
-                    {{ rowdata }}
+                <td style="text-align:center">
+                    {{ column }}
                 </td>
-                {% endfor %}
                 {% endfor %}
             </tr>
             {% endfor %}
