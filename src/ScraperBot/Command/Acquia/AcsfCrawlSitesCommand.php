@@ -3,6 +3,7 @@
 namespace ScraperBot\Command\Acquia;
 
 use ScraperBot\Command\CrawlSitesCommand;
+use ScraperBot\Source\SitesJsonSource;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -29,23 +30,11 @@ class AcsfCrawlSitesCommand extends CrawlSitesCommand {
     }
 
     /**
-     * Get the path to the file containing URLs.
+     * @inheritDoc
      */
-    protected function getFilePath(InputInterface $input) {
-        return $input->getArgument('sites_json_file');
-    }
-
-    /**
-     * Get the list of sites to query.
-     */
-    protected function getSiteList($file) {
-        if (($json = file_get_contents($file)) == false) {
-            $this->output->writeln("<error>Could not open file: " . $file . "</error>");
-            return [];
-        }
-
-        $data = json_decode($json, TRUE);
-        return empty($data['sites']) ? [] : array_keys($data['sites']);
+    protected function getSource(InputInterface $input) {
+        $file = $input->getArgument('sites_json_file');
+        return new SitesJsonSource($file);
     }
 
 }
