@@ -7,6 +7,7 @@ use Symfony\Component\Console\Application;
 
 $application = new Application("Visual Regression Bot");
 $application->add(new \ScraperBot\Command\CrawlSitesCommand());
+$application->add(new \ScraperBot\Command\CrawlXmlSitemapCommand());
 $application->add(new \ScraperBot\Command\CompareCrawlsCommand());
 $application->add(new \ScraperBot\Command\Acquia\GenerateSiteListCommand());
 $application->add(new \ScraperBot\Command\Acquia\AcsfCrawlSitesCommand());
