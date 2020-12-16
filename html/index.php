@@ -21,7 +21,6 @@ foreach ($statusCodes as $code) {
 
 }
 
-//print_r($rows);
 // Specify our Twig templates location
 $loader = new \Twig\Loader\FilesystemLoader(__DIR__.'/../src/templates');
 // Instantiate our Twig
