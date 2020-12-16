@@ -1,24 +1,26 @@
 <?php
 declare(strict_types=1);
 
-namespace ScrapperBot;
+namespace ScraperBot;
 
 require 'vendor/autoload.php';
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Promise\EachPromise;
 use GuzzleHttp\Psr7\Response;
+use ScraperBot\Storage\StorageInterface;
 
 class Crawler {
+
     private $headers = NULL;
 
-    private $db;
+    private $storage;
 
-    public function __construct($config) {
+    public function __construct(StorageInterface $storage, $config) {
         $this->headers = $config;
         $this->concurrency = $config['concurrency'];
 
-        $this->db = new \dbManager();
+        $this->storage = $storage;
     }
 
     /**
@@ -30,7 +32,7 @@ class Crawler {
      */
     public function crawlSites($listOfSites, Client $client, $default_config = NULL, $timestamp) {
         // Preparing file to be written.
-        $csvManager = new \csvManager();
+        $csvManager = new CsvManager();
         $fileToWrite = date('dmY-His') . '-output.csv';
 
         $promises = (function () use ($listOfSites, $client, $default_config) {
@@ -67,7 +69,14 @@ class Crawler {
                 $siteCrawled['footprint'] = md5($body);
 
                 $csvManager->writeCsvLine($siteCrawled,$fileToWrite);
-                $this->db->writedb($siteCrawled, $timestamp);
+                $this->storage->addResult(
+                    $siteCrawled['url'],
+                    $siteCrawled['url'],
+                    $siteCrawled['size'],
+                    $siteCrawled['statusCode'],
+                    $siteCrawled['footprint'],
+                    $timestamp
+                );
             },
             'rejected' => function ($reason, $index, $promise) use ($csvManager, $fileToWrite) {
                 // Handle promise rejected here (ie: not existing domains, long timeouts or too many redirects).

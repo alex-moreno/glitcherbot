@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Command;
+namespace ScraperBot\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -41,7 +41,6 @@ class CompareCrawlsCommand extends Command {
 
         $listOfDifferences = $this->getCrawlResults($resultsinCSV1, $resultsinCSV2, $tolerance);
         $this->StoreCrawlDifferences($listOfDifferences);
-//        print_r($listOfDifferences);
 
         $crawlSites = new CrawlSitesCommand();
 

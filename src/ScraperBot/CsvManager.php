@@ -1,6 +1,8 @@
 <?php
 
-class csvManager {
+namespace ScraperBot;
+
+class CsvManager {
 
     /**
      * Read csv and return an array.
