@@ -1,7 +1,10 @@
-<html>
+<?php
 
-<a href="sites.php">Crawls results per dates</a>
-<br>
-<a href="status.php">List of status changes between crawls</a>
+require_once __DIR__.'/../vendor/autoload.php';
 
-</html>
+// Specify our Twig templates location
+$loader = new \Twig\Loader\FilesystemLoader(__DIR__.'/../src/templates');
+// Instantiate our Twig
+$twig = new \Twig\Environment($loader);
+$template = $twig->load('index.twig');
+echo $template->render();
