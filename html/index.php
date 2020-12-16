@@ -10,13 +10,14 @@ $headers = [];
 
 $index = 0;
 
-// @todo need to map empty results into columns, too
-
+// Iterate over the results, preparing columns and rows for the twig template.
 foreach ($crawls as $timestamp) {
     // Get site crawl results for each timestamp.
     $resultsByTimestamp = $resultsStorage->getResultsbyTimestamp($timestamp);
     $headers[$index] = $timestamp;
 
+    // Get the list of results, per site, for a given timestamp and prepare
+    // array entries representing the rows.
     foreach ($resultsByTimestamp as $listOfSites) {
         foreach ($listOfSites as $site) {
             $site_id = $site['site_id'];
