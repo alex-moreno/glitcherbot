@@ -1,7 +1,6 @@
 <?php
 
-
-namespace Command\Acquia;
+namespace ScraperBot\Command\Acquia;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;

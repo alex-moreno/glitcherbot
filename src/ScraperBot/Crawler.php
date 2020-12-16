@@ -1,20 +1,26 @@
 <?php
 declare(strict_types=1);
 
-namespace ScrapperBot;
+namespace ScraperBot;
 
 require 'vendor/autoload.php';
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Promise\EachPromise;
 use GuzzleHttp\Psr7\Response;
+use ScraperBot\Storage\StorageInterface;
 
 class Crawler {
+
     private $headers = NULL;
 
-    public function __construct($config) {
+    private $storage;
+
+    public function __construct(StorageInterface $storage, $config) {
         $this->headers = $config;
         $this->concurrency = $config['concurrency'];
+
+        $this->storage = $storage;
     }
 
     /**
@@ -24,9 +30,9 @@ class Crawler {
      * @param $client
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function crawlSites($listOfSites, Client $client, $default_config = NULL) {
+    public function crawlSites($listOfSites, Client $client, $default_config = NULL, $timestamp) {
         // Preparing file to be written.
-        $csvManager = new \csvManager();
+        $csvManager = new CsvManager();
         $fileToWrite = date('dmY-His') . '-output.csv';
 
         $promises = (function () use ($listOfSites, $client, $default_config) {
@@ -51,7 +57,7 @@ class Crawler {
         $eachPromise = new EachPromise($promises, [
             // how many concurrency we are use
             'concurrency' => $this->concurrency,
-            'fulfilled' => function (Response $response, $index) use ($csvManager, $fileToWrite) {
+            'fulfilled' => function (Response $response, $index) use ($csvManager, $fileToWrite, $timestamp) {
                 echo PHP_EOL . 'Code: ' . $response->getStatusCode();
                 echo ' index: ' . ($index + 1);
 
@@ -61,7 +67,16 @@ class Crawler {
                 $body = $response->getBody()->getContents();
                 $siteCrawled['size'] = strlen($body);
                 $siteCrawled['footprint'] = md5($body);
+
                 $csvManager->writeCsvLine($siteCrawled,$fileToWrite);
+                $this->storage->addResult(
+                    $siteCrawled['url'],
+                    $siteCrawled['url'],
+                    $siteCrawled['size'],
+                    $siteCrawled['statusCode'],
+                    $siteCrawled['footprint'],
+                    $timestamp
+                );
             },
             'rejected' => function ($reason, $index, $promise) use ($csvManager, $fileToWrite) {
                 // Handle promise rejected here (ie: not existing domains, long timeouts or too many redirects).
@@ -77,33 +92,5 @@ class Crawler {
 
         $eachPromise->promise()->wait();
     }
-
-    /**
-     * Request to return the size of a given site.
-     *
-     * @param $client
-     * @param $site
-     * @return callable
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     */
-    function syncRequest($client, $site) {
-
-        try {
-            // TODO: move the headers to a settings file.
-            // Load headers from a file.
-            $res = $client->request('GET', $site, $this->headers);
-
-            // Return the size of the response body.
-            $htmlSize = strlen($res->getBody()->getContents());
-            $htmlFootprint = md5($res->getBody()->getContents());
-            return array($htmlFootprint, $htmlSize, $res->getStatusCode());
-        } catch (Exception $exception) {
-            echo "Unrecoverable Exception happened in $site" . PHP_EOL;
-
-            return array('', 500);
-        }
-
-    }
-
 }
 

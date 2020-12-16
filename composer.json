@@ -3,14 +3,16 @@
         "guzzlehttp/guzzle": "^7.2",
         "amphp/parallel": "^1.4",
         "php": ">=7.4",
-        "symfony/console": "^5.2"
+        "symfony/console": "^5.2",
+        "ext-sqlite3": "*",
+        "twig/twig": "^3.1"
     },
     "autoload": {
         "classmap": [
             "src"
         ],
         "psr-4": {
-            "Command\\": "src/Command"
+            "ScraperBot\\": "src/ScraperBot"
         }
     }
 }

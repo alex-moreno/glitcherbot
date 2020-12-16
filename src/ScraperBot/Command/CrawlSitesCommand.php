@@ -1,10 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace Command;
+namespace ScraperBot\Command;
 
 use GuzzleHttp\Client;
-use ScrapperBot\Crawler;use Symfony\Component\Console\Command\Command;
+use ScraperBot\Crawler;
+use ScraperBot\CsvManager;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -16,6 +18,12 @@ use Symfony\Component\Console\Output\OutputInterface;
  * @package Command
  */
 class CrawlSitesCommand extends Command {
+
+    /**
+     * PDO instance
+     * @var type
+     */
+    private $pdo;
 
     protected static $defaultName = 'bot:crawl-sites';
 
@@ -38,7 +46,7 @@ class CrawlSitesCommand extends Command {
         $this->output = $output;
 
         $sitesinCSV = $this->getFilePath($input);
-        $destination = $input->getOption('destination_folder');
+        // $destination = $input->getOption('destination_folder');
         $use_base_uri = $input->getOption('use_base_uri');
 
         $default_config = ['defaults' => [
@@ -62,7 +70,7 @@ class CrawlSitesCommand extends Command {
 
         $site_list = $this->getSiteList($sitesinCSV);
 
-        $crawler = new Crawler($headers);
+        $crawler = new Crawler(new \ScraperBot\Storage\SqlLite3Storage(), $headers);
         $output->writeln('Starting crawling. Date: ' . date('l jS \of F Y h:i:s A'), OutputInterface::VERBOSITY_VERBOSE);
 
         // Unless configured, do not ask the crawler to use a base URI.
@@ -70,7 +78,7 @@ class CrawlSitesCommand extends Command {
             $default_config = NULL;
         }
 
-        $crawler->crawlSites($site_list, $client, $default_config);
+        $crawler->crawlSites($site_list, $client, $default_config, time());
         $output->writeln('Crawling finished. Date: ' . date('l jS \of F Y h:i:s A'), OutputInterface::VERBOSITY_VERBOSE);
 
         return Command::SUCCESS;
@@ -88,7 +96,7 @@ class CrawlSitesCommand extends Command {
      * @param $file
      */
     protected function getSiteList($file) {
-        $csvManager = new \csvManager();
+        $csvManager = new CsvManager();
         $listOfSites = $csvManager->readCsv($file);
 
         $listOfSites = array_map(
