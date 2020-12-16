@@ -81,4 +81,3 @@ $twig = new \Twig\Environment($loader);
 $template = $twig->load('results.twig');
 echo $template->render(['headers' => $headers, 'rows' => $rows]);
 
-print_r($rows);
