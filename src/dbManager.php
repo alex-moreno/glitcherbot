@@ -42,10 +42,25 @@ class dbManager {
      * @return mixed
      */
     public function getTimeStamps() {
-        $queryString = sprintf("SELECT * FROM sites group by timestamp ");
+        $queryString = sprintf("SELECT * FROM sites group by timestamp");
         $query = $this->pdo->query($queryString);
         while ($row = $query->fetchArray()) {
             $results[] = $row['timestamp'];
+        }
+
+        return $results;
+    }
+
+    /**
+     * Get different crawls
+     *
+     * @return mixed
+     */
+    public function getStatusCodes() {
+        $queryString = sprintf("SELECT statusCode FROM sites group by StatusCode");
+        $query = $this->pdo->query($queryString);
+        while ($row = $query->fetchArray()) {
+            $results[] = $row['statusCode'];
         }
 
         return $results;
@@ -66,4 +81,25 @@ class dbManager {
 
         return $results;
     }
+
+    /**
+     * Get different crawls
+     *
+     * @return mixed
+     */
+    public function getStatsByStatus($statusCode) {
+
+        $timeStamps = $this->getTimeStamps();
+        foreach ($timeStamps as $timeStamp) {
+            $queryString = sprintf("SELECT COUNT(*) as count FROM sites WHERE timestamp = '%s' AND statusCode = '%d'", $timeStamp, $statusCode);
+            $rows = $this->pdo->query($queryString);
+            $row = $rows->fetchArray();
+
+            $numRows[$timeStamp] = $row['count'];
+        }
+
+        return $numRows;
+    }
+
+
 }
