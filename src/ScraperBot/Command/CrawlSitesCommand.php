@@ -6,6 +6,7 @@ namespace ScraperBot\Command;
 use GuzzleHttp\Client;
 use ScraperBot\Crawler;
 use ScraperBot\CsvManager;
+use ScraperBot\Source\CsvSource;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -18,12 +19,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  * @package Command
  */
 class CrawlSitesCommand extends Command {
-
-    /**
-     * PDO instance
-     * @var type
-     */
-    private $pdo;
 
     protected static $defaultName = 'bot:crawl-sites';
 
@@ -44,8 +39,6 @@ class CrawlSitesCommand extends Command {
      */
     protected function execute(InputInterface $input, OutputInterface $output) {
         $this->output = $output;
-
-        $sitesinCSV = $this->getFilePath($input);
         // $destination = $input->getOption('destination_folder');
         $use_base_uri = $input->getOption('use_base_uri');
 
@@ -63,12 +56,8 @@ class CrawlSitesCommand extends Command {
         }
 
         $output->writeln("Using config file: " . $config_file, OutputInterface::VERBOSITY_VERBOSE);
-
         $headers = include('config.php');
-
         $output->writeln("Using headers: " . print_r($headers, TRUE), OutputInterface::VERBOSITY_DEBUG);
-
-        $site_list = $this->getSiteList($sitesinCSV);
 
         $crawler = new Crawler(new \ScraperBot\Storage\SqlLite3Storage(), $headers);
         $output->writeln('Starting crawling. Date: ' . date('l jS \of F Y h:i:s A'), OutputInterface::VERBOSITY_VERBOSE);
@@ -78,34 +67,17 @@ class CrawlSitesCommand extends Command {
             $default_config = NULL;
         }
 
-        $crawler->crawlSites($site_list, $client, $default_config, time());
+        $source = $this->getSource($input);
+        $crawler->crawlSites($source, $client, $default_config);
         $output->writeln('Crawling finished. Date: ' . date('l jS \of F Y h:i:s A'), OutputInterface::VERBOSITY_VERBOSE);
 
         return Command::SUCCESS;
     }
 
     /**
-     * @param InputInterface $input
-     * @return string|string[]|null
+     * @inheritDoc
      */
-    protected function getFilePath(InputInterface $input) {
-        return $input->getArgument('sites_csv_file');
-    }
-
-    /**
-     * @param $file
-     */
-    protected function getSiteList($file) {
-        $csvManager = new CsvManager();
-        $listOfSites = $csvManager->readCsv($file);
-
-        $listOfSites = array_map(
-            function($entry) {
-                return empty($entry[0]) ? '' : $entry[0];
-            },
-            $listOfSites
-        );
-
-        return $listOfSites;
+    protected function getSource(InputInterface $input) {
+        return new CsvSource($input->getArgument('sites_csv_file'));
     }
 }

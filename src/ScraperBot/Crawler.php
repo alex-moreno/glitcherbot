@@ -8,6 +8,7 @@ require 'vendor/autoload.php';
 use GuzzleHttp\Client;
 use GuzzleHttp\Promise\EachPromise;
 use GuzzleHttp\Psr7\Response;
+use ScraperBot\Source\SourceInterface;
 use ScraperBot\Storage\StorageInterface;
 
 class Crawler {
@@ -30,15 +31,17 @@ class Crawler {
      * @param $client
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function crawlSites($listOfSites, Client $client, $default_config = NULL, $timestamp) {
+    public function crawlSites(SourceInterface $source, Client $client, $default_config = NULL) {
+        $urls = $source->getLinks();
+
         // Preparing file to be written.
         $csvManager = new CsvManager();
         $fileToWrite = date('dmY-His') . '-output.csv';
 
-        $promises = (function () use ($listOfSites, $client, $default_config) {
-            foreach ($listOfSites as $site) {
-                $url = $site;
+        $timestamp = time();
 
+        $promises = (function () use ($urls, $client, $default_config) {
+            foreach ($urls as $url) {
                 // don't forget using generator
                 echo PHP_EOL . 'querying: ' . $url;
 
@@ -50,7 +53,6 @@ class Crawler {
                 }
 
                 yield $client->getAsync($url, $this->headers);
-
             }
         })();
 
