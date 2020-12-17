@@ -6,13 +6,20 @@
 <body>
     {% include 'menu.twig' %}
     <div class="container-fluid">
-        <h1>Status codes by date and time of crawl</h1>
+        <h1>Crawl diffs</h1>
         <table class="table table-striped" style="text-align:center">
             <thead class="thead-dark">
                 <tr>
-                    <th>Site/Error code</th>
+                    <th>Site ID</th>
                     {% for header in headers %}
-                    <th style="text-align:center" colspan="1">{{ header }}</th>
+                    <th style="text-align:center" colspan="2">{{ header|date }}</th>
+                    {%  endfor %}
+                </tr>
+                <tr>
+                    <th></th>
+                    {% for header in headers %}
+                        <th>Size</th>
+                        <th>Status Code</th>
                     {%  endfor %}
                 </tr>
             </thead>
@@ -20,18 +27,21 @@
             {%  for key, row in rows %}
             <tr>
                 <td style="text-align:center">
-                    {{ key|date }}
+                    {{ key }}
                 </td>
-
                 {%  for column in row %}
-                <td style="text-align:center">
-                    {{ column }}
+                {%  for rowdata in column %}
+                <td>
+                    {{ rowdata }}
                 </td>
+                {% endfor %}
                 {% endfor %}
             </tr>
             {% endfor %}
         </table>
     </div>
+
+    <b>Results found: {{ rows|length }} - Tolerance: {{  tolerance }}</b>
 
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
