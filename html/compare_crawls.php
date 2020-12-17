@@ -10,7 +10,7 @@ $crawls = $resultsStorage->getTimeStamps();
 $rows = [];
 $headers = [];
 $index = 0;
-$tolerance = 100;
+$tolerance = 1000;
 
 if (isset($_GET['tolerance'])) {
     $tolerance = $_GET['tolerance'];

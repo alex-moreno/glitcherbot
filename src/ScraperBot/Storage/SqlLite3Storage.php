@@ -99,7 +99,7 @@ class SqlLite3Storage implements StorageInterface {
      * @param $timestamp1
      * @param $timestamp2
      */
-    public function getCrawlDiffs($timestamp1, $timestamp2, $tolerance = 100) {
+    public function getCrawlDiffs($timestamp1, $timestamp2, $tolerance = 1000) {
         $queryString = sprintf("SELECT DISTINCT * FROM sites WHERE timestamp = '%s' order by site_id", $timestamp1);
         $results1 = $this->pdo->query($queryString);
 
