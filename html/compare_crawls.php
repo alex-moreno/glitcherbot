@@ -1,7 +1,6 @@
 <?php
 
 require_once __DIR__.'/../vendor/autoload.php';
-use Symfony\Component\HttpFoundation\Request;
 
 
 $resultsStorage = new \ScraperBot\Storage\SqlLite3Storage('../railerdb.sqlite3');
