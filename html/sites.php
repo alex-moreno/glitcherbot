@@ -9,6 +9,9 @@ $rows = [];
 $headers = [];
 $index = 0;
 
+// We just use the last two crawls.
+$naugthySites = $resultsStorage->getCrawlDiffs($crawls[0], end($crawls), 1000);
+
 // Iterate over the results, preparing columns and rows for the twig template.
 foreach ($crawls as $timestamp) {
     // Get site crawl results for each timestamp.
@@ -20,13 +23,17 @@ foreach ($crawls as $timestamp) {
     foreach ($resultsByTimestamp as $listOfSites) {
         foreach ($listOfSites as $site) {
             $site_id = $site['site_id'];
+            if (isset($naugthySites[$site_id])) {
+                $site['naugthy'] = 'naugthy';
+            }
 
             // Initialise the row for the site if it's empty.
             if (empty($rows[$site_id][$index])) {
                 $rows[$site_id][$index] = [];
             }
 
-            array_push($rows[$site_id][$index], $site['size'], $site['statusCode']);
+            array_push($rows[$site_id][$index], $site['size'], $site['statusCode'],$site['naugthy']);
+
         }
     }
 
@@ -47,6 +54,8 @@ foreach ($rows as $site_id => $row) {
 // Specify our Twig templates location
 $loader = new \Twig\Loader\FilesystemLoader(__DIR__.'/../src/templates');
 // Instantiate our Twig
-$twig = new \Twig\Environment($loader);
+$twig = new \Twig\Environment($loader, ['debug' => true]);
+$twig->addExtension(new \Twig\Extension\DebugExtension());
+
 $template = $twig->load('results.twig');
 echo $template->render(['headers' => $headers, 'rows' => $rows]);

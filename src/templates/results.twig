@@ -30,11 +30,15 @@
                     {{ key }}
                 </td>
                 {%  for column in row %}
-                {%  for rowdata in column %}
-                <td>
-                    {{ rowdata }}
-                </td>
-                {% endfor %}
+{#                {%  for rowdata in column %}#}
+                    <td {% if column.2 %}class="table-danger"{% endif %}>
+{#                        {{ dump(column) }}#}
+                        {{ column.0 }}
+                    </td>
+                    <td {% if column.2 %}class="table-danger"{% endif %}>
+                        {{ column.1 }}
+                    </td>
+{#                {% endfor %}#}
                 {% endfor %}
             </tr>
             {% endfor %}
