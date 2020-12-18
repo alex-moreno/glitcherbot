@@ -9,8 +9,14 @@ $rows = [];
 $headers = [];
 $index = 0;
 
+$tolerance = 1000;
+if (isset($_GET['tolerance'])) {
+    $tolerance = $_GET['tolerance'];
+}
+
 // We just use the last two crawls.
-$naugthySites = $resultsStorage->getCrawlDiffs($crawls[0], end($crawls), 1000);
+$lastElem = array_key_last($crawls);
+$naughtySites = $resultsStorage->getCrawlDiffs($crawls[$lastElem-1], $crawls[$lastElem], $tolerance);
 
 // Iterate over the results, preparing columns and rows for the twig template.
 foreach ($crawls as $timestamp) {
@@ -23,8 +29,8 @@ foreach ($crawls as $timestamp) {
     foreach ($resultsByTimestamp as $listOfSites) {
         foreach ($listOfSites as $site) {
             $site_id = $site['site_id'];
-            if (isset($naugthySites[$site_id])) {
-                $site['naugthy'] = 'naugthy';
+            if (isset($naughtySites[$site_id])) {
+                $site['naughty'] = 'naughty';
             }
 
             // Initialise the row for the site if it's empty.
@@ -32,7 +38,7 @@ foreach ($crawls as $timestamp) {
                 $rows[$site_id][$index] = [];
             }
 
-            array_push($rows[$site_id][$index], $site['size'], $site['statusCode'],$site['naugthy']);
+            array_push($rows[$site_id][$index], $site['size'], $site['statusCode'],$site['naughty']);
 
         }
     }
@@ -54,8 +60,6 @@ foreach ($rows as $site_id => $row) {
 // Specify our Twig templates location
 $loader = new \Twig\Loader\FilesystemLoader(__DIR__.'/../src/templates');
 // Instantiate our Twig
-$twig = new \Twig\Environment($loader, ['debug' => true]);
-$twig->addExtension(new \Twig\Extension\DebugExtension());
-
+$twig = new \Twig\Environment($loader);
 $template = $twig->load('results.twig');
 echo $template->render(['headers' => $headers, 'rows' => $rows]);
