@@ -15,9 +15,9 @@ if (isset($_GET['tolerance'])) {
     $tolerance = $_GET['tolerance'];
 }
 
-// TODO: fix to latest two crawls.
-// TODO: add a form to select crawls.
-$rows = $resultsStorage->getCrawlDiffs($crawls[0], $crawls[1], $tolerance);
+// TODO: add a form to select crawls to compare.
+$lastElem = array_key_last($crawls);
+$rows = $resultsStorage->getCrawlDiffs($crawls[$lastElem-1], $crawls[$lastElem], $tolerance);
 
 // Iterate over the results, preparing columns and rows for the twig template.
 foreach ($crawls as $timestamp) {
