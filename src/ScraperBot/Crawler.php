@@ -80,7 +80,7 @@ class Crawler {
                     $timestamp
                 );
             },
-            'rejected' => function ($reason, $index, $promise) use ($csvManager, $fileToWrite) {
+            'rejected' => function ($reason, $index, $promise) use ($csvManager, $fileToWrite, $timestamp) {
                 // Handle promise rejected here (ie: not existing domains, long timeouts or too many redirects).
                 echo 'rejected: ' . $reason;
 
@@ -89,6 +89,14 @@ class Crawler {
                 $siteCrawled['statusCode'] = 'rejected';
                 $siteCrawled['size'] = $siteCrawled['footprint'] = 0;
                 $csvManager->writeCsvLine(array($index, 'rejected',0, 0),$fileToWrite);
+                $this->storage->addResult(
+                    $index,
+                    $index,
+                    0,
+                    0,
+                    0,
+                    $timestamp
+                );
             }
         ]);
 

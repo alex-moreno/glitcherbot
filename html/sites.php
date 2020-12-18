@@ -9,7 +9,6 @@ $rows = [];
 $headers = [];
 $index = 0;
 
-
 // Iterate over the results, preparing columns and rows for the twig template.
 foreach ($crawls as $timestamp) {
     // Get site crawl results for each timestamp.
@@ -51,4 +50,3 @@ $loader = new \Twig\Loader\FilesystemLoader(__DIR__.'/../src/templates');
 $twig = new \Twig\Environment($loader);
 $template = $twig->load('results.twig');
 echo $template->render(['headers' => $headers, 'rows' => $rows]);
-

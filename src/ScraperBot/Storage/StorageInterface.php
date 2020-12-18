@@ -8,5 +8,6 @@ interface StorageInterface {
     public function getResults();
     public function getTimeStamps();
     public function getResultsbyTimestamp($timestamp);
-
+    public function getCrawlDiffs($timestamp1, $timestamp2);
+    public function getStatsByStatus($statusCode);
 }
