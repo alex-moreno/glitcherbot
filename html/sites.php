@@ -64,4 +64,4 @@ $loader = new \Twig\Loader\FilesystemLoader(__DIR__.'/../src/templates');
 // Instantiate our Twig
 $twig = new \Twig\Environment($loader);
 $template = $twig->load('results.twig');
-echo $template->render(['headers' => $headers, 'rows' => $rows]);
+echo $template->render(['headers' => $headers, 'rows' => $rows, 'tolerance' => $tolerance]);
