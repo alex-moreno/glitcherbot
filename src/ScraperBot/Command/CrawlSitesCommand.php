@@ -68,7 +68,8 @@ class CrawlSitesCommand extends Command {
         }
 
         $source = $this->getSource($input);
-        $crawler->crawlSites($source, $client, $default_config);
+        //$crawler->crawlSites($source, $client, $default_config);
+        $crawler->crawlSiteMaps($source, $client, $default_config);
         $output->writeln('Crawling finished. Date: ' . date('l jS \of F Y h:i:s A'), OutputInterface::VERBOSITY_VERBOSE);
 
         return Command::SUCCESS;
