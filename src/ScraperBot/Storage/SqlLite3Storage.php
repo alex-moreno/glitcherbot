@@ -4,6 +4,8 @@ namespace ScraperBot\Storage;
 
 class SqlLite3Storage implements StorageInterface {
 
+    private $pdo;
+
     /**
      * ResultsService constructor.
      * @param string $db
@@ -11,6 +13,7 @@ class SqlLite3Storage implements StorageInterface {
     public function __construct($db = 'railerdb.sqlite3') {
         $this->pdo = new \SQLite3($db);
 
+        echo 'creating table';
         $this->pdo->query("CREATE TABLE IF NOT EXISTS sites (
                             timestamp NOT NULL,
                             site_id INTEGER,
@@ -19,6 +22,14 @@ class SqlLite3Storage implements StorageInterface {
                             statusCode INTEGER,
                             footprint TEXT
        );");
+
+        echo 'creating table2';
+        $this->pdo->query("CREATE TABLE IF NOT EXISTS sitemapURLs (
+                            timestamp NOT NULL,
+                            site_id INTEGER,
+                            url TEXT NOT NULL
+       );");
+
     }
 
     /**
@@ -149,4 +160,20 @@ class SqlLite3Storage implements StorageInterface {
         return $numRows;
     }
 
+    public function addTemporaryURL($url, $index, $timestamp)
+    {
+        // TODO: Implement addTemporaryURL() method.
+        $query = sprintf("INSERT INTO sitemapURLs (timestamp, url, site_id) VALUES(%d,%d,\"%s\")", $timestamp, $index, $url);
+        $this->pdo->query($query);
+    }
+
+    public function getTemporaryURLs() {
+        $queryString = sprintf("SELECT * FROM sitemapURLs ");
+        $query = $this->pdo->query($queryString);
+        while ($row = $query->fetchArray()) {
+            $results[] = $row;
+        }
+
+        return $results;
+    }
 }

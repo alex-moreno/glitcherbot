@@ -1,13 +1,12 @@
 <?php
 
-
 namespace ScraperBot\Source;
-
 
 use ScraperBot\CsvManager;
 
 class CsvSource implements SourceInterface {
 
+    private $listOfSites = NULL;
 
     /**
      * CsvSource constructor.
@@ -29,7 +28,21 @@ class CsvSource implements SourceInterface {
             $listOfSites
         );
 
+        $this->listOfSites = $listOfSites;
+
         return $listOfSites;
     }
 
+    public function addLink($url) {
+        $this->listOfSites[] = $url;
+    }
+
+    public function readLinks() {
+        return $this->listOfSites;
+    }
+
+
+    public function getCurrentIndex() {
+        return sizeof($this->listOfSites);
+    }
 }

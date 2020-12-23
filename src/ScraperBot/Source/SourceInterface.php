@@ -6,4 +6,5 @@ interface SourceInterface {
 
     public function getLinks();
 
+    public function addLink($url);
 }
