@@ -1,8 +1,6 @@
 <?php
 
-
 namespace ScraperBot\Source;
-
 
 class SitesJsonSource implements SourceInterface {
     /**
@@ -20,6 +18,11 @@ class SitesJsonSource implements SourceInterface {
 
         $data = json_decode($json, TRUE);
         return empty($data['sites']) ? [] : array_keys($data['sites']);
+    }
+
+    public function addLink($url)
+    {
+        // TODO: Implement addLink() method.
     }
 
 }

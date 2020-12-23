@@ -7,6 +7,7 @@ use GuzzleHttp\Client;
 use ScraperBot\Crawler;
 use ScraperBot\CsvManager;
 use ScraperBot\Source\CsvSource;
+use ScraperBot\Source\XmlSitemapSource;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -68,8 +69,24 @@ class CrawlSitesCommand extends Command {
         }
 
         $source = $this->getSource($input);
-        //$crawler->crawlSites($source, $client, $default_config);
-        $crawler->crawlSiteMaps($source, $client, $default_config);
+
+        $timestamp = time();
+        $crawler->crawlSites($source, $client, $default_config, $timestamp);
+        $crawler->crawlSiteMaps($source, $client, $default_config, $timestamp, $source->getCurrentIndex());
+//        $sitemapsSource = new XMLSitemapSource($sitemapURLs);
+        $sitemapURLs = $crawler->getListPendingSitemaps();
+        $sourceSitemap = new XmlSitemapSource($sitemapURLs);
+
+        // Crawl the sitemaps.
+        echo 'sourcejer::::';
+        $crawler->crawlSiteMaps($sourceSitemap, $client, $default_config, $timestamp, $source->getCurrentIndex());
+
+//        print_r($sourceSitemap);
+
+        echo 'testing when this finishes:: ';
+
+        //        $crawler->crawlSites($sitemapsSource, $client, $default_config, $timestamp);
+
         $output->writeln('Crawling finished. Date: ' . date('l jS \of F Y h:i:s A'), OutputInterface::VERBOSITY_VERBOSE);
 
         return Command::SUCCESS;
