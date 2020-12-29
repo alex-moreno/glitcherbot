@@ -15,8 +15,10 @@ if (isset($_GET['tolerance'])) {
 }
 
 // We just use the last two crawls.
-$lastElem = array_key_last($crawls);
-$naughtySites = $resultsStorage->getCrawlDiffs($crawls[$lastElem-1], $crawls[$lastElem], $tolerance);
+if (sizeof($crawls) > 1) {
+    $lastElem = array_key_last($crawls);
+    $naughtySites = $resultsStorage->getCrawlDiffs($crawls[$lastElem-1], $crawls[$lastElem], $tolerance);
+}
 
 // Iterate over the results, preparing columns and rows for the twig template.
 foreach ($crawls as $timestamp) {
@@ -29,7 +31,7 @@ foreach ($crawls as $timestamp) {
     foreach ($resultsByTimestamp as $listOfSites) {
         foreach ($listOfSites as $site) {
             $site_id = $site['site_id'];
-            if (isset($naughtySites[$site_id])) {
+            if (isset($naughtySites[$site_id]) && sizeof($crawls) > 1) {
                 $site['naughty'] = 'naughty';
             }
 
@@ -62,4 +64,4 @@ $loader = new \Twig\Loader\FilesystemLoader(__DIR__.'/../src/templates');
 // Instantiate our Twig
 $twig = new \Twig\Environment($loader);
 $template = $twig->load('results.twig');
-echo $template->render(['headers' => $headers, 'rows' => $rows]);
+echo $template->render(['headers' => $headers, 'rows' => $rows, 'tolerance' => $tolerance]);
