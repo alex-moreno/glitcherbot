@@ -148,9 +148,6 @@ class Crawler
         // First read the robots, so we can find the sitemap (if any)
         $urls = $source->getLinks();
 
-        echo 'urls:::';
-        print_r($urls);
-
         $promises = (function () use ($urls, $client, $default_config, $offIndex) {
             foreach ($urls as $url) {
                 echo 'idexing:: ' . $url;

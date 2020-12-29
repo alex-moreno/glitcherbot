@@ -122,13 +122,12 @@ class SqlLite3Storage implements StorageInterface {
             $index++;
         }
 
-        print_r($listofSites1);
-        echo '<br><br>';
         $index2 = 1;
         while ($row2 = $results2->fetchArray()) {
+            // url == $row2[2].
             $listofSites2[$row2[2]] = $row2;
             $diff = abs($listofSites1[$index2]['size'] - $row2['size']);
-            if (($diff > $tolerance && $diff > 0) || ($listofSites1[$row2[2]]['statusCode'] != $row2['statusCode'])) {
+            if (($diff > $tolerance && $diff > 0) || ($listofSites1[$index2]['statusCode'] != $row2['statusCode'])) {
                 $naughtySite[$index2]['size1'][$index2] = $listofSites1[$index2]['size'];
                 $naughtySite[$index2]['statusCode1'][$index2] = $listofSites1[$index2]['statusCode'];
                 $naughtySite[$index2]['url1'][$index2] = $listofSites1[$index2]['url'];
@@ -139,7 +138,6 @@ class SqlLite3Storage implements StorageInterface {
             }
             $index2++;
         }
-        print_r($listofSites2);
 
         return $naughtySite;
     }
