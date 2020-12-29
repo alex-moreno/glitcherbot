@@ -13,7 +13,6 @@ class SqlLite3Storage implements StorageInterface {
     public function __construct($db = 'railerdb.sqlite3') {
         $this->pdo = new \SQLite3($db);
 
-        echo 'creating table';
         $this->pdo->query("CREATE TABLE IF NOT EXISTS sites (
                             timestamp NOT NULL,
                             site_id INTEGER,
@@ -23,7 +22,6 @@ class SqlLite3Storage implements StorageInterface {
                             footprint TEXT
        );");
 
-        echo 'creating table2';
         $this->pdo->query("CREATE TABLE IF NOT EXISTS sitemapURLs (
                             timestamp NOT NULL,
                             site_id INTEGER,
@@ -40,7 +38,7 @@ class SqlLite3Storage implements StorageInterface {
      */
     public function addResult($site_id, $site_url, $size, $status_code, $footprint, $timestamp) {
         date('dmY-His');
-        $query = sprintf("INSERT INTO sites (site_id,url, size, statusCode, footprint, timestamp) VALUES(%d,%d,%d,%d,\"%s\",\"%s\")",
+        $query = sprintf("INSERT INTO sites (site_id, url, size, statusCode, footprint, timestamp) VALUES(%d,\"%s\",%d,%d,\"%s\",\"%s\")",
             $site_id, $site_url, $size, $status_code, $footprint, $timestamp);
         $this->pdo->query($query);
     }
@@ -124,19 +122,24 @@ class SqlLite3Storage implements StorageInterface {
             $index++;
         }
 
+        print_r($listofSites1);
+        echo '<br><br>';
         $index2 = 1;
         while ($row2 = $results2->fetchArray()) {
-            $listofSites2[$index2] = $row2;
+            $listofSites2[$row2[2]] = $row2;
             $diff = abs($listofSites1[$index2]['size'] - $row2['size']);
-            if (($diff > $tolerance && $diff > 0) || ($listofSites1[$index2]['statusCode'] != $row2['statusCode'])) {
+            if (($diff > $tolerance && $diff > 0) || ($listofSites1[$row2[2]]['statusCode'] != $row2['statusCode'])) {
                 $naughtySite[$index2]['size1'][$index2] = $listofSites1[$index2]['size'];
                 $naughtySite[$index2]['statusCode1'][$index2] = $listofSites1[$index2]['statusCode'];
+                $naughtySite[$index2]['url1'][$index2] = $listofSites1[$index2]['url'];
 
-                $naughtySite[$index2]['size2'][$index2] = $row2['size'];
-                $naughtySite[$index2]['statusCode2'][$index2] = $row2['statusCode'];
+                $naughtySite[$index2]['size2'][$row2[2]] = $row2['size'];
+                $naughtySite[$index2]['statusCode2'][$row2[2]] = $row2['statusCode'];
+                $naughtySite[$index2]['url2'][$index2] = $listofSites1[$index2]['url'];
             }
             $index2++;
         }
+        print_r($listofSites2);
 
         return $naughtySite;
     }

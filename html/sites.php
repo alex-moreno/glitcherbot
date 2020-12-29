@@ -39,8 +39,7 @@ foreach ($crawls as $timestamp) {
             if (empty($rows[$site_id][$index])) {
                 $rows[$site_id][$index] = [];
             }
-
-            array_push($rows[$site_id][$index], $site['size'], $site['statusCode'],$site['naughty']);
+            array_push($rows[$site_id][$index], $site['size'], $site['statusCode'], $site['naughty'], $site['url']);
 
         }
     }

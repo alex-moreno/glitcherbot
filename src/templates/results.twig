@@ -17,12 +17,13 @@
                 <tr>
                     <th>Site ID</th>
                     {% for header in headers %}
-                    <th style="text-align:center" colspan="2">{{ header|date }}</th>
+                    <th style="text-align:center" colspan="3">{{ header|date }}</th>
                     {%  endfor %}
                 </tr>
                 <tr>
                     <th></th>
                     {% for header in headers %}
+                        <th>url</th>
                         <th>Size</th>
                         <th>Status Code</th>
                     {%  endfor %}
@@ -35,6 +36,9 @@
                     {{ key }}
                 </td>
                 {%  for column in row %}
+                    <td {% if column.2 %}class="table-danger"{% endif %}>
+                        <a href="http://{{ column.3 }}" target="_blank">{{ column.3 }}</a>
+                    </td>
                     <td {% if column.2 %}class="table-danger"{% endif %}>
                         {{ column.0 }}
                     </td>

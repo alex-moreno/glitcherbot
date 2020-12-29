@@ -14,7 +14,7 @@
                 <tr>
                     <th>Site ID</th>
                     {% for header in headers %}
-                    <th style="text-align:center" colspan="2">{{ header|date }}</th>
+                    <th style="text-align:center" colspan="3">{{ header|date }}</th>
                     {%  endfor %}
                 </tr>
                 <tr>
@@ -22,6 +22,7 @@
                     {% for header in headers %}
                         <th>Size</th>
                         <th>Status Code</th>
+                        <th>url</th>
                     {%  endfor %}
                 </tr>
             </thead>
