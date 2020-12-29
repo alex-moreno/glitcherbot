@@ -71,6 +71,7 @@ class Crawler
             'fulfilled' => function (Response $response, $index) use ($csvManager, $fileToWrite, $timestamp, $urls) {
                 echo PHP_EOL . 'Code: ' . $response->getStatusCode();
                 echo ' index: ' . ($index + 1);
+                echo 'crawoling::: ' . $urls[$index];
 
                 $siteCrawled = array();
                 $siteCrawled['site_id'] = ($index + 1);
