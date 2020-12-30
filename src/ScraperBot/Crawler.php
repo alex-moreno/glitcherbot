@@ -51,7 +51,7 @@ class Crawler
         $promises = (function () use ($urls, $client, $default_config) {
             foreach ($urls as $url) {
                 if (!empty($url)) {
-//                    echo PHP_EOL . 'querying: ' . $url;
+                    echo PHP_EOL . 'querying: ' . $url;
 
                     // If default config is provided, create a new client each time.
                     if ($default_config != NULL) {
@@ -124,7 +124,7 @@ class Crawler
      */
     public function crawlSiteMaps(SourceInterface $source, Client $client, $default_config = NULL, $timestamp = NULL, $offIndex = 0)
     {
-        echo 'Sitemaps crawling>>>> ';
+        echo PHP_EOL . 'Sitemaps crawling>>>> ';
 
         $this->offIndex = $offIndex;
 
@@ -150,8 +150,6 @@ class Crawler
 
         $promises = (function () use ($urls, $client, $default_config, $offIndex) {
             foreach ($urls as $url) {
-//                echo PHP_EOL . 'indexing sitemaps:: ' . $url;
-
                 // If default config is provided, create a new client each time.
                 if ($default_config != NULL) {
                     $config = $default_config + ['base_uri' => 'http://' . $url];
@@ -189,8 +187,12 @@ class Crawler
         $eachPromise->promise()->wait();
     }
 
-    public function getListPendingSitemaps() {
-        return $this->storage->getSitemapURLs();
+    public function getListPendingSitemaps($dumpCurrent = TRUE) {
+        return $this->storage->getSitemapURLs($dumpCurrent);
+    }
+
+    public function getListPendingURL($dumpCurrent = TRUE) {
+        return $this->storage->getPendingURLs($dumpCurrent);
     }
 
     /**
@@ -208,7 +210,7 @@ class Crawler
 
         $promises = (function () use ($urls, $client, $default_config, $offIndex) {
             foreach ($urls as $url) {
-                echo PHP_EOL . 'indexing url from sitemap:: ' . $url;
+                echo PHP_EOL . 'Found sitemap in:: ' . $url;
 
                 // If default config is provided, create a new client each time.
                 if ($default_config != NULL) {
@@ -226,14 +228,12 @@ class Crawler
             'concurrency' => $this->concurrency,
             'fulfilled' => function (Response $response, $index) use ($timestamp, $urls, $offIndex) {
                 // We want to follow Sitemap: urls.
-//                echo PHP_EOL . 'url:: . ' . $urls[$index];
                 // TODO: NEXT: CRAWL CONTENT OF THE SITEMAP AND INSERT IN THE TEMPORARY URLS:
 
                 $sourceSitemap = new XmlSitemapSource();
                 $links = $sourceSitemap->extractLinks($response->getBody()->getContents());
                 if(is_array($links)){
                     foreach ($links as $link) {
-                        echo 'pending::  ' . $link;
                         $this->storage->addPendingURL($link, $this->offIndex, $timestamp);
                         $this->offIndex++;
                     }

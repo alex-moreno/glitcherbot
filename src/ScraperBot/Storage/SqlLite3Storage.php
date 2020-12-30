@@ -174,7 +174,7 @@ class SqlLite3Storage implements StorageInterface {
         $this->pdo->query($query);
     }
 
-    public function getSitemapURLs() {
+    public function getSitemapURLs($dumpCurrent = FALSE) {
         $queryString = sprintf("SELECT * FROM sitemapURLs ");
         $query = $this->pdo->query($queryString);
 
@@ -182,8 +182,10 @@ class SqlLite3Storage implements StorageInterface {
             $results[] = $row;
         }
 
-        // Remove once has been accessed.
-        $this->dumpSitemaps();
+        if($dumpCurrent) {
+            // Remove once has been accessed.
+            $this->dumpSitemaps();
+        }
 
         return $results;
     }
@@ -200,15 +202,22 @@ class SqlLite3Storage implements StorageInterface {
         $this->pdo->query($query);
     }
 
-    public function getPendingURLs()
+    public function getPendingURLs($dumpCurrent = FALSE)
     {
         // TODO: Implement addTemporaryURL() method.
-        $query = sprintf("SELECT * FROM pendingURLs");
+        $queryString = sprintf("SELECT url FROM pendingURLs");
+        $query = $this->pdo->query($queryString);
 
-        // Remove once has been accessed.
-        $this->dumpPendingURLs();
+        while ($row = $query->fetchArray()) {
+            $results[] = $row['url'];
+        }
 
-        return $this->pdo->query($query);
+        if ($dumpCurrent) {
+            // Remove once has been accessed.
+            $this->dumpPendingURLs();
+        }
+
+        return $results;
     }
 
     public function dumpPendingURLs() {
