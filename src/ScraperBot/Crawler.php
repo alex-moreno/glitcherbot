@@ -51,7 +51,7 @@ class Crawler
         $promises = (function () use ($urls, $client, $default_config) {
             foreach ($urls as $url) {
                 if (!empty($url)) {
-                    echo PHP_EOL . 'querying: ' . $url;
+//                    echo PHP_EOL . 'querying: ' . $url;
 
                     // If default config is provided, create a new client each time.
                     if ($default_config != NULL) {
@@ -71,7 +71,7 @@ class Crawler
             'fulfilled' => function (Response $response, $index) use ($csvManager, $fileToWrite, $timestamp, $urls) {
                 echo PHP_EOL . 'Code: ' . $response->getStatusCode();
                 echo ' index: ' . ($index + 1);
-                echo 'crawoling::: ' . $urls[$index];
+                echo 'crawling::: ' . $urls[$index];
 
                 $siteCrawled = array();
                 $siteCrawled['site_id'] = ($index + 1);
@@ -150,7 +150,7 @@ class Crawler
 
         $promises = (function () use ($urls, $client, $default_config, $offIndex) {
             foreach ($urls as $url) {
-                echo 'indexing sitemap:: ' . $url;
+//                echo PHP_EOL . 'indexing sitemaps:: ' . $url;
 
                 // If default config is provided, create a new client each time.
                 if ($default_config != NULL) {
@@ -190,7 +190,7 @@ class Crawler
     }
 
     public function getListPendingSitemaps() {
-        return $this->storage->getTemporaryURLs();
+        return $this->storage->getSitemapURLs();
     }
 
     /**
@@ -206,12 +206,9 @@ class Crawler
         // First read the robots, so we can find the sitemap (if any)
         $urls = $source->getLinks();
 
-//        echo 'here';
-//        print_r($urls);
-
         $promises = (function () use ($urls, $client, $default_config, $offIndex) {
             foreach ($urls as $url) {
-                echo PHP_EOL . 'indexing sitemap:: ' . $url;
+                echo PHP_EOL . 'indexing url from sitemap:: ' . $url;
 
                 // If default config is provided, create a new client each time.
                 if ($default_config != NULL) {
@@ -229,14 +226,20 @@ class Crawler
             'concurrency' => $this->concurrency,
             'fulfilled' => function (Response $response, $index) use ($timestamp, $urls, $offIndex) {
                 // We want to follow Sitemap: urls.
-                echo PHP_EOL . 'url:: . ' . $urls[$index];
+//                echo PHP_EOL . 'url:: . ' . $urls[$index];
                 // TODO: NEXT: CRAWL CONTENT OF THE SITEMAP AND INSERT IN THE TEMPORARY URLS:
 
                 $sourceSitemap = new XmlSitemapSource();
                 $links = $sourceSitemap->extractLinks($response->getBody()->getContents());
-                foreach ($links as $link) {
-                    $this->storage->addTemporaryURL($link, $this->offIndex, $timestamp);
-                    $this->offIndex++;
+                if(is_array($links)){
+                    foreach ($links as $link) {
+                        echo 'pending::  ' . $link;
+                        $this->storage->addPendingURL($link, $this->offIndex, $timestamp);
+                        $this->offIndex++;
+                    }
+                }
+                else {
+                    echo 'not array';
                 }
             },
             'rejected' => function ($reason, $index, $promise) use ($timestamp, $urls) {
