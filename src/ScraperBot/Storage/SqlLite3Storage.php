@@ -123,30 +123,25 @@ class SqlLite3Storage implements StorageInterface {
 
         $listofSites1 = array();
 
-        print_r($results1);
+        while ($row = $results1->fetchArray()) {
+            $listofSites1[$row['url']] = $row;
+        }
 
-//        $index = 1;
-//        while ($row = $results1->fetchArray()) {
-//            $listofSites1[$index] = $row;
-//            $index++;
-//        }
+        while ($row2 = $results2->fetchArray()) {
+            $listofSites2[$row2[2]] = $row2;
+            $index2 = $row2['url'];
+            $diff = abs($listofSites1[$index2]['size'] - $row2['size']);
+            if (($diff > $tolerance && $diff > 0) || ($listofSites1[$index2]['statusCode'] != $row2['statusCode'])) {
+                echo 'nauthy';
+                $naughtySite[$index2]['size1'][$index2] = $listofSites1[$index2]['size'];
+                $naughtySite[$index2]['statusCode1'][$index2] = $listofSites1[$index2]['statusCode'];
+                $naughtySite[$index2]['url1'][$index2] = $listofSites1[$index2]['url'];
 
-//        $index2 = 1;
-//        while ($row2 = $results2->fetchArray()) {
-//            // url == $row2[2].
-//            $listofSites2[$row2[2]] = $row2;
-//            $diff = abs($listofSites1[$index2]['size'] - $row2['size']);
-//            if (($diff > $tolerance && $diff > 0) || ($listofSites1[$index2]['statusCode'] != $row2['statusCode'])) {
-//                $naughtySite[$index2]['size1'][$index2] = $listofSites1[$index2]['size'];
-//                $naughtySite[$index2]['statusCode1'][$index2] = $listofSites1[$index2]['statusCode'];
-//                $naughtySite[$index2]['url1'][$index2] = $listofSites1[$index2]['url'];
-//
-//                $naughtySite[$index2]['size2'][$row2[2]] = $row2['size'];
-//                $naughtySite[$index2]['statusCode2'][$row2[2]] = $row2['statusCode'];
-//                $naughtySite[$index2]['url2'][$index2] = $listofSites1[$index2]['url'];
-//            }
-//            $index2++;
-//        }
+                $naughtySite[$index2]['size2'][$row2[2]] = $row2['size'];
+                $naughtySite[$index2]['statusCode2'][$row2[2]] = $row2['statusCode'];
+                $naughtySite[$index2]['url2'][$index2] = $listofSites1[$index2]['url'];
+            }
+        }
 
         return $naughtySite;
     }
