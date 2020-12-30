@@ -124,7 +124,7 @@ class Crawler
      */
     public function crawlSiteMaps(SourceInterface $source, Client $client, $default_config = NULL, $timestamp = NULL, $offIndex = 0)
     {
-        echo 'calling here>>>> ';
+        echo 'Sitemaps crawling>>>> ';
 
         $this->offIndex = $offIndex;
 
@@ -150,7 +150,7 @@ class Crawler
 
         $promises = (function () use ($urls, $client, $default_config, $offIndex) {
             foreach ($urls as $url) {
-                echo 'idexing:: ' . $url;
+                echo 'indexing sitemap:: ' . $url;
 
                 // If default config is provided, create a new client each time.
                 if ($default_config != NULL) {
@@ -175,7 +175,7 @@ class Crawler
                         echo PHP_EOL . 'Storing sitemap: ' . $newurl . PHP_EOL;
                         echo 'offindex: ' . $this->offIndex . PHP_EOL;
                         // Store new links.
-                        $this->storage->addTemporaryURL($newurl, $this->offIndex, $timestamp);
+                        $this->storage->addSitemapURL($newurl, $this->offIndex, $timestamp);
                     }
                 }
 
@@ -191,5 +191,60 @@ class Crawler
 
     public function getListPendingSitemaps() {
         return $this->storage->getTemporaryURLs();
+    }
+
+    /**
+     * Trigger Crawl using threads.
+     *
+     * @param $urls
+     * @param $client
+     * @param $default_config
+     * @param $offIndex
+     * @param $timestamp
+     */
+    public function extractSitemaps($source, $client, $default_config, $timestamp, $offIndex) {
+        // First read the robots, so we can find the sitemap (if any)
+        $urls = $source->getLinks();
+
+//        echo 'here';
+//        print_r($urls);
+
+        $promises = (function () use ($urls, $client, $default_config, $offIndex) {
+            foreach ($urls as $url) {
+                echo PHP_EOL . 'indexing sitemap:: ' . $url;
+
+                // If default config is provided, create a new client each time.
+                if ($default_config != NULL) {
+                    $config = $default_config + ['base_uri' => 'http://' . $url];
+                    $url = '';
+                    $client = new Client($config);
+                }
+
+                yield $client->getAsync($url, $this->headers);
+            }
+        })();
+
+        $eachPromise = new EachPromise($promises, [
+            // Concurrency to use.
+            'concurrency' => $this->concurrency,
+            'fulfilled' => function (Response $response, $index) use ($timestamp, $urls, $offIndex) {
+                // We want to follow Sitemap: urls.
+                echo PHP_EOL . 'url:: . ' . $urls[$index];
+                // TODO: NEXT: CRAWL CONTENT OF THE SITEMAP AND INSERT IN THE TEMPORARY URLS:
+
+                $sourceSitemap = new XmlSitemapSource();
+                $links = $sourceSitemap->extractLinks($response->getBody()->getContents());
+                foreach ($links as $link) {
+                    $this->storage->addTemporaryURL($link, $this->offIndex, $timestamp);
+                    $this->offIndex++;
+                }
+            },
+            'rejected' => function ($reason, $index, $promise) use ($timestamp, $urls) {
+                // Handle promise rejected here (ie: not existing domains, long timeouts or too many redirects).
+                echo 'rejected: ' . $reason;
+            }
+        ]);
+
+        $eachPromise->promise()->wait();
     }
 }

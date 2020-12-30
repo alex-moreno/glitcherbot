@@ -71,15 +71,22 @@ class CrawlSitesCommand extends Command {
         $source = $this->getSource($input);
 
         $timestamp = time();
-        $crawler->crawlSites($source, $client, $default_config, $timestamp);
-        $crawler->crawlSiteMaps($source, $client, $default_config, $timestamp, $source->getCurrentIndex());
+//        $crawler->crawlSites($source, $client, $default_config, $timestamp);
+//        $crawler->crawlSiteMaps($source, $client, $default_config, $timestamp, $source->getCurrentIndex());
 //        $sitemapsSource = new XMLSitemapSource($sitemapURLs);
         $sitemapURLs = $crawler->getListPendingSitemaps();
         $sourceSitemap = new XmlSitemapSource($sitemapURLs);
 
         // Crawl the sitemaps.
-        echo 'sourcejer::::';
-        $crawler->crawlSiteMaps($sourceSitemap, $client, $default_config, $timestamp, $source->getCurrentIndex());
+//        echo 'sourcejer::::';
+//        print_r($sourceSitemap);
+        //$crawler->crawlSiteMaps($sourceSitemap, $client, $default_config, $timestamp, $source->getCurrentIndex());
+        $crawler->extractSitemaps($sourceSitemap, $client, $default_config, $timestamp, $source->getCurrentIndex());
+
+        // TODO:
+        // 1. FETCH LIST OF SITES IN THE SITEMAP IN $sourceSitemap, and store in pendingURLs.
+        // 2. Crawl all sites in pendingURLs.
+        // 3. adapt sites.php to list all urls included added pendingURLs.
 
 //        print_r($sourceSitemap);
 
