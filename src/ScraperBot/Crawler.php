@@ -51,8 +51,6 @@ class Crawler
         $promises = (function () use ($urls, $client, $default_config) {
             foreach ($urls as $url) {
                 if (!empty($url)) {
-                    echo PHP_EOL . 'querying: ' . $url;
-
                     // If default config is provided, create a new client each time.
                     if ($default_config != NULL) {
                         $config = $default_config + ['base_uri' => 'http://' . $url];
@@ -69,9 +67,9 @@ class Crawler
             // Concurrency to use.
             'concurrency' => $this->concurrency,
             'fulfilled' => function (Response $response, $index) use ($csvManager, $fileToWrite, $timestamp, $urls) {
-                echo PHP_EOL . 'Code: ' . $response->getStatusCode();
-                echo ' index: ' . ($index + 1);
-                echo 'crawling::: ' . $urls[$index];
+//                echo PHP_EOL . 'Code: ' . $response->getStatusCode();
+//                echo ' index: ' . ($index + 1);
+//                echo 'crawling::: ' . $urls[$index];
 
                 $siteCrawled = array();
                 $siteCrawled['site_id'] = ($index + 1);
@@ -170,8 +168,7 @@ class Crawler
                     if (strpos($line, 'Sitemap:') !== false) {
                         $this->offIndex++;
                         $newurl = trim(substr($line, strlen("Sitemap:"), strlen($line)));
-                        echo PHP_EOL . 'Storing sitemap: ' . $newurl . PHP_EOL;
-                        echo 'offindex: ' . $this->offIndex . PHP_EOL;
+
                         // Store new links.
                         $this->storage->addSitemapURL($newurl, $this->offIndex, $timestamp);
                     }
