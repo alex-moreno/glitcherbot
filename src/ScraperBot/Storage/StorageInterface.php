@@ -10,6 +10,8 @@ interface StorageInterface {
     public function getResultsbyTimestamp($timestamp);
     public function getCrawlDiffs($timestamp1, $timestamp2);
     public function getStatsByStatus($statusCode);
-    public function addTemporaryURL($url, $index, $timestamp);
-    public function getTemporaryURLs();
+    public function addSitemapURL($url, $index, $timestamp);
+    public function getSitemapURLs();
+    public function addPendingURL($url, $index, $timestamp);
+    public function getPendingURLs();
 }

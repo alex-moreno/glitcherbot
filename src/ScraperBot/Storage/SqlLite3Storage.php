@@ -174,20 +174,44 @@ class SqlLite3Storage implements StorageInterface {
         $this->pdo->query($query);
     }
 
-    public function addTemporaryURL($url, $index, $timestamp)
+    public function getSitemapURLs() {
+        $queryString = sprintf("SELECT * FROM sitemapURLs ");
+        $query = $this->pdo->query($queryString);
+
+        while ($row = $query->fetchArray()) {
+            $results[] = $row;
+        }
+
+        // Remove once has been accessed.
+        $this->dumpSitemaps();
+
+        return $results;
+    }
+
+    public function dumpSitemaps() {
+        $this->pdo->query("delete from sitemapURLs ");
+    }
+
+
+    public function addPendingURL($url, $index, $timestamp)
     {
         // TODO: Implement addTemporaryURL() method.
         $query = sprintf("INSERT INTO pendingURLs (timestamp, url, site_id) VALUES(%d,\"%s\",%d)", $timestamp, $url, $index);
         $this->pdo->query($query);
     }
 
-    public function getTemporaryURLs() {
-        $queryString = sprintf("SELECT * FROM sitemapURLs ");
-        $query = $this->pdo->query($queryString);
-        while ($row = $query->fetchArray()) {
-            $results[] = $row;
-        }
+    public function getPendingURLs()
+    {
+        // TODO: Implement addTemporaryURL() method.
+        $query = sprintf("SELECT * FROM pendingURLs");
 
-        return $results;
+        // Remove once has been accessed.
+        $this->dumpPendingURLs();
+
+        return $this->pdo->query($query);
+    }
+
+    public function dumpPendingURLs() {
+        $this->pdo->query("delete from pendingURLs");
     }
 }
