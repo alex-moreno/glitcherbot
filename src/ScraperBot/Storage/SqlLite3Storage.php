@@ -99,10 +99,10 @@ class SqlLite3Storage implements StorageInterface {
      * @return mixed
      */
     public function getResultsbyTimestamp($timestamp) {
-        $queryString = sprintf("SELECT * FROM sites WHERE timestamp = '%s' GROUP BY `site_id` order by site_id", $timestamp);
+        $queryString = sprintf("SELECT * FROM sites WHERE timestamp = '%s' order by url", $timestamp);
         $query = $this->pdo->query($queryString);
         while ($row = $query->fetchArray()) {
-            $results[$timestamp][] = $row;
+            $results[$timestamp][$row['url']] = $row;
         }
 
         return $results;
@@ -115,35 +115,38 @@ class SqlLite3Storage implements StorageInterface {
      * @param $timestamp2
      */
     public function getCrawlDiffs($timestamp1, $timestamp2, $tolerance = 1000) {
-        $queryString = sprintf("SELECT DISTINCT * FROM sites WHERE timestamp = '%s' order by site_id", $timestamp1);
+        $queryString = sprintf("SELECT DISTINCT * FROM sites WHERE timestamp = '%s' order by url", $timestamp1);
         $results1 = $this->pdo->query($queryString);
 
-        $queryString2 = sprintf("SELECT DISTINCT * FROM sites WHERE timestamp = '%s' order by site_id", $timestamp2);
+        $queryString2 = sprintf("SELECT DISTINCT * FROM sites WHERE timestamp = '%s' order by url", $timestamp2);
         $results2 = $this->pdo->query($queryString2);
 
         $listofSites1 = array();
-        $index = 1;
-        while ($row = $results1->fetchArray()) {
-            $listofSites1[$index] = $row;
-            $index++;
-        }
 
-        $index2 = 1;
-        while ($row2 = $results2->fetchArray()) {
-            // url == $row2[2].
-            $listofSites2[$row2[2]] = $row2;
-            $diff = abs($listofSites1[$index2]['size'] - $row2['size']);
-            if (($diff > $tolerance && $diff > 0) || ($listofSites1[$index2]['statusCode'] != $row2['statusCode'])) {
-                $naughtySite[$index2]['size1'][$index2] = $listofSites1[$index2]['size'];
-                $naughtySite[$index2]['statusCode1'][$index2] = $listofSites1[$index2]['statusCode'];
-                $naughtySite[$index2]['url1'][$index2] = $listofSites1[$index2]['url'];
+        print_r($results1);
 
-                $naughtySite[$index2]['size2'][$row2[2]] = $row2['size'];
-                $naughtySite[$index2]['statusCode2'][$row2[2]] = $row2['statusCode'];
-                $naughtySite[$index2]['url2'][$index2] = $listofSites1[$index2]['url'];
-            }
-            $index2++;
-        }
+//        $index = 1;
+//        while ($row = $results1->fetchArray()) {
+//            $listofSites1[$index] = $row;
+//            $index++;
+//        }
+
+//        $index2 = 1;
+//        while ($row2 = $results2->fetchArray()) {
+//            // url == $row2[2].
+//            $listofSites2[$row2[2]] = $row2;
+//            $diff = abs($listofSites1[$index2]['size'] - $row2['size']);
+//            if (($diff > $tolerance && $diff > 0) || ($listofSites1[$index2]['statusCode'] != $row2['statusCode'])) {
+//                $naughtySite[$index2]['size1'][$index2] = $listofSites1[$index2]['size'];
+//                $naughtySite[$index2]['statusCode1'][$index2] = $listofSites1[$index2]['statusCode'];
+//                $naughtySite[$index2]['url1'][$index2] = $listofSites1[$index2]['url'];
+//
+//                $naughtySite[$index2]['size2'][$row2[2]] = $row2['size'];
+//                $naughtySite[$index2]['statusCode2'][$row2[2]] = $row2['statusCode'];
+//                $naughtySite[$index2]['url2'][$index2] = $listofSites1[$index2]['url'];
+//            }
+//            $index2++;
+//        }
 
         return $naughtySite;
     }

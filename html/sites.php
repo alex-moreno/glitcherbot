@@ -24,13 +24,15 @@ if (sizeof($crawls) > 1) {
 foreach ($crawls as $timestamp) {
     // Get site crawl results for each timestamp.
     $resultsByTimestamp = $resultsStorage->getResultsbyTimestamp($timestamp);
+//    print_r($resultsByTimestamp);
+
     $headers[$index] = $timestamp;
 
     // Get the list of results, per site, for a given timestamp and prepare
     // array entries representing the rows.
     foreach ($resultsByTimestamp as $listOfSites) {
         foreach ($listOfSites as $site) {
-            $site_id = $site['site_id'];
+            $site_id = $site['url'];
             if (isset($naughtySites[$site_id]) && sizeof($crawls) > 1) {
                 $site['naughty'] = 'naughty';
             }
@@ -39,10 +41,12 @@ foreach ($crawls as $timestamp) {
             if (empty($rows[$site_id][$index])) {
                 $rows[$site_id][$index] = [];
             }
-            array_push($rows[$site_id][$index], $site['size'], $site['statusCode'], $site['naughty'], $site['url']);
 
+            array_push($rows[$site_id][$index], $site['size'], $site['statusCode'], $site['naughty'], $site['url']);
         }
     }
+
+//    print_r($rows);
 
     $index++;
 }
