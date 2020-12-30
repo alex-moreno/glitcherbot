@@ -132,7 +132,6 @@ class SqlLite3Storage implements StorageInterface {
             $index2 = $row2['url'];
             $diff = abs($listofSites1[$index2]['size'] - $row2['size']);
             if (($diff > $tolerance && $diff > 0) || ($listofSites1[$index2]['statusCode'] != $row2['statusCode'])) {
-                echo 'nauthy';
                 $naughtySite[$index2]['size1'][$index2] = $listofSites1[$index2]['size'];
                 $naughtySite[$index2]['statusCode1'][$index2] = $listofSites1[$index2]['statusCode'];
                 $naughtySite[$index2]['url1'][$index2] = $listofSites1[$index2]['url'];
