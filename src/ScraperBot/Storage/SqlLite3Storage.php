@@ -28,6 +28,12 @@ class SqlLite3Storage implements StorageInterface {
                             url TEXT NOT NULL
        );");
 
+        $this->pdo->query("CREATE TABLE IF NOT EXISTS pendingURLs (
+                            timestamp NOT NULL,
+                            site_id INTEGER,
+                            url TEXT NOT NULL
+       );");
+
     }
 
     /**
@@ -161,10 +167,17 @@ class SqlLite3Storage implements StorageInterface {
         return $numRows;
     }
 
-    public function addTemporaryURL($url, $index, $timestamp)
+    public function addSitemapURL($url, $index, $timestamp)
     {
         // TODO: Implement addTemporaryURL() method.
         $query = sprintf("INSERT INTO sitemapURLs (timestamp, url, site_id) VALUES(%d,%d,\"%s\")", $timestamp, $index, $url);
+        $this->pdo->query($query);
+    }
+
+    public function addTemporaryURL($url, $index, $timestamp)
+    {
+        // TODO: Implement addTemporaryURL() method.
+        $query = sprintf("INSERT INTO pendingURLs (timestamp, url, site_id) VALUES(%d,\"%s\",%d)", $timestamp, $url, $index);
         $this->pdo->query($query);
     }
 
