@@ -38,9 +38,13 @@ class XmlSitemapSource implements SourceInterface {
     public function extractLinks($sitemap) {
         $links = [];
 
+
         $xml = simplexml_load_string($sitemap);
-        foreach ($xml->{'url'} as $item) {
-            $links[] =  (string)$item->loc;
+        // Ensure the string returned is a valid xml.
+        if ($xml !== false) {
+            foreach ($xml->{'url'} as $item) {
+                $links[] =  (string)$item->loc;
+            }
         }
 
         return $links;

@@ -67,10 +67,6 @@ class Crawler
             // Concurrency to use.
             'concurrency' => $this->concurrency,
             'fulfilled' => function (Response $response, $index) use ($csvManager, $fileToWrite, $timestamp, $urls) {
-//                echo PHP_EOL . 'Code: ' . $response->getStatusCode();
-//                echo ' index: ' . ($index + 1);
-//                echo 'crawling::: ' . $urls[$index];
-
                 $siteCrawled = array();
                 $siteCrawled['site_id'] = ($index + 1);
                 $siteCrawled['url'] = $urls[$index];
@@ -91,7 +87,7 @@ class Crawler
             },
             'rejected' => function ($reason, $index, $promise) use ($csvManager, $fileToWrite, $timestamp, $urls) {
                 // Handle promise rejected here (ie: not existing domains, long timeouts or too many redirects).
-                echo 'rejected: ' . $reason;
+                echo 'rejected: ' . $reason . PHP_EOL . ' ----- ';
 
                 $siteCrawled = array();
                 $siteCrawled['site_id'] = ($index + 1);
@@ -177,7 +173,7 @@ class Crawler
             },
             'rejected' => function ($reason, $index, $promise) use ($timestamp, $urls) {
                 // Handle promise rejected here (ie: not existing domains, long timeouts or too many redirects).
-                echo 'rejected: ' . $reason;
+                echo 'rejected: ' . $reason . PHP_EOL . ' ----- ';
             }
         ]);
 
@@ -241,7 +237,7 @@ class Crawler
             },
             'rejected' => function ($reason, $index, $promise) use ($timestamp, $urls) {
                 // Handle promise rejected here (ie: not existing domains, long timeouts or too many redirects).
-                echo 'rejected: ' . $reason;
+                echo 'rejected: ' . $reason . PHP_EOL . ' ----- ';
             }
         ]);
 
