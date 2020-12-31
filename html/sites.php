@@ -3,7 +3,12 @@
 require_once __DIR__.'/../vendor/autoload.php';
 
 $resultsStorage = new \ScraperBot\Storage\SqlLite3Storage('../railerdb.sqlite3');
-$crawls = $resultsStorage->getTimeStamps();
+
+
+if (isset($_GET['latest'])) {
+    $onlyLatest = $_GET['latest'];
+}
+$crawls = $resultsStorage->getTimeStamps($onlyLatest);
 
 $rows = [];
 $headers = [];
@@ -14,10 +19,11 @@ if (isset($_GET['tolerance'])) {
     $tolerance = $_GET['tolerance'];
 }
 
+
 // We just use the last two crawls.
 if (sizeof($crawls) > 1) {
     $lastElem = array_key_last($crawls);
-    $naughtySites = $resultsStorage->getCrawlDiffs($crawls[$lastElem-1], $crawls[$lastElem], $tolerance);
+    $naughtySites = $resultsStorage->getCrawlDiffs($crawls[$lastElem-1], $crawls[$lastElem], $tolerance, $onlyLatest);
 }
 
 // Iterate over the results, preparing columns and rows for the twig template.
