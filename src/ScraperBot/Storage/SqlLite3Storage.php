@@ -127,6 +127,7 @@ class SqlLite3Storage implements StorageInterface {
             $listofSites1[$row['url']] = $row;
         }
 
+        $naughtySite = [];
         while ($row2 = $results2->fetchArray()) {
             $listofSites2[$row2[2]] = $row2;
             $index2 = $row2['url'];
@@ -151,6 +152,7 @@ class SqlLite3Storage implements StorageInterface {
      * @return mixed
      */
     public function getStatsByStatus($statusCode) {
+        $numRows = [];
 
         $timeStamps = $this->getTimeStamps();
         foreach ($timeStamps as $timeStamp) {
@@ -171,7 +173,14 @@ class SqlLite3Storage implements StorageInterface {
         $this->pdo->query($query);
     }
 
+    /**
+     * Get sitemaps.
+     *
+     * @param bool $dumpCurrent
+     * @return array
+     */
     public function getSitemapURLs($dumpCurrent = FALSE) {
+        $results = [];
         $queryString = sprintf("SELECT * FROM sitemapURLs ");
         $query = $this->pdo->query($queryString);
 
@@ -187,11 +196,20 @@ class SqlLite3Storage implements StorageInterface {
         return $results;
     }
 
+    /**
+     * Remove sitemap urls from the db
+     */
     public function dumpSitemaps() {
         $this->pdo->query("delete from sitemapURLs ");
     }
 
-
+    /**
+     * Insert new pending url into the db.
+     *
+     * @param $url
+     * @param $index
+     * @param $timestamp
+     */
     public function addPendingURL($url, $index, $timestamp)
     {
         // TODO: Implement addTemporaryURL() method.
@@ -199,9 +217,15 @@ class SqlLite3Storage implements StorageInterface {
         $this->pdo->query($query);
     }
 
+    /**
+     * Get pending urls from the db.
+     *
+     * @param bool $dumpCurrent
+     * @return mixed
+     */
     public function getPendingURLs($dumpCurrent = FALSE)
     {
-        // TODO: Implement addTemporaryURL() method.
+        $results = [];
         $queryString = sprintf("SELECT url FROM pendingURLs");
         $query = $this->pdo->query($queryString);
 
@@ -217,6 +241,9 @@ class SqlLite3Storage implements StorageInterface {
         return $results;
     }
 
+    /**
+     * Remove pending urls from the db
+     */
     public function dumpPendingURLs() {
         $this->pdo->query("delete from pendingURLs");
     }

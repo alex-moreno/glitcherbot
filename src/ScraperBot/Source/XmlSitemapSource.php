@@ -16,12 +16,15 @@ class XmlSitemapSource implements SourceInterface {
      */
     public function __construct($sitemap = NULL) {
         $this->sitemap = $sitemap;
-
     }
 
     public function getLinks() {
-        foreach ($this->sitemap as $sitemap) {
-            $urls[] = $sitemap[1];
+        $urls = [];
+
+        if (is_array($this->sitemap)) {
+            foreach ($this->sitemap as $sitemap) {
+                $urls[] = $sitemap[1];
+            }
         }
 
         return $urls;

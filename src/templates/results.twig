@@ -15,7 +15,7 @@
         <table class="table table-striped" style="text-align:center">
             <thead class="thead-dark">
                 <tr>
-                    <th>Site ID</th>
+                    <th>Index</th>
                     {% for header in headers %}
                     <th style="text-align:center" colspan="3">{{ header|date }}</th>
                     {%  endfor %}
@@ -33,7 +33,7 @@
             {%  for key, row in rows %}
             <tr>
                 <td style="text-align:center">
-                    {{ key }}
+                    {{ loop.index }}
                 </td>
                 {%  for column in row %}
                     <td {% if column.2 %}class="table-danger"{% endif %}>
