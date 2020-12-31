@@ -38,7 +38,6 @@ class XmlSitemapSource implements SourceInterface {
     public function extractLinks($sitemap) {
         $links = [];
 
-
         $xml = simplexml_load_string($sitemap);
         // Ensure the string returned is a valid xml.
         if ($xml !== false) {

@@ -67,6 +67,7 @@ class Crawler
             // Concurrency to use.
             'concurrency' => $this->concurrency,
             'fulfilled' => function (Response $response, $index) use ($csvManager, $fileToWrite, $timestamp, $urls) {
+
                 $siteCrawled = array();
                 $siteCrawled['site_id'] = ($index + 1);
                 $siteCrawled['url'] = $urls[$index];
@@ -238,6 +239,7 @@ class Crawler
             'rejected' => function ($reason, $index, $promise) use ($timestamp, $urls) {
                 // Handle promise rejected here (ie: not existing domains, long timeouts or too many redirects).
                 echo 'rejected: ' . $reason . PHP_EOL . ' ----- ';
+
             }
         ]);
 
