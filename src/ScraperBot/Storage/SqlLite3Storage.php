@@ -67,11 +67,15 @@ class SqlLite3Storage implements StorageInterface {
      *
      * @return mixed
      */
-    public function getTimeStamps($getLatest = NULL) {
-        $queryString = sprintf("SELECT DISTINCT  * FROM sites group by timestamp");
-        if ($getLatest!=NULL && $getLatest == 'true') {
-            // Get only the two latest crawls.
-            $queryString = sprintf("SELECT DISTINCT  * FROM sites group by timestamp order by timestamp desc LIMIT 2");
+    public function getTimeStamps($timestamps = NULL, $getLatest = NULL) {
+        if ($timestamps != NULL) {
+            $queryString = sprintf("SELECT * FROM sites WHERE timestamp = '%s' OR timestamp = '%s' GROUP BY timestamp order by url", strtotime($timestamps['date1']), strtotime($timestamps['date2']));
+        } else {
+            $queryString = sprintf("SELECT DISTINCT  * FROM sites group by timestamp");
+            if ($getLatest!=NULL && $getLatest == 'true') {
+                // Get only the two latest crawls.
+                $queryString = sprintf("SELECT DISTINCT  * FROM sites group by timestamp order by timestamp desc LIMIT 2");
+            }
         }
 
         $query = $this->pdo->query($queryString);

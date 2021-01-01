@@ -1,10 +1,37 @@
 
 <form>
-    <div style="margin-left: 20px;">
+    <div style="margin-left: 20px;float:left">
         <label for="example"><b>Tolerance (>=0)</b></label>
         <input id="tolerance" type="text" name="tolerance" value="{{ tolerance }}" size="8">
         <input type="submit" value="Send">
     </div>
 </form>
 
-<div style="margin-left: 20px"><a href="?latest=true">Get only latest 2 crawls</a> | <a href="?latest=false">Get all crawls</a></div>
+{% if(date1 is null and date2 is null) %}
+    <form>
+        <div style="margin-left: 20px;float:left">
+            <label for="crawl"><b>Compare only two crawls:</b></label>
+            <br>
+            <form action="#">
+                <select id="date1" name="date1">
+                    {% for header in headers %}
+                        <option value="{{ header|date('F d, Y H:i:s') }}">{{ header|date('F d, Y H:i:s') }}</option>
+                    {%  endfor %}
+                </select>
+
+                <select id="date2" name="date2">
+                    {% for header in headers %}
+                        <option value="{{ header|date('F d, Y H:i:s') }}">{{ header|date('F d, Y H:i:s') }}</option>
+                    {%  endfor %}
+                </select>
+                <input type="submit">
+            </form>
+        </div>
+    </form>
+
+{% endif %}
+
+<div style="clear: both"></div>
+<div style="margin-left: 20px;"><a href="?latest=true">Get only latest 2 crawls</a> | <a href="?latest=false">Get all crawls</a>
+{% if(date1 and date2) %} | <a href="?latest=false">Reset dates filter</a>{% endif %}
+</div>

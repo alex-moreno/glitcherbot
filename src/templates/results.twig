@@ -17,7 +17,7 @@
                 <tr>
                     <th>Index</th>
                     {% for header in headers %}
-                    <th style="text-align:center" colspan="3">{{ header|date }}</th>
+                    <th style="text-align:center" colspan="3">{{ header|date('F d, Y H:i:s') }}</th>
                     {%  endfor %}
                 </tr>
                 <tr>

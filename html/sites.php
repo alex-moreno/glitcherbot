@@ -4,11 +4,17 @@ require_once __DIR__.'/../vendor/autoload.php';
 
 $resultsStorage = new \ScraperBot\Storage\SqlLite3Storage('../railerdb.sqlite3');
 
+$compare = [];
+if (isset($_GET['date1']) && $_GET['date2']) {
+    echo $_GET['date1'] . ' date2: ' . $_GET['date2'];
+    $compare['date1'] = $_GET['date1'];
+    $compare['date2'] = $_GET['date2'];
+}
 
 if (isset($_GET['latest'])) {
     $onlyLatest = $_GET['latest'];
 }
-$crawls = $resultsStorage->getTimeStamps($onlyLatest);
+$crawls = $resultsStorage->getTimeStamps($compare, $onlyLatest);
 
 $rows = [];
 $headers = [];
@@ -73,4 +79,4 @@ $loader = new \Twig\Loader\FilesystemLoader(__DIR__.'/../src/templates');
 // Instantiate our Twig
 $twig = new \Twig\Environment($loader);
 $template = $twig->load('results.twig');
-echo $template->render(['headers' => $headers, 'rows' => $rows, 'tolerance' => $tolerance]);
+echo $template->render(['headers' => $headers, 'rows' => $rows, 'tolerance' => $tolerance, 'date1' => $compare['date1'], 'date2' => $compare['date2']]);
