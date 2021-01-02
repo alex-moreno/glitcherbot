@@ -3,7 +3,7 @@
 require_once __DIR__.'/../vendor/autoload.php';
 
 
-$resultsStorage = new \ScraperBot\Storage\SqlLite3Storage('../railerdb.sqlite3');
+$resultsStorage = new \ScraperBot\Storage\SqlLite3Storage('../glitcherbot.sqlite3');
 $crawls = $resultsStorage->getTimeStamps();
 
 $rows = [];

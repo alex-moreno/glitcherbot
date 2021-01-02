@@ -70,11 +70,14 @@ class Crawler
 
                 $siteCrawled = array();
                 $siteCrawled['site_id'] = ($index + 1);
-                $siteCrawled['url'] = $urls[$index];
+                $siteCrawled['url'] = trim($urls[$index]);
                 $siteCrawled['statusCode'] = $response->getStatusCode();
                 $body = $response->getBody()->getContents();
                 $siteCrawled['size'] = strlen($body);
                 $siteCrawled['footprint'] = md5($body);
+
+                $tagDistribution = $this->getTags($body);
+                echo PHP_EOL . $siteCrawled['url'] . '-- ';
 
                 $csvManager->writeCsvLine($siteCrawled, $fileToWrite);
                 $this->storage->addResult(
@@ -85,6 +88,7 @@ class Crawler
                     $siteCrawled['footprint'],
                     $timestamp
                 );
+                $this->storage->addTagDistribution($siteCrawled['url'], $tagDistribution, $timestamp);
             },
             'rejected' => function ($reason, $index, $promise) use ($csvManager, $fileToWrite, $timestamp, $urls) {
                 // Handle promise rejected here (ie: not existing domains, long timeouts or too many redirects).
@@ -108,6 +112,33 @@ class Crawler
         ]);
 
         $eachPromise->promise()->wait();
+    }
+
+    /**
+     * Return tag analysis of the given html as string.
+     *
+     * @param $body
+     * @return mixed
+     */
+    public function getTags($body){
+        if ($body != "") {
+            $dom = new \DOMDocument();
+            $dom->loadHTML($body, LIBXML_NOWARNING | LIBXML_NOERROR);
+            $allElements = $dom->getElementsByTagName('*');
+
+            $elementDistribution = [];
+            foreach($allElements as $element) {
+                if(array_key_exists($element->tagName, $elementDistribution)) {
+                    $elementDistribution[$element->tagName] += 1;
+                } else {
+                    $elementDistribution[$element->tagName] = 1;
+                }
+            }
+            $elementDistribution['total'] = $allElements->length;
+
+            return $elementDistribution;
+        }
+
     }
 
     /**

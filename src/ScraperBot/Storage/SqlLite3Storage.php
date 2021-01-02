@@ -10,7 +10,7 @@ class SqlLite3Storage implements StorageInterface {
      * ResultsService constructor.
      * @param string $db
      */
-    public function __construct($db = 'railerdb.sqlite3') {
+    public function __construct($db = 'glitcherbot.sqlite3') {
         $this->pdo = new \SQLite3($db);
 
         $this->pdo->query("CREATE TABLE IF NOT EXISTS sites (
@@ -34,6 +34,14 @@ class SqlLite3Storage implements StorageInterface {
                             url TEXT NOT NULL
        );");
 
+        $this->pdo->query("CREATE TABLE IF NOT EXISTS tags (
+                            timestamp NOT NULL,
+                            url TEXT NOT NULL,
+                            tag_name TEXT NOT NULL,
+                            tag_value TEXT NOT NULL
+                            
+       );");
+
     }
 
     /**
@@ -43,11 +51,26 @@ class SqlLite3Storage implements StorageInterface {
      * @param $sites
      */
     public function addResult($site_id, $site_url, $size, $status_code, $footprint, $timestamp) {
-        date('dmY-His');
         $query = sprintf("INSERT INTO sites (site_id, url, size, statusCode, footprint, timestamp) VALUES(%d,\"%s\",%d,%d,\"%s\",\"%s\")",
             $site_id, $site_url, $size, $status_code, $footprint, $timestamp);
         $this->pdo->query($query);
     }
+
+    /**
+     * Store tags found.
+     *
+     * @param $site_url
+     * @param $tagDistribution
+     * @param $timestamp
+     */
+    public function addTagDistribution($site_url, $tagDistribution, $timestamp) {
+        foreach ($tagDistribution as $index=>$tag) {
+            $query = sprintf("INSERT INTO tags (url, timestamp, tag_name, tag_value) VALUES(\"%s\",\"%s\",\"%s\",\"%s\")",
+                $site_url, $timestamp, $index, $tag);
+            $this->pdo->query($query);
+        }
+    }
+
 
     /**
      * @return SQLite3Result
