@@ -19,7 +19,6 @@ class SitesArraySource implements SourceInterface {
 
     public function addLink($url)
     {
-        // TODO: Implement addLink() method.
         $this->sites[] = $url;
     }
 

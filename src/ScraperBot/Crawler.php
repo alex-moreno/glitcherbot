@@ -36,7 +36,7 @@ class Crawler
      * @param $client
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function crawlSites(SourceInterface $source, Client $client, $default_config = NULL, $timestamp = NULL)
+    public function crawlSites(SourceInterface $source, Client $client, $default_config = NULL, $timestamp = NULL, $debug = NULL)
     {
         $urls = $source->getLinks();
 
@@ -66,7 +66,7 @@ class Crawler
         $eachPromise = new EachPromise($promises, [
             // Concurrency to use.
             'concurrency' => $this->concurrency,
-            'fulfilled' => function (Response $response, $index) use ($csvManager, $fileToWrite, $timestamp, $urls) {
+            'fulfilled' => function (Response $response, $index) use ($csvManager, $fileToWrite, $timestamp, $urls, $debug) {
 
                 $siteCrawled = array();
                 $siteCrawled['site_id'] = ($index + 1);
@@ -77,7 +77,9 @@ class Crawler
                 $siteCrawled['footprint'] = md5($body);
 
                 $tagDistribution = $this->getTags($body);
-                echo PHP_EOL . $siteCrawled['url'] . '-- ';
+                if ($debug) {
+                    echo PHP_EOL . $siteCrawled['url'];
+                }
 
                 $csvManager->writeCsvLine($siteCrawled, $fileToWrite);
                 $this->storage->addResult(
