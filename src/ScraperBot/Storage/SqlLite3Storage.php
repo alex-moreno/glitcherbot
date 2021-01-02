@@ -205,7 +205,6 @@ class SqlLite3Storage implements StorageInterface {
 
     public function addSitemapURL($url, $index, $timestamp)
     {
-        // TODO: Implement addTemporaryURL() method.
         $query = sprintf("INSERT INTO sitemapURLs (timestamp, url, site_id) VALUES(%d,%d,\"%s\")", $timestamp, $index, $url);
         $this->pdo->query($query);
     }
@@ -249,7 +248,6 @@ class SqlLite3Storage implements StorageInterface {
      */
     public function addPendingURL($url, $index, $timestamp)
     {
-        // TODO: Implement addTemporaryURL() method.
         $query = sprintf("INSERT INTO pendingURLs (timestamp, url, site_id) VALUES(%d,\"%s\",%d)", $timestamp, $url, $index);
         $this->pdo->query($query);
     }
