@@ -45,6 +45,7 @@ foreach ($crawls as $timestamp) {
     foreach ($resultsByTimestamp as $listOfSites) {
         foreach ($listOfSites as $site) {
             $site_id = $site['url'];
+            $site['naughty'] = '';
             if (isset($naughtySites[$site_id]) && sizeof($crawls) > 1) {
                 $site['naughty'] = 'naughty';
             }

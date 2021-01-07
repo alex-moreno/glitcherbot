@@ -64,7 +64,7 @@ class SqlLite3Storage implements StorageInterface {
      * @param $timestamp
      */
     public function addTagDistribution($site_url, $tagDistribution, $timestamp) {
-        if (is_array($tagDistribution))) {
+        if (is_array($tagDistribution)) {
             foreach ($tagDistribution as $index=>$tag) {
                 $query = sprintf("INSERT INTO tags (url, timestamp, tag_name, tag_value) VALUES(\"%s\",\"%s\",\"%s\",\"%s\")",
                     $site_url, $timestamp, $index, $tag);

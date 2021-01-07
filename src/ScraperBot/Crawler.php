@@ -95,7 +95,6 @@ class Crawler
             'rejected' => function ($reason, $index, $promise) use ($csvManager, $fileToWrite, $timestamp, $urls) {
                 // Handle promise rejected here (ie: not existing domains, long timeouts or too many redirects).
                 echo 'rejected: ' . $reason . PHP_EOL . ' ----- ';
-
                 $siteCrawled = array();
                 $siteCrawled['site_id'] = ($index + 1);
                 $siteCrawled['url'] = $urls[$index + 1];
