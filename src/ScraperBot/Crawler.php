@@ -159,7 +159,7 @@ class Crawler
             $timestamp = time();
         }
 
-        $this->triggerThreadedCrawl($source, $client, $default_config, $offIndex, $timestamp);
+        $this->triggerThreadedCrawl($source, $client, $default_config, $timestamp);
     }
 
     /**
@@ -171,11 +171,11 @@ class Crawler
      * @param $offIndex
      * @param $timestamp
      */
-    public function triggerThreadedCrawl($source, $client, $default_config, $offIndex, $timestamp) {
+    public function triggerThreadedCrawl($source, $client, $default_config, $timestamp) {
         // First read the robots, so we can find the sitemap (if any)
         $urls = $source->getLinks();
 
-        $promises = (function () use ($urls, $client, $default_config, $offIndex) {
+        $promises = (function () use ($urls, $client, $default_config) {
             foreach ($urls as $url) {
                 // If default config is provided, create a new client each time.
                 if ($default_config != NULL) {
@@ -191,7 +191,7 @@ class Crawler
         $eachPromise = new EachPromise($promises, [
             // Concurrency to use.
             'concurrency' => $this->concurrency,
-            'fulfilled' => function (Response $response, $index) use ($timestamp, $urls, $offIndex) {
+            'fulfilled' => function (Response $response, $index) use ($timestamp, $urls) {
                 foreach(explode(PHP_EOL, $response->getBody()->getContents()) as $line) {
                     // We want to follow Sitemap: urls.
                     if (strpos($line, 'Sitemap:') !== false) {
