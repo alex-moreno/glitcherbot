@@ -36,7 +36,6 @@ if (sizeof($crawls) > 1) {
 foreach ($crawls as $timestamp) {
     // Get site crawl results for each timestamp.
     $resultsByTimestamp = $resultsStorage->getResultsbyTimestamp($timestamp);
-//    print_r($resultsByTimestamp);
 
     $headers[$index] = $timestamp;
 
@@ -58,8 +57,6 @@ foreach ($crawls as $timestamp) {
             array_push($rows[$site_id][$index], $site['size'], $site['statusCode'], $site['naughty'], $site['url']);
         }
     }
-
-//    print_r($rows);
 
     $index++;
 }
