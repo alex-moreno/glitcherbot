@@ -1,10 +1,11 @@
 <?php
 
-
 namespace ScraperBot\Source;
 
-
 class SitesJsonSource implements SourceInterface {
+
+    private $listOfSites = NULL;
+
     /**
      * SitesJsonSource constructor.
      */
@@ -19,7 +20,21 @@ class SitesJsonSource implements SourceInterface {
         }
 
         $data = json_decode($json, TRUE);
+        $this->listOfSites = $data;
         return empty($data['sites']) ? [] : array_keys($data['sites']);
     }
 
+    public function addLink($url)
+    {
+        // TODO: Implement addLink() method.
+    }
+
+    /**
+     * Get current index.
+     *
+     * @return int
+     */
+    public function getCurrentIndex() {
+        return sizeof($this->listOfSites);
+    }
 }

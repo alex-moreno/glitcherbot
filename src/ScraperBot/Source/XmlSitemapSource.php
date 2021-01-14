@@ -14,30 +14,38 @@ class XmlSitemapSource implements SourceInterface {
     /**
      * XmlSitemapSource constructor.
      */
-    public function __construct($sitemap) {
+    public function __construct($sitemap = NULL) {
         $this->sitemap = $sitemap;
     }
 
     public function getLinks() {
+        $urls = [];
+
+        if (is_array($this->sitemap)) {
+            foreach ($this->sitemap as $sitemap) {
+                $urls[] = $sitemap[1];
+            }
+        }
+
+        return $urls;
+    }
+
+    public function addLink($url)
+    {
+        $this->sitemap[] = $url;
+    }
+
+    public function extractLinks($sitemap) {
         $links = [];
 
-        $xml = simplexml_load_file($this->sitemap);
-
-        if($xml->getName() == 'urlset') {
-            $children = $xml->children();
-
-            foreach($children as $child) {
-                if($child->getName() == 'url') {
-                    // Strip the scheme from the URL.
-                    $url = $child->loc;
-                    $url = preg_replace('#^http(s)?://#', '', rtrim($url,'/'));
-
-                    $links[] = $url;
-                }
+        $xml = simplexml_load_string($sitemap, null, LIBXML_NOWARNING | LIBXML_NOERROR);
+        // Ensure the string returned is a valid xml.
+        if ($xml !== false) {
+            foreach ($xml->{'url'} as $item) {
+                $links[] =  (string)$item->loc;
             }
         }
 
         return $links;
     }
-
 }

@@ -6,7 +6,7 @@ $rows = [];
 $headers = [];
 $index = 0;
 
-$resultsStorage = new \ScraperBot\Storage\SqlLite3Storage('../railerdb.sqlite3');
+$resultsStorage = new \ScraperBot\Storage\SqlLite3Storage('../glitcherbot.sqlite3');
 $crawls = $resultsStorage->getTimeStamps();
 
 $statusCodes = $resultsStorage->getStatusCodes();

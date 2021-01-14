@@ -2,8 +2,19 @@
 
 require_once __DIR__.'/../vendor/autoload.php';
 
-$resultsStorage = new \ScraperBot\Storage\SqlLite3Storage('../railerdb.sqlite3');
-$crawls = $resultsStorage->getTimeStamps();
+$resultsStorage = new \ScraperBot\Storage\SqlLite3Storage('../glitcherbot.sqlite3');
+
+$compare = [];
+if (isset($_GET['date1']) && $_GET['date2']) {
+    echo $_GET['date1'] . ' date2: ' . $_GET['date2'];
+    $compare['date1'] = $_GET['date1'];
+    $compare['date2'] = $_GET['date2'];
+}
+
+if (isset($_GET['latest'])) {
+    $onlyLatest = $_GET['latest'];
+}
+$crawls = $resultsStorage->getTimeStamps($compare, $onlyLatest);
 
 $rows = [];
 $headers = [];
@@ -14,23 +25,27 @@ if (isset($_GET['tolerance'])) {
     $tolerance = $_GET['tolerance'];
 }
 
+
 // We just use the last two crawls.
 if (sizeof($crawls) > 1) {
     $lastElem = array_key_last($crawls);
-    $naughtySites = $resultsStorage->getCrawlDiffs($crawls[$lastElem-1], $crawls[$lastElem], $tolerance);
+    $naughtySites = $resultsStorage->getCrawlDiffs($crawls[$lastElem-1], $crawls[$lastElem], $tolerance, $onlyLatest);
 }
 
 // Iterate over the results, preparing columns and rows for the twig template.
 foreach ($crawls as $timestamp) {
     // Get site crawl results for each timestamp.
     $resultsByTimestamp = $resultsStorage->getResultsbyTimestamp($timestamp);
+//    print_r($resultsByTimestamp);
+
     $headers[$index] = $timestamp;
 
     // Get the list of results, per site, for a given timestamp and prepare
     // array entries representing the rows.
     foreach ($resultsByTimestamp as $listOfSites) {
         foreach ($listOfSites as $site) {
-            $site_id = $site['site_id'];
+            $site_id = $site['url'];
+            $site['naughty'] = '';
             if (isset($naughtySites[$site_id]) && sizeof($crawls) > 1) {
                 $site['naughty'] = 'naughty';
             }
@@ -40,10 +55,11 @@ foreach ($crawls as $timestamp) {
                 $rows[$site_id][$index] = [];
             }
 
-            array_push($rows[$site_id][$index], $site['size'], $site['statusCode'],$site['naughty']);
-
+            array_push($rows[$site_id][$index], $site['size'], $site['statusCode'], $site['naughty'], $site['url']);
         }
     }
+
+//    print_r($rows);
 
     $index++;
 }
@@ -64,4 +80,4 @@ $loader = new \Twig\Loader\FilesystemLoader(__DIR__.'/../src/templates');
 // Instantiate our Twig
 $twig = new \Twig\Environment($loader);
 $template = $twig->load('results.twig');
-echo $template->render(['headers' => $headers, 'rows' => $rows, 'tolerance' => $tolerance]);
+echo $template->render(['headers' => $headers, 'rows' => $rows, 'tolerance' => $tolerance, 'date1' => $compare['date1'], 'date2' => $compare['date2']]);

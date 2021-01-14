@@ -7,6 +7,8 @@ use GuzzleHttp\Client;
 use ScraperBot\Crawler;
 use ScraperBot\CsvManager;
 use ScraperBot\Source\CsvSource;
+use ScraperBot\Source\SitesArraySource;
+use ScraperBot\Source\XmlSitemapSource;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -59,7 +61,8 @@ class CrawlSitesCommand extends Command {
         $headers = include('config.php');
         $output->writeln("Using headers: " . print_r($headers, TRUE), OutputInterface::VERBOSITY_DEBUG);
 
-        $crawler = new Crawler(new \ScraperBot\Storage\SqlLite3Storage(), $headers);
+        $sqlStorage = new \ScraperBot\Storage\SqlLite3Storage();
+        $crawler = new Crawler($sqlStorage, $headers);
         $output->writeln('Starting crawling. Date: ' . date('l jS \of F Y h:i:s A'), OutputInterface::VERBOSITY_VERBOSE);
 
         // Unless configured, do not ask the crawler to use a base URI.
@@ -68,7 +71,21 @@ class CrawlSitesCommand extends Command {
         }
 
         $source = $this->getSource($input);
-        $crawler->crawlSites($source, $client, $default_config);
+
+        $timestamp = time();
+        $crawler->crawlSites($source, $client, $default_config, $timestamp);
+        $crawler->crawlSiteMaps($source, $client, $default_config, $timestamp, 0);
+
+        $sitemapURLs = $crawler->getListPendingSitemaps(TRUE);
+        $sourceSitemap = new XmlSitemapSource($sitemapURLs);
+
+        // Crawl the sitemaps.
+        $crawler->extractSitemaps($sourceSitemap, $client, $default_config, $timestamp, $source->getCurrentIndex());
+
+        $pendingURLs = $sqlStorage->getPendingURLs(TRUE);
+        $pendingSource = new SitesArraySource($pendingURLs);
+        $crawler->crawlSites($pendingSource, $client, $default_config, $timestamp);
+
         $output->writeln('Crawling finished. Date: ' . date('l jS \of F Y h:i:s A'), OutputInterface::VERBOSITY_VERBOSE);
 
         return Command::SUCCESS;
