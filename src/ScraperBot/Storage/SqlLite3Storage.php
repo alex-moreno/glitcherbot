@@ -136,11 +136,41 @@ class SqlLite3Storage implements StorageInterface {
         if ($onlyLatest != NULL) {
 
         }
+        $queryString = sprintf("SELECT * FROM sites  INNER JOIN tags ON sites.url=tags.url WHERE sites.timestamp='%s' AND tag_name='total' AND sites.timestamp=tags.timestamp;", $timestamp);
 
-        $queryString = sprintf("SELECT * FROM sites WHERE timestamp = '%s' order by url", $timestamp);
         $query = $this->pdo->query($queryString);
         while ($row = $query->fetchArray()) {
             $results[$timestamp][$row['url']] = $row;
+            // Get tags.
+            $results[$timestamp][$row['url']]['tags']['total'] = $row['tag_value'];
+
+        }
+
+        return $results;
+    }
+
+    /**
+     * Get results for a given date.
+     *
+     * @param $timestamp
+     * @return mixed
+     */
+    public function getResultsAndTagsbyTimestamp($timestamp, $onlyLatest = NULL) {
+        if ($onlyLatest != NULL) {
+
+        }
+
+//        $queryString = sprintf("SELECT * FROM sites WHERE timestamp = '%s' order by url", $timestamp);
+        $queryString = sprintf("SELECT * FROM sites  INNER JOIN tags ON sites.url=tags.url WHERE sites.timestamp='%s' AND tag_name='total';", $timestamp);
+
+        $query = $this->pdo->query($queryString);
+        while ($row = $query->fetchArray()) {
+            $results[$timestamp][$row['url']] = $row;
+            // Get tags.
+            $results[$timestamp][$row['url']]['tags']['total'] = $row['tag_value'];
+
+//            print_r($results);
+//            echo '<br><br>';
         }
 
         return $results;
@@ -179,6 +209,63 @@ class SqlLite3Storage implements StorageInterface {
                 $naughtySite[$index2]['size2'][$row2[2]] = $row2['size'];
                 $naughtySite[$index2]['statusCode2'][$row2[2]] = $row2['statusCode'];
                 $naughtySite[$index2]['url2'][$index2] = $listofSites1[$index2]['url'];
+            }
+        }
+
+        return $naughtySite;
+    }
+
+    /**
+     * Get diffs between two crawls.
+     *
+     * @param $timestamp1
+     * @param $timestamp2
+     */
+    public function getTagsDiffs($timestamp1, $timestamp2, $tolerance = 1000) {
+
+        $queryString = sprintf("SELECT DISTINCT * FROM sites WHERE timestamp = '%s' order by url", $timestamp1);
+        $results1 = $this->pdo->query($queryString);
+
+        $queryString2 = sprintf("SELECT DISTINCT * FROM sites WHERE timestamp = '%s' order by url", $timestamp2);
+        $results2 = $this->pdo->query($queryString2);
+
+        $listofSites1 = array();
+
+        while ($row = $results1->fetchArray()) {
+            $listofSites1[$row['url']] = $row;
+        }
+
+        $naughtySite = [];
+        while ($row2 = $results2->fetchArray()) {
+            $listofSites2[$row2[2]] = $row2;
+            $index2 = $row2['url'];
+            $diff = abs($listofSites1[$index2]['size'] - $row2['size']);
+            if (($diff > $tolerance && $diff > 0) || ($listofSites1[$index2]['statusCode'] != $row2['statusCode'])) {
+                $naughtySite[$index2]['size1'][$index2] = $listofSites1[$index2]['size'];
+                $naughtySite[$index2]['statusCode1'][$index2] = $listofSites1[$index2]['statusCode'];
+                $naughtySite[$index2]['url1'][$index2] = $listofSites1[$index2]['url'];
+
+//                echo "<br><br> url1:: " . $listofSites1[$index2]['url'];
+
+                // TODO: query with tags before
+
+                $naughtySite[$index2]['size2'][$row2[2]] = $row2['size'];
+                $naughtySite[$index2]['statusCode2'][$row2[2]] = $row2['statusCode'];
+                $naughtySite[$index2]['url2'][$index2] = $listofSites1[$index2]['url'];
+//                echo "<br>url2:: " . $index2;
+
+                // TODO: query with tags after
+                $queryStringTags = sprintf("SELECT * FROM sites  INNER JOIN tags ON sites.url=tags.url WHERE sites.timestamp='%s' and tag_name='total';", $timestamp2);
+//                $queryStringTags = sprintf("SELECT * FROM tags where url='%s' and tag_name='total' and timestamp='%s';", $index2, $timestamp2);
+
+                ;
+                $tags = $this->pdo->query($queryStringTags);
+                print_r($tags);
+                while ($rowtags = $tags->fetchArray()) {
+//                    $listofSites1[$row['url']] = $row;
+                    print_r($rowtags);
+                }
+                // SELECT * FROM sites  INNER JOIN tags ON sites.url=tags.url WHERE sites.timestamp='1610100005';
             }
         }
 

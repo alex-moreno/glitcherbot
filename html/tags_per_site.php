@@ -25,23 +25,22 @@ if (isset($_GET['tolerance'])) {
     $tolerance = $_GET['tolerance'];
 }
 
-
 // We just use the last two crawls.
-if (sizeof($crawls) > 1) {
+//if (sizeof($crawls) > 1) {
     $lastElem = array_key_last($crawls);
     $naughtySites = $resultsStorage->getCrawlDiffs($crawls[$lastElem-1], $crawls[$lastElem], $tolerance, $onlyLatest);
-}
+//}
 
 // Iterate over the results, preparing columns and rows for the twig template.
 foreach ($crawls as $timestamp) {
     // Get site crawl results for each timestamp.
-    $resultsByTimestamp = $resultsStorage->getResultsbyTimestamp($timestamp);
+    $sitesByTimestamp = $resultsStorage->getResultsAndTagsbyTimestamp($timestamp);
 
     $headers[$index] = $timestamp;
 
     // Get the list of results, per site, for a given timestamp and prepare
     // array entries representing the rows.
-    foreach ($resultsByTimestamp as $listOfSites) {
+    foreach ($sitesByTimestamp as $listOfSites) {
         foreach ($listOfSites as $site) {
             $site_id = $site['url'];
             $site['naughty'] = '';
@@ -76,5 +75,5 @@ foreach ($rows as $site_id => $row) {
 $loader = new \Twig\Loader\FilesystemLoader(__DIR__.'/../src/templates');
 // Instantiate our Twig
 $twig = new \Twig\Environment($loader);
-$template = $twig->load('results.twig');
+$template = $twig->load('results-tags.twig');
 echo $template->render(['headers' => $headers, 'rows' => $rows, 'tolerance' => $tolerance, 'date1' => $compare['date1'], 'date2' => $compare['date2']]);
