@@ -16,6 +16,11 @@ if (isset($_GET['latest'])) {
 }
 $crawls = $resultsStorage->getTimeStamps($compare, $onlyLatest);
 
+if (isset($_GET['onlynaughty']) && $_GET['onlynaughty'] == 1) {
+    $showOnlyNaughty = $_GET['onlynaughty'];
+}
+
+
 $rows = [];
 $headers = [];
 $index = 0;
@@ -29,7 +34,7 @@ if (isset($_GET['tolerance'])) {
 // We just use the last two crawls.
 if (sizeof($crawls) > 1) {
     $lastElem = array_key_last($crawls);
-    $naughtySites = $resultsStorage->getCrawlDiffs($crawls[$lastElem-1], $crawls[$lastElem], $tolerance, $onlyLatest);
+    $naughtySites = $resultsStorage->getNaughtySites($crawls[$lastElem-1], $crawls[$lastElem], $tolerance, $onlyLatest);
 }
 
 // Iterate over the results, preparing columns and rows for the twig template.
@@ -45,31 +50,22 @@ foreach ($crawls as $timestamp) {
         foreach ($listOfSites as $site) {
             $site_id = $site['url'];
             $site['naughty'] = '';
+
             if (isset($naughtySites[$site_id]) && sizeof($crawls) > 1) {
                 $site['naughty'] = 'naughty';
             }
 
-            // Initialise the row for the site if it's empty.
-            if (empty($rows[$site_id][$index])) {
-                $rows[$site_id][$index] = [];
-            }
+            if ($showOnlyNaughty == TRUE && $site['naughty'] == 'naughty' || $showOnlyNaughty != TRUE) {
+                if (empty($rows[$site_id][$index])) {
+                    $rows[$site_id][$index] = [];
+                }
 
-            array_push($rows[$site_id][$index], $site['size'], $site['statusCode'], $site['naughty'], $site['url'], $site['tags']);
+                array_push($rows[$site_id][$index], $site['size'], $site['statusCode'], $site['naughty'], $site['url'], $site['tags']);
+            }
         }
     }
 
     $index++;
-}
-
-// Populate missing data for the rows and sort by index to maintain
-// column order.
-foreach ($rows as $site_id => $row) {
-    for ($i = 0; $i < $index; $i++) {
-        if (empty($rows[$site_id][$i])) {
-            $rows[$site_id][$i] = ['', ''];
-        }
-    }
-    ksort($rows[$site_id]);
 }
 
 // Specify our Twig templates location

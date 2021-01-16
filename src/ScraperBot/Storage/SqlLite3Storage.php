@@ -210,24 +210,26 @@ class SqlLite3Storage implements StorageInterface {
      * @param $timestamp1
      * @param $timestamp2
      */
-    public function getCrawlDiffs($timestamp1, $timestamp2, $tolerance = 1000, $site = NULL) {
-        $queryString = sprintf("SELECT DISTINCT * FROM sites WHERE timestamp = '%s' AND url LIKE '%s' order by url", $timestamp1, $site);
+    public function getCrawlDiffs($timestamp1, $timestamp2, $tolerance = 1000) {
+        $queryString = sprintf("SELECT DISTINCT * FROM sites INNER JOIN tags ON sites.url=tags.url WHERE sites.timestamp = '%s' AND tag_name='total' order by site_id", $timestamp1);
         $results1 = $this->pdo->query($queryString);
 
-        $queryString2 = sprintf("SELECT DISTINCT * FROM sites WHERE timestamp = '%s' AND url LIKE '%s' order by url", $timestamp2, $site);
+        $queryString2 = sprintf("SELECT DISTINCT * FROM sites INNER JOIN tags ON sites.url=tags.url WHERE sites.timestamp = '%s' AND tag_name='total' order by site_id", $timestamp2);
         $results2 = $this->pdo->query($queryString2);
-        $listofSites1 = array();
 
+        $listofSites1 = array();
+        $index = 1;
         while ($row = $results1->fetchArray()) {
-            $listofSites1[$row['url']] = $row;
+            $listofSites1[$index] = $row;
+            $index++;
         }
 
+        $index2 = 1;
         $naughtySite = [];
         while ($row2 = $results2->fetchArray()) {
-            $listofSites2[$row2[2]] = $row2;
-            $index2 = $row2['url'];
+            $listofSites2[$index2] = $row2;
             $diff = abs($listofSites1[$index2]['size'] - $row2['size']);
-            if (($diff > $tolerance && $diff > 0) || ($listofSites1[$index2]['statusCode'] != $row2['statusCode'])) {
+            if (($diff > $tolerance && $diff > 0) ) { // || ($listofSites1[$index2]['statusCode'] != $row2['statusCode'])
                 $naughtySite[$index2]['size1'][$index2] = $listofSites1[$index2]['size'];
                 $naughtySite[$index2]['statusCode1'][$index2] = $listofSites1[$index2]['statusCode'];
                 $naughtySite[$index2]['url1'][$index2] = $listofSites1[$index2]['url'];
@@ -236,59 +238,41 @@ class SqlLite3Storage implements StorageInterface {
                 $naughtySite[$index2]['statusCode2'][$row2[2]] = $row2['statusCode'];
                 $naughtySite[$index2]['url2'][$index2] = $listofSites1[$index2]['url'];
             }
+            $index2++;
         }
 
         return $naughtySite;
     }
 
-    /**
-     * Get diffs between two crawls.
-     *
-     * @param $timestamp1
-     * @param $timestamp2
-     */
-    public function getTagsDiffs($timestamp1, $timestamp2, $tolerance = 1000) {
 
-        $queryString = sprintf("SELECT DISTINCT * FROM sites WHERE timestamp = '%s' order by url", $timestamp1);
+    public function getNaughtySites($timestamp1, $timestamp2, $tolerance = 1000) {
+        $queryString = sprintf("SELECT DISTINCT * FROM sites INNER JOIN tags ON sites.url=tags.url WHERE sites.timestamp = '%s' AND tag_name='total' order by site_id", $timestamp1);
         $results1 = $this->pdo->query($queryString);
 
-        $queryString2 = sprintf("SELECT DISTINCT * FROM sites WHERE timestamp = '%s' order by url", $timestamp2);
+        $queryString2 = sprintf("SELECT DISTINCT * FROM sites INNER JOIN tags ON sites.url=tags.url WHERE sites.timestamp = '%s' AND tag_name='total' order by site_id", $timestamp2);
         $results2 = $this->pdo->query($queryString2);
 
         $listofSites1 = array();
-
+        $index = 1;
         while ($row = $results1->fetchArray()) {
-            $listofSites1[$row['url']] = $row;
+            $listofSites1[$index] = $row;
+            $index++;
         }
 
+        $index2 = 1;
         $naughtySite = [];
         while ($row2 = $results2->fetchArray()) {
-            $listofSites2[$row2[2]] = $row2;
-            $index2 = $row2['url'];
+            $listofSites2[$index2] = $row2;
             $diff = abs($listofSites1[$index2]['size'] - $row2['size']);
-            if (($diff > $tolerance && $diff > 0) || ($listofSites1[$index2]['statusCode'] != $row2['statusCode'])) {
-                $naughtySite[$index2]['size1'][$index2] = $listofSites1[$index2]['size'];
-                $naughtySite[$index2]['statusCode1'][$index2] = $listofSites1[$index2]['statusCode'];
-                $naughtySite[$index2]['url1'][$index2] = $listofSites1[$index2]['url'];
-
-                // TODO: query with tags before
-                $naughtySite[$index2]['size2'][$row2[2]] = $row2['size'];
-                $naughtySite[$index2]['statusCode2'][$row2[2]] = $row2['statusCode'];
-                $naughtySite[$index2]['url2'][$index2] = $listofSites1[$index2]['url'];
-
-                // TODO: query with tags after
-                $queryStringTags = sprintf("SELECT * FROM sites  INNER JOIN tags ON sites.url=tags.url WHERE sites.timestamp='%s' and tag_name='total';", $timestamp2);
-
-                $tags = $this->pdo->query($queryStringTags);
-                print_r($tags);
-                while ($rowtags = $tags->fetchArray()) {
-                }
+            if (($diff > $tolerance && $diff > 0) || ($listofSites1[$index2]['statusCode'] != $row2['statusCode'])) { //
+                $naughtySite[$listofSites1[$index2]['url']] = $listofSites1[$index2]['url'];
+//                echo '<br>site:: ' . $listofSites1[$index2]['url'];
             }
+            $index2++;
         }
 
         return $naughtySite;
     }
-
     /**
      * Get different crawls
      *
