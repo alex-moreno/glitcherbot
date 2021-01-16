@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="css/bot.css">
+
+
+</head>
+<body>
+{% include 'menu.twig' %}
+
+<div class="container-fluid">
+    <h1>Stats for site: </h1>
+    <table class="table " style="text-align:center">
+        <thead class="thead-dark">
+        <tr>
+            <th>Index</th>
+            {% for header in headers %}
+                <th style="text-align:center" colspan="4">{{ header|date('F d, Y H:i:s') }}</th>
+            {%  endfor %}
+        </tr>
+        <tr>
+            <th></th>
+            {% for header in headers %}
+                <th>url</th>
+                <th>Size</th>
+                <th>Status Code</th>
+                <th style="width: 60%">Tags</th>
+            {%  endfor %}
+        </tr>
+        </thead>
+
+        {%  for key, row in rows %}
+            <tr>
+                <td style="text-align:center">
+                    {{ loop.index }}
+                </td>
+                {%  for column in row %}
+                    <td {% if column.2 %}class="table-danger"{% endif %}>
+                        <a href="http://{{ column.3 }}" target="_blank">{{ column.3 }}</a>
+                    </td>
+                    <td {% if column.2 %}class="table-danger"{% endif %}>
+                        {{ column.0 }}
+                    </td>
+                    <td {% if column.2 %}class="table-danger"{% endif %}>
+                        {{ column.1 }}
+                    </td>
+
+                    <td style="text-align:left" {% if column.2 %}class="table-danger"{% endif %}>
+                        {%  for key, tag in column.4 %}
+                            {% if key != 'total' %}
+                                <b>&lt;{{ key }}&gt;</b> {{ tag }}<br>
+                            {% endif %}
+                        {% endfor %}
+                        <br><br>
+                        <b>Total tags: {{ column.4['total'] }}</b>
+                    </td>
+
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+</div>
+
+{% include 'footer.twig' %}
+</body>
+</html>
