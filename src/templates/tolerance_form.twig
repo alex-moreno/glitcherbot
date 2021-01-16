@@ -32,6 +32,9 @@
 {% endif %}
 
 <div style="clear: both"></div>
-<div style="margin-left: 20px;"><a href="?latest=true">Get only latest 2 crawls</a> | <a href="?latest=false">Get all crawls</a>
+<div style="margin-left: 20px;">
+    <a href="?">Show all crawls</a>
+    | <a href="?latest=true">Show latest 2 crawls</a>
+    | <a href="?onlynaughty=true">Naughty sites</a>
 {% if(date1 and date2) %} | <a href="?latest=false">Reset dates filter</a>{% endif %}
 </div>

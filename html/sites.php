@@ -16,7 +16,7 @@ if (isset($_GET['latest'])) {
 }
 $crawls = $resultsStorage->getTimeStamps($compare, $onlyLatest);
 
-if (isset($_GET['onlynaughty']) && $_GET['onlynaughty'] == 1) {
+if (isset($_GET['onlynaughty']) && $_GET['onlynaughty'] == true) {
     $showOnlyNaughty = $_GET['onlynaughty'];
 }
 
