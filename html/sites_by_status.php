@@ -16,6 +16,7 @@ if (isset($_GET['latest'])) {
 }
 $crawls = $resultsStorage->getTimeStamps($compare, $onlyLatest);
 
+$showOnlyNaughty = NULL;
 if (isset($_GET['onlynaughty']) && $_GET['onlynaughty'] == true) {
     $showOnlyNaughty = $_GET['onlynaughty'];
 }
@@ -44,6 +45,7 @@ if (sizeof($crawlResults[$crawls[1]]) > 1) {
             if ($crawlResults[$crawls[1]][$site['url']]['statusCode'] != $site['statusCode']) {
 
                 $site_id = $site['url'];
+                $site['naughty'] = $crawlResults[$crawls[1]][$site['url']]['naughty'] = '';
                 if (empty($rows[$site_id][$index])) {
                     // Prepare the first column.
                     $rows[$site_id][$index] = [];
@@ -66,5 +68,5 @@ $index++;
 $loader = new \Twig\Loader\FilesystemLoader(__DIR__.'/../src/templates');
 // Instantiate our Twig
 $twig = new \Twig\Environment($loader);
-$template = $twig->load('results_status.twig');
+$template = $twig->load('results_changed_to_errors.twig');
 echo $template->render(['headers' => $headers, 'rows' => $rows, 'tolerance' => $tolerance, 'date1' => $compare['date1'], 'date2' => $compare['date2']]);

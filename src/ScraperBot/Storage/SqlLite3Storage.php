@@ -139,7 +139,7 @@ class SqlLite3Storage implements StorageInterface {
         if ($onlyLatest != NULL) {
 
         }
-
+        $siteTags = [];
         // If site is empty we'll list all sites instead.
         if ($site == NULL) {
             $site = "%";

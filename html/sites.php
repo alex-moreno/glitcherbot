@@ -10,11 +10,13 @@ if (isset($_GET['date1']) && $_GET['date2']) {
     $compare['date2'] = $_GET['date2'];
 }
 
+$onlyLatest = NULL;
 if (isset($_GET['latest'])) {
     $onlyLatest = $_GET['latest'];
 }
 $crawls = $resultsStorage->getTimeStamps($compare, $onlyLatest);
 
+$showOnlyNaughty = NULL;
 if (isset($_GET['onlynaughty']) && $_GET['onlynaughty'] == true) {
     $showOnlyNaughty = $_GET['onlynaughty'];
 }
