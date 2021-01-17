@@ -161,6 +161,30 @@ class SqlLite3Storage implements StorageInterface {
     }
 
     /**
+     * Get list of sites depending on their status.
+     *
+     * @param $timestamp1
+     * @param int $status
+     * @param null $statusFinal
+     * @return array
+     */
+    public function getSitesPerStatus($timestamp, $status = NULL) {
+        $statusQuery = "";
+        if ($status != NULL) {
+            $statusQuery = "AND statusCode='%s'";
+        }
+        $queryString = sprintf("SELECT * FROM sites INNER JOIN tags ON sites.url=tags.url WHERE sites.timestamp = '%s' " . $statusQuery . " AND tag_name='total' AND sites.timestamp=tags.timestamp  order by site_id", $timestamp, $status);
+
+        $query = $this->pdo->query($queryString);
+        while ($row = $query->fetchArray()) {
+            $results[$row['url']] = $row;
+            $results[$row['url']]['tags']['total'] = $row['tag_value'];
+        }
+
+        return $results;
+    }
+
+    /**
      * Return tags linked to a given site and timestamp.
      *
      * @param $site
@@ -190,7 +214,6 @@ class SqlLite3Storage implements StorageInterface {
 
         }
 
-//        $queryString = sprintf("SELECT * FROM sites WHERE timestamp = '%s' order by url", $timestamp);
         $queryString = sprintf("SELECT * FROM sites  INNER JOIN tags ON sites.url=tags.url WHERE sites.timestamp='%s' AND tag_name='total';", $timestamp);
 
         $query = $this->pdo->query($queryString);
@@ -229,7 +252,7 @@ class SqlLite3Storage implements StorageInterface {
         while ($row2 = $results2->fetchArray()) {
             $listofSites2[$index2] = $row2;
             $diff = abs($listofSites1[$index2]['size'] - $row2['size']);
-            if (($diff > $tolerance && $diff > 0) ) { // || ($listofSites1[$index2]['statusCode'] != $row2['statusCode'])
+            if (($diff > $tolerance && $diff > 0)  || ($listofSites1[$index2]['statusCode'] != $row2['statusCode'])) {
                 $naughtySite[$index2]['size1'][$index2] = $listofSites1[$index2]['size'];
                 $naughtySite[$index2]['statusCode1'][$index2] = $listofSites1[$index2]['statusCode'];
                 $naughtySite[$index2]['url1'][$index2] = $listofSites1[$index2]['url'];
@@ -245,6 +268,16 @@ class SqlLite3Storage implements StorageInterface {
     }
 
 
+    /**
+     * Get list of sites with inconsistencies between crawls.
+     *
+     * @param $timestamp1
+     * @param $timestamp2
+     * @param int $tolerance
+     *   Page weight tolerance in bits between crawls.
+     * @return array
+     *   List of naughty sites
+     */
     public function getNaughtySites($timestamp1, $timestamp2, $tolerance = 1000) {
         $queryString = sprintf("SELECT DISTINCT * FROM sites INNER JOIN tags ON sites.url=tags.url WHERE sites.timestamp = '%s' AND tag_name='total' order by site_id", $timestamp1);
         $results1 = $this->pdo->query($queryString);
@@ -266,7 +299,6 @@ class SqlLite3Storage implements StorageInterface {
             $diff = abs($listofSites1[$index2]['size'] - $row2['size']);
             if (($diff > $tolerance && $diff > 0) || ($listofSites1[$index2]['statusCode'] != $row2['statusCode'])) { //
                 $naughtySite[$listofSites1[$index2]['url']] = $listofSites1[$index2]['url'];
-//                echo '<br>site:: ' . $listofSites1[$index2]['url'];
             }
             $index2++;
         }
@@ -290,9 +322,17 @@ class SqlLite3Storage implements StorageInterface {
             $numRows[$timeStamp] = $row['count'];
         }
 
+        print_r($numRows);
         return $numRows;
     }
 
+    /**
+     * Add sitemap url.
+     *
+     * @param $url
+     * @param $index
+     * @param $timestamp
+     */
     public function addSitemapURL($url, $index, $timestamp)
     {
         $query = sprintf("INSERT INTO sitemapURLs (timestamp, url, site_id) VALUES(%d,%d,\"%s\")", $timestamp, $index, $url);
