@@ -322,7 +322,6 @@ class SqlLite3Storage implements StorageInterface {
             $numRows[$timeStamp] = $row['count'];
         }
 
-        print_r($numRows);
         return $numRows;
     }
 
