@@ -22,56 +22,51 @@ if (isset($_GET['onlynaughty']) && $_GET['onlynaughty'] == true) {
 }
 
 
-$rows = [];
-$headers = [];
-$index = 0;
-
 $tolerance = 1000;
 if (isset($_GET['tolerance'])) {
     $tolerance = $_GET['tolerance'];
 }
 
+$rows = $secondaryRow = [];
+$headers = [];
+$index = 0;
 
-// We just use the last two crawls.
-if (sizeof($crawls) > 1) {
-    $lastElem = array_key_last($crawls);
-    $naughtySites = $resultsStorage->getNaughtySites($crawls[$lastElem-1], $crawls[$lastElem], $tolerance, $onlyLatest);
-}
+$headers[0] = $crawls[0];
+$headers[1] = $crawls[1];
 
 // Iterate over the results, preparing columns and rows for the twig template.
-foreach ($crawls as $timestamp) {
-    // Get site crawl results for each timestamp.
-    $resultsByTimestamp = $resultsStorage->getResultsbyTimestamp($timestamp);
-
-    $headers[$index] = $timestamp;
+$crawlResults[$crawls[0]] = $resultsStorage->getSitesPerStatus($crawls[0], 200);
+$crawlResults[$crawls[1]] = $resultsStorage->getSitesPerStatus($crawls[1]);
 
     // Get the list of results, per site, for a given timestamp and prepare
     // array entries representing the rows.
-    foreach ($resultsByTimestamp as $listOfSites) {
-        foreach ($listOfSites as $site) {
-            $site_id = $site['url'];
-            $site['naughty'] = '';
+if (sizeof($crawlResults[$crawls[1]]) > 1) {
+        foreach ($crawlResults[$crawls[0]] as $url => $site) {
+            if ($crawlResults[$crawls[1]][$site['url']]['statusCode'] != $site['statusCode']) {
 
-            if (isset($naughtySites[$site_id]) && sizeof($crawls) > 1) {
-                $site['naughty'] = 'naughty';
-            }
-
-            if ($showOnlyNaughty == TRUE && $site['naughty'] == 'naughty' || $showOnlyNaughty != TRUE) {
+                $site_id = $site['url'];
+                $site['naughty'] = $crawlResults[$crawls[1]][$site['url']]['naughty'] = '';
                 if (empty($rows[$site_id][$index])) {
+                    // Prepare the first column.
                     $rows[$site_id][$index] = [];
+                    // Prepare the second column.
+                    $rows[$site_id][$index+1] = [];
                 }
 
+                // Put first results in the first column.
                 array_push($rows[$site_id][$index], $site['size'], $site['statusCode'], $site['naughty'], $site['url'], $site['tags']);
+                // Put second results in the second column.
+                array_push($rows[$site_id][$index+1], $crawlResults[$crawls[1]][$site['url']]['size'],
+                    $crawlResults[$crawls[1]][$site['url']]['statusCode'], $crawlResults[$crawls[1]][$site['url']]['naughty'],
+                    $crawlResults[$crawls[1]][$site['url']]['url'], $crawlResults[$crawls[1]][$site['url']]['tags']);
             }
-        }
     }
-
-    $index++;
 }
+$index++;
 
 // Specify our Twig templates location
 $loader = new \Twig\Loader\FilesystemLoader(__DIR__.'/../src/templates');
 // Instantiate our Twig
 $twig = new \Twig\Environment($loader);
-$template = $twig->load('results.twig');
+$template = $twig->load('results_changed_to_errors.twig');
 echo $template->render(['headers' => $headers, 'rows' => $rows, 'tolerance' => $tolerance, 'date1' => $compare['date1'], 'date2' => $compare['date2']]);

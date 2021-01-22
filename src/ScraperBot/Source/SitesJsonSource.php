@@ -27,6 +27,16 @@ class SitesJsonSource implements SourceInterface {
     public function addLink($url)
     {
         // TODO: Implement addLink() method.
+        $this->listOfSites[] = $url;
+    }
+
+    /**
+     * Return all links in the array.
+     *
+     * @return |null
+     */
+    public function readLinks() {
+        return $this->listOfSites;
     }
 
     /**

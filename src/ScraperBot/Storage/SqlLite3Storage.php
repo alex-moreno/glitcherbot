@@ -94,12 +94,12 @@ class SqlLite3Storage implements StorageInterface {
      */
     public function getTimeStamps($timestamps = NULL, $getLatest = NULL) {
         if ($timestamps != NULL) {
-            $queryString = sprintf("SELECT * FROM sites WHERE timestamp = '%s' OR timestamp = '%s' GROUP BY timestamp order by url", strtotime($timestamps['date1']), strtotime($timestamps['date2']));
+            $queryString = sprintf("SELECT DISTINCT * FROM sites WHERE timestamp = '%s' OR timestamp = '%s' GROUP BY timestamp order by url", strtotime($timestamps['date1']), strtotime($timestamps['date2']));
         } else {
-            $queryString = sprintf("SELECT DISTINCT  * FROM sites group by timestamp");
+            $queryString = sprintf("SELECT DISTINCT * FROM sites GROUP by timestamp");
             if ($getLatest!=NULL && $getLatest == 'true') {
                 // Get only the two latest crawls.
-                $queryString = sprintf("SELECT DISTINCT  * FROM sites group by timestamp order by timestamp desc LIMIT 2");
+                $queryString = sprintf("SELECT DISTINCT * FROM sites GROUP by timestamp order by timestamp desc LIMIT 2");
             }
         }
 
@@ -130,17 +130,98 @@ class SqlLite3Storage implements StorageInterface {
      * Get results for a given date.
      *
      * @param $timestamp
+     * @param null $onlyLatest
+     * @param null $site
+     *  Site for which we want to fetch results.
      * @return mixed
      */
-    public function getResultsbyTimestamp($timestamp, $onlyLatest = NULL) {
+    public function getResultsbyTimestamp($timestamp, $onlyLatest = NULL, $site = NULL) {
+        if ($onlyLatest != NULL) {
+
+        }
+        $siteTags = [];
+        // If site is empty we'll list all sites instead.
+        if ($site == NULL) {
+            $site = "%";
+        } else {
+            $siteTags = $this->getTags($site, $timestamp);
+        }
+
+        $queryString = sprintf("SELECT * FROM sites INNER JOIN tags ON sites.url=tags.url WHERE sites.timestamp='%s' AND tag_name='total' AND sites.timestamp=tags.timestamp AND sites.url LIKE '%s';", $timestamp, $site);
+
+        $query = $this->pdo->query($queryString);
+        while ($row = $query->fetchArray()) {
+            $results[$timestamp][$row['url']] = $row;
+            // Get tags.
+            $results[$timestamp][$row['url']]['tags'] = $siteTags;
+            $results[$timestamp][$row['url']]['tags']['total'] = $row['tag_value'];
+        }
+
+        return $results;
+    }
+
+    /**
+     * Get list of sites depending on their status.
+     *
+     * @param $timestamp1
+     * @param int $status
+     * @param null $statusFinal
+     * @return array
+     */
+    public function getSitesPerStatus($timestamp, $status = NULL) {
+        $statusQuery = "";
+        if ($status != NULL) {
+            $statusQuery = "AND statusCode='%s'";
+        }
+        $queryString = sprintf("SELECT * FROM sites INNER JOIN tags ON sites.url=tags.url WHERE sites.timestamp = '%s' " . $statusQuery . " AND tag_name='total' AND sites.timestamp=tags.timestamp  order by site_id", $timestamp, $status);
+
+        $query = $this->pdo->query($queryString);
+        while ($row = $query->fetchArray()) {
+            $results[$row['url']] = $row;
+            $results[$row['url']]['tags']['total'] = $row['tag_value'];
+        }
+
+        return $results;
+    }
+
+    /**
+     * Return tags linked to a given site and timestamp.
+     *
+     * @param $site
+     * @param $timestamp
+     *
+     * @return mixed
+     */
+    public function getTags($site, $timestamp) {
+        $queryString = sprintf("SELECT * FROM tags WHERE timestamp='%s' AND url LIKE '%s';", $timestamp, $site);
+        $query = $this->pdo->query($queryString);
+
+        $tags = [];
+        while ($row = $query->fetchArray()) {
+            $tags[$row['tag_name']] = $row['tag_value'];
+        }
+        return $tags;
+    }
+
+    /**
+     * Get results for a given date.
+     *
+     * @param $timestamp
+     * @return mixed
+     */
+    public function getResultsAndTagsbyTimestamp($timestamp, $onlyLatest = NULL) {
         if ($onlyLatest != NULL) {
 
         }
 
-        $queryString = sprintf("SELECT * FROM sites WHERE timestamp = '%s' order by url", $timestamp);
+        $queryString = sprintf("SELECT * FROM sites  INNER JOIN tags ON sites.url=tags.url WHERE sites.timestamp='%s' AND tag_name='total';", $timestamp);
+
         $query = $this->pdo->query($queryString);
         while ($row = $query->fetchArray()) {
             $results[$timestamp][$row['url']] = $row;
+            // Get tags.
+            $results[$timestamp][$row['url']]['tags']['total'] = $row['tag_value'];
+
         }
 
         return $results;
@@ -153,25 +234,25 @@ class SqlLite3Storage implements StorageInterface {
      * @param $timestamp2
      */
     public function getCrawlDiffs($timestamp1, $timestamp2, $tolerance = 1000) {
-
-        $queryString = sprintf("SELECT DISTINCT * FROM sites WHERE timestamp = '%s' order by url", $timestamp1);
+        $queryString = sprintf("SELECT DISTINCT * FROM sites INNER JOIN tags ON sites.url=tags.url WHERE sites.timestamp = '%s' AND tag_name='total' order by site_id", $timestamp1);
         $results1 = $this->pdo->query($queryString);
 
-        $queryString2 = sprintf("SELECT DISTINCT * FROM sites WHERE timestamp = '%s' order by url", $timestamp2);
+        $queryString2 = sprintf("SELECT DISTINCT * FROM sites INNER JOIN tags ON sites.url=tags.url WHERE sites.timestamp = '%s' AND tag_name='total' order by site_id", $timestamp2);
         $results2 = $this->pdo->query($queryString2);
 
         $listofSites1 = array();
-
+        $index = 1;
         while ($row = $results1->fetchArray()) {
-            $listofSites1[$row['url']] = $row;
+            $listofSites1[$index] = $row;
+            $index++;
         }
 
+        $index2 = 1;
         $naughtySite = [];
         while ($row2 = $results2->fetchArray()) {
-            $listofSites2[$row2[2]] = $row2;
-            $index2 = $row2['url'];
+            $listofSites2[$index2] = $row2;
             $diff = abs($listofSites1[$index2]['size'] - $row2['size']);
-            if (($diff > $tolerance && $diff > 0) || ($listofSites1[$index2]['statusCode'] != $row2['statusCode'])) {
+            if (($diff > $tolerance && $diff > 0)  || ($listofSites1[$index2]['statusCode'] != $row2['statusCode'])) {
                 $naughtySite[$index2]['size1'][$index2] = $listofSites1[$index2]['size'];
                 $naughtySite[$index2]['statusCode1'][$index2] = $listofSites1[$index2]['statusCode'];
                 $naughtySite[$index2]['url1'][$index2] = $listofSites1[$index2]['url'];
@@ -180,11 +261,50 @@ class SqlLite3Storage implements StorageInterface {
                 $naughtySite[$index2]['statusCode2'][$row2[2]] = $row2['statusCode'];
                 $naughtySite[$index2]['url2'][$index2] = $listofSites1[$index2]['url'];
             }
+            $index2++;
         }
 
         return $naughtySite;
     }
 
+
+    /**
+     * Get list of sites with inconsistencies between crawls.
+     *
+     * @param $timestamp1
+     * @param $timestamp2
+     * @param int $tolerance
+     *   Page weight tolerance in bits between crawls.
+     * @return array
+     *   List of naughty sites
+     */
+    public function getNaughtySites($timestamp1, $timestamp2, $tolerance = 1000) {
+        $queryString = sprintf("SELECT DISTINCT * FROM sites INNER JOIN tags ON sites.url=tags.url WHERE sites.timestamp = '%s' AND tag_name='total' order by site_id", $timestamp1);
+        $results1 = $this->pdo->query($queryString);
+
+        $queryString2 = sprintf("SELECT DISTINCT * FROM sites INNER JOIN tags ON sites.url=tags.url WHERE sites.timestamp = '%s' AND tag_name='total' order by site_id", $timestamp2);
+        $results2 = $this->pdo->query($queryString2);
+
+        $listofSites1 = array();
+        $index = 1;
+        while ($row = $results1->fetchArray()) {
+            $listofSites1[$index] = $row;
+            $index++;
+        }
+
+        $index2 = 1;
+        $naughtySite = [];
+        while ($row2 = $results2->fetchArray()) {
+            $listofSites2[$index2] = $row2;
+            $diff = abs($listofSites1[$index2]['size'] - $row2['size']);
+            if (($diff > $tolerance && $diff > 0) || ($listofSites1[$index2]['statusCode'] != $row2['statusCode'])) { //
+                $naughtySite[$listofSites1[$index2]['url']] = $listofSites1[$index2]['url'];
+            }
+            $index2++;
+        }
+
+        return $naughtySite;
+    }
     /**
      * Get different crawls
      *
@@ -205,6 +325,13 @@ class SqlLite3Storage implements StorageInterface {
         return $numRows;
     }
 
+    /**
+     * Add sitemap url.
+     *
+     * @param $url
+     * @param $index
+     * @param $timestamp
+     */
     public function addSitemapURL($url, $index, $timestamp)
     {
         $query = sprintf("INSERT INTO sitemapURLs (timestamp, url, site_id) VALUES(%d,%d,\"%s\")", $timestamp, $index, $url);
