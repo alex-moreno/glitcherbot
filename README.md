@@ -1,14 +1,18 @@
 
-#Requirements
+# Visual regression testing made easy
+
+Automating the boring stuff.
+
+# Requirements
 
 - PHP 7.4
 - a (maybe big) list of urls to crawl
 
-#Install
+# Install
 
 ```composer.json```
 
-#Usage
+# Usage
 
 Create a .csv which contains a list of urls to iterate over (see example.csv).
 
@@ -28,7 +32,7 @@ Whilst debugging, increase verbosity by adding a number of `-v` flags.
 `-vv` : very verbose
 `-vvv` : debug
 
-#Configuration
+# Configuration
 
 There are some settings that you can configure, like the headers that you'll send to the site or the concurrency that you want to use.
 
