@@ -1,7 +1,7 @@
 
 # Visual regression testing made easy
 
-Automating the boring stuff.
+Automating the boring stuff. Managing a website can be difficult. You can end up with hundreds of pages, and making sure all of them are functional after an event, say a deployment, peaks of traffic, editorial changes, ads or javascripts behaving badly, ... Creating software and maintaining websites and apps is hard... regression testing should not.
 
 # Requirements
 
