@@ -17,7 +17,9 @@ Managing a website can be difficult. You can end up with hundreds of pages, and 
 2. Run:
 ```composer install```
 
-3. Vagrant up if you want to use the crawler inside the virtual machine (recommended).
+3. Make a copy of your config.php
+
+```cp config.sample.php config.php```
 
 # Usage
 
@@ -29,7 +31,10 @@ If using Acquia Site Factory, a command is supplied to generate a list of sites 
 
 ```scp  [subscription][ENV].[ENV]@[subscription][ENV].ssh.enterprise-g1.acquia-sites.com:/mnt/files/[subscription][ENV]/files-private/sites.json ./sites-dev.json```
 
-2. Run the crawl against that json
+2. Vagrant up if you want to use the crawler inside the virtual machine (recommended).
+
+
+3. Run the crawl against that json
 
 ```php bin/visual_regression_bot.php acquia:acsf-crawl-sites sites.json```
 
