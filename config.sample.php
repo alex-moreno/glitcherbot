@@ -2,7 +2,7 @@
 
 return [
   'headers' => [
-    'User-Agent'   => 'AcquiaScrapperBot/0.1',
+    'User-Agent'   => 'GlitcherBotScrapper/0.2',
     'Accept'       => 'application/json',
   ],
   'http_errors' => false,
