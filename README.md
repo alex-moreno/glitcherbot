@@ -27,7 +27,7 @@ If using Acquia Site Factory, a command is supplied to generate a list of sites 
 
 1. Download the sites.json in your Acquia Cloud subscription
 
-```scp  bayerwsf.01dev@bayerwsf01dev.ssh.enterprise-g1.acquia-sites.com:/mnt/files/bayerwsf01dev/files-private/sites.json ./sites-dev.json```
+```scp  [subscription][ENV].[ENV]@[subscription][ENV].ssh.enterprise-g1.acquia-sites.com:/mnt/files/[subscription][ENV]/files-private/sites.json ./sites-dev.json```
 
 2. Run the crawl against that json
 
