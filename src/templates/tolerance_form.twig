@@ -4,9 +4,6 @@
         <input type="checkbox" id="onlynaughty" name="onlynaughty" value="onlynaughty" {{ persistNaughty }}><label for="onlynaughty"> Show only Naughty sites</label><br>
         <input type="checkbox" id="latest" name="latest" value="latest" {{ persistLatest }}><label for="latest"> Only two latest</label><br>
 
-        post:: {{ persistNaughty }}
-        post:: {{ _get.onlynaughty }}
-
         <label for="example"><b>Tolerance (>=0)</b></label>
         <input id="tolerance" type="text" name="tolerance" value="{{ tolerance }}" size="8">
         <input type="submit" value="Send">
@@ -40,8 +37,5 @@
 
 <div style="clear: both"></div>
 <div style="margin-left: 20px;">
-{#    <a href="?">Show all crawls</a>#}
-{#    | <a href="?latest=true">Show latest 2 crawls</a>#}
-{#    | <a href="?onlynaughty=true">** Naughty sites **</a>#}
 {% if(date1 and date2) %} | <a href="?latest=false">Reset dates filter</a>{% endif %}
 </div>
