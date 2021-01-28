@@ -77,3 +77,14 @@ return [
 ```
 
 Note: The higher the concurrency is configured, the more sites it will run on each step, but be careful, php is fast (contrary to popular believ) and can send high load to a site and put it in trouble. Big power means bigger responsibility.
+
+# Docker Web App
+
+A basic docker compose file is included that will run a web server for viewing results.
+
+To run this:
+
+1. Ensure that your dependencies have been installed using composer.
+2. Run the container using 'docker-compose up -d'
+
+The server runs on port 10002 on localhost, so navigate to 'http://localhost:10002' to get started.
