@@ -269,7 +269,7 @@ class SqlLite3Storage implements StorageInterface {
 
 
     /**
-     * Get list of sites with inconsistencies between crawls.
+     * Get list of sites with inconsistencies between crawls (potentially broken sites).
      *
      * @param $timestamp1
      * @param $timestamp2
@@ -305,6 +305,7 @@ class SqlLite3Storage implements StorageInterface {
 
         return $naughtySite;
     }
+
     /**
      * Get different crawls
      *
@@ -321,6 +322,20 @@ class SqlLite3Storage implements StorageInterface {
 
             $numRows[$timeStamp] = $row['count'];
         }
+
+        return $numRows;
+    }
+
+    /**
+     * Get different crawls
+     *
+     * @return mixed
+     */
+    public function getNumberofSites($timeStamp) {
+        $queryString = sprintf("SELECT COUNT(*) as count FROM sites WHERE timestamp = '%s' ", $timeStamp);
+        $rows = $this->pdo->query($queryString);
+        $row = $rows->fetchArray();
+        $numRows = $row['count'];
 
         return $numRows;
     }
