@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="css/bot.css">
+</head>
+<body>
+{% include 'menu.twig' %}
+
+<div class="container-fluid">
+    <form class="form-inline" method="post">
+        <div class="form-group mb-2">
+            <label for="timestamp1">Run 1</label>
+            <select class="form-control" id="timestamp1" name="timestamp1">
+                {% for option in options %}
+                {% if option == select1 %}
+                <option value="{{ option }}" selected>{{ option | date("F jS \\a\\t g:ia") }}</option>
+                {%  else %}
+                <option value="{{ option }}">{{ option | date("F jS \\a\\t g:ia") }}</option>
+                {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group mb-2">
+            <label for="timestamp2">Run 2</label>
+            <select class="form-control" id="timestamp2" name="timestamp2">
+                {% for option in options %}
+                {% if option == select2 %}
+                <option value="{{ option }}" selected>{{ option | date("F jS \\a\\t g:ia") }}</option>
+                {%  else %}
+                <option value="{{ option }}">{{ option | date("F jS \\a\\t g:ia") }}</option>
+                {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary mb-2">Submit</button>
+    </form>
+
+    <canvas id="myChart"></canvas>
+</div>
+
+{% include 'footer.twig' %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+<script>
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var chart = new Chart(ctx, {
+        // The type of chart we want to create
+        type: 'bar',
+
+        // The data for our dataset
+        data: {
+            labels: {{ codes }},
+            datasets: [{
+                    label: '{{ select1 | date("F jS \\\\a\\\\t g:ia") }}',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    data:{{ dataset1 }}
+                },
+                {
+                    label: '{{ select2 | date("F jS \\\\a\\\\t g:ia") }}',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    data: {{ dataset2 }}
+                }
+            ]
+        },
+
+        // Configuration options go here
+        options: {}
+    });
+</script>
+</body>
+</html>

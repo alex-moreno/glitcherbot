@@ -426,4 +426,19 @@ class SqlLite3Storage implements StorageInterface {
     public function dumpPendingURLs() {
         $this->pdo->query("delete from pendingURLs");
     }
+
+    /**
+     * Get status code totals data for a given timestamp.
+     */
+    public function getStatusCodeTotals($timestamp) {
+        $stmt = $this->pdo->prepare("select statusCode, count(*) as total from sites where timestamp = :timestamp group by statusCode");
+        $stmt->bindParam(':timestamp', $timestamp);
+        $result = $stmt->execute();
+
+        while($row =  $result->fetchArray()) {
+            $data[$row['statusCode']] = $row["total"];
+        }
+
+        return $data;
+    }
 }
