@@ -15,4 +15,6 @@ interface StorageInterface {
     public function getSitemapURLs();
     public function addPendingURL($url, $index, $timestamp);
     public function getPendingURLs();
+    public function getStatusCodeTotals($timestamp);
+
 }
