@@ -4,3 +4,5 @@ vendor
 csv
 .idea
 .vagrant
+glitcherbot.sqlite3
+sites.json
