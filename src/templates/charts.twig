@@ -8,9 +8,10 @@
 {% include 'menu.twig' %}
 
 <div class="container-fluid">
+    <h2>Status Codes</h2>
     <form class="form-inline" method="post">
-        <div class="form-group mb-2">
-            <label for="timestamp1">Run 1</label>
+        <div class="form-group mb-2 mr-sm-2 mb-sm-0">
+            <label for="timestamp1" class="form-group mb-2 mr-sm-2 mb-sm-0">Run 1</label>
             <select class="form-control" id="timestamp1" name="timestamp1">
                 {% for option in options %}
                 {% if option == select1 %}
@@ -21,8 +22,8 @@
                 {% endfor %}
             </select>
         </div>
-        <div class="form-group mb-2">
-            <label for="timestamp2">Run 2</label>
+        <div class="form-group mb-2 mr-sm-2 mb-sm-0">
+            <label for="timestamp2" class="form-group mb-2 mr-sm-2 mb-sm-0">Run 2</label>
             <select class="form-control" id="timestamp2" name="timestamp2">
                 {% for option in options %}
                 {% if option == select2 %}
@@ -33,7 +34,7 @@
                 {% endfor %}
             </select>
         </div>
-        <button type="submit" class="btn btn-primary mb-2">Submit</button>
+        <button type="submit" class="btn btn-primary mb-2 mr-sm-2 mb-sm-0">Submit</button>
     </form>
 
     <canvas id="myChart"></canvas>
