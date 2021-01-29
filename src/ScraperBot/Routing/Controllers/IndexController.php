@@ -6,6 +6,10 @@ use ScraperBot\Renderer\TwigRenderer;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Class IndexController
+ * @package ScraperBot\Routing\Controllers
+ */
 class IndexController {
 
     /**
