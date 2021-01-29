@@ -37,7 +37,7 @@
                 </td>
                 {%  for key2, column in row %}
                     <td {% if column.2 %}class="table-danger"{% endif %}>
-                        <a href="/site_stats.php?url={{ column.3 }}">{{ column.3 }}</a>
+                        <a href="/stats/site?url={{ column.3 }}">{{ column.3 }}</a>
                     </td>
                     <td {% if column.2 %}class="table-danger"{% endif %}>
                         {{ column.0 }}

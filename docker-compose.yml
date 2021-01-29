@@ -2,7 +2,7 @@ version: '2'
 services:
   web:
     container_name: glitcherbot
-    image: php:7.4-apache
+    build: . 
     restart: unless-stopped
     volumes:
       - ./:/var/www/

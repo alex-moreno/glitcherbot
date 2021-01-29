@@ -6,7 +6,9 @@
         "symfony/console": "^5.2",
         "ext-sqlite3": "*",
         "twig/twig": "^3.1",
-      "ext-simplexml": "*"
+      "ext-simplexml": "*",
+        "symfony/http-kernel": "^5.2",
+        "symfony/routing": "^5.2"
     },
     "autoload": {
         "classmap": [
