@@ -13,12 +13,14 @@ if (isset($_GET['date1']) && $_GET['date2']) {
 $onlyLatest = NULL;
 if (isset($_GET['latest'])) {
     $onlyLatest = $_GET['latest'];
+    $persistLatest = 'checked';
 }
 $crawls = $resultsStorage->getTimeStamps($compare, $onlyLatest);
 
 $showOnlyNaughty = NULL;
 if (isset($_GET['onlynaughty']) && $_GET['onlynaughty'] == true) {
     $showOnlyNaughty = $_GET['onlynaughty'];
+    $persistNaughty = 'checked';
 }
 
 
@@ -74,4 +76,6 @@ $loader = new \Twig\Loader\FilesystemLoader(__DIR__.'/../src/templates');
 // Instantiate our Twig
 $twig = new \Twig\Environment($loader);
 $template = $twig->load('results.twig');
-echo $template->render(['headers' => $headers, 'rows' => $rows, 'tolerance' => $tolerance, 'date1' => $compare['date1'], 'date2' => $compare['date2']]);
+
+echo $template->render(['headers' => $headers, 'rows' => $rows, 'tolerance' => $tolerance, 'date1' => $compare['date1'], 'date2' => $compare['date2'], 'persistNaughty' => $persistNaughty, 'persistLatest' => $persistLatest]);
+
