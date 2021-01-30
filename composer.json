@@ -20,17 +20,19 @@
             "role": "Developer"
         }
     ],
-
     "require": {
         "guzzlehttp/guzzle": "^7.2",
         "amphp/parallel": "^1.4",
-        "php": ">=7.4",
+        "php": ">=7.0",
         "symfony/console": "^5.2",
-        "ext-sqlite3": "*",
         "twig/twig": "^3.1",
       "ext-simplexml": "*",
         "symfony/http-kernel": "^5.2",
         "symfony/routing": "^5.2"
+    },
+    "suggest": {
+        "ext-sqlite3": "*",
+        "php": ">=7.4"
     },
     "autoload": {
         "classmap": [
