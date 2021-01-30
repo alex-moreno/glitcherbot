@@ -16,7 +16,7 @@ Managing a website can be difficult. You can end up with hundreds of pages, and 
 
 Or
 
-1.1 (Recommended) Use composer: `composer require alex-moreno/glitcherbot`
+1.1 (Coming soon) Use composer: `composer require alex-moreno/glitcherbot`
 
 2. Run:
 ```composer install```
