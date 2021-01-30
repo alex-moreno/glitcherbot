@@ -58,13 +58,13 @@ Vagrant.configure("2") do |config|
   # backing providers for Vagrant. These expose provider-specific options.
   # Example for VirtualBox:
   #
-  # config.vm.provider "virtualbox" do |vb|
+   config.vm.provider "virtualbox" do |vb|
   #   # Display the VirtualBox GUI when booting the machine
   #   vb.gui = true
   #
   #   # Customize the amount of memory on the VM:
-  #   vb.memory = "1024"
-  # end
+     vb.memory = "2024"
+   end
   #
   # View the documentation for the provider you are using for more
   # information on available options.
@@ -72,13 +72,5 @@ Vagrant.configure("2") do |config|
   # Enable provisioning with a shell script. Additional provisioners such as
   # Ansible, Chef, Docker, Puppet and Salt are also available. Please see the
   # documentation for more information about their specific syntax and use.
-   config.vm.provision "shell", inline: <<-SHELL
-  #   apt-get update
-  #   apt-get install -y apache2
-    # Install dependencies
-    add-apt-repository ppa:ondrej/php
-    apt-get update
-    apt-get install -y apache2 git curl php7.4 php7.4-bcmath php7.4-bz2 php7.4-cli php7.4-curl php7.4-intl php7.4-json php7.4-mbstring php7.4-opcache php7.4-soap php7.4-sqlite3 php7.4-xml php7.4-xsl php7.4-zip libapache2-mod-php7.4 sqlite3 php-pear composer
-    pear install HTML_Table
-  SHELL
+  config.vm.provision :shell, :path => "bootstrap.sh"
 end
