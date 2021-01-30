@@ -5,7 +5,7 @@
     "description": "Visual regression testing made easy",
     "keywords": ["visual regression","visual regression testing", "regression testing"],
     "homepage": "https://alexmoreno.net",
-    "license": "AGPL",
+    "license": "AGPL-3.0-or-later",
     "authors": [
         {
             "name": "Alejandro Moreno",
