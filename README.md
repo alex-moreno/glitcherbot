@@ -8,7 +8,10 @@ Managing a website can be difficult. You can end up with hundreds of pages, and 
 # Requirements
 
 - PHP 7.4
-- a (maybe big) list of urls to crawl
+- Sqlite
+- A (maybe big) list of urls to crawl. Robots.txt and Sitemaps detected automatically
+
+Alternatively, using the Vagrant machine provided will take care of the sqlite and PHP 7.4 requirements. Keep reading.
 
 # Install
 
