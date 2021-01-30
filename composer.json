@@ -1,4 +1,26 @@
-{
+{ 
+   
+    "name": "alex-moreno/glitcherbot",
+    "type": "library",
+    "description": "Visual regression testing made easy",
+    "keywords": ["visual regression","visual regression testing", "regression testing"],
+    "homepage": "https://alexmoreno.net",
+    "license": "AGPL",
+    "authors": [
+        {
+            "name": "Alejandro Moreno",
+            "email": "alejandro.moreno@tdo.es",
+            "homepage": "https://github.com/alex-moreno/glitcherbot",
+            "role": "Devrel and Developer"
+        },
+        
+        {
+            "name": "Iain Potter",
+            "email": "iain.potter@acquia.com",
+            "role": "Developer"
+        }
+    ],
+
     "require": {
         "guzzlehttp/guzzle": "^7.2",
         "amphp/parallel": "^1.4",

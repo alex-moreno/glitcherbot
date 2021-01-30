@@ -12,7 +12,11 @@ Managing a website can be difficult. You can end up with hundreds of pages, and 
 
 # Install
 
-1. Clone or fork this repository.
+1. Clone / fork this repository.
+
+Or
+
+1.1 (Recommended) Use composer: `composer require alex-moreno/glitcherbot`
 
 2. Run:
 ```composer install```
