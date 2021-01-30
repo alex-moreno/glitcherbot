@@ -14,10 +14,6 @@ Managing a website can be difficult. You can end up with hundreds of pages, and 
 
 1. Clone / fork this repository.
 
-Or
-
-1.1 (Coming soon) Use composer: `composer require alex-moreno/glitcherbot`
-
 2. Run:
 ```composer install```
 
