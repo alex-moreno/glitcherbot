@@ -36,7 +36,7 @@
                 </td>
                 {%  for column in row %}
                     <td {% if column.2 %}class="table-danger"{% endif %}>
-                        <a href="http://{{ column.3 }}" target="_blank">{{ column.3 }}</a>
+                        <a href="{{ column.3 }}" target="_blank">{{ column.3 }}</a>
                     </td>
                     <td {% if column.2 %}class="table-danger"{% endif %}>
                         {{ column.0 }}

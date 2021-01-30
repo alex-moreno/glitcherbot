@@ -67,7 +67,6 @@ class Crawler
             // Concurrency to use.
             'concurrency' => $this->concurrency,
             'fulfilled' => function (Response $response, $index) use ($csvManager, $fileToWrite, $timestamp, $urls, $debug) {
-
                 $siteCrawled = array();
                 $siteCrawled['site_id'] = ($index + 1);
                 $siteCrawled['url'] = trim($urls[$index]);
@@ -77,6 +76,8 @@ class Crawler
                 $siteCrawled['footprint'] = md5($body);
 
                 $tagDistribution = $this->getTags($body);
+
+                echo PHP_EOL . 'Crawling: ' . trim($urls[$index]);
                 if ($debug) {
                     echo PHP_EOL . $siteCrawled['url'];
                 }
@@ -92,23 +93,33 @@ class Crawler
                 );
                 $this->storage->addTagDistribution($siteCrawled['url'], $tagDistribution, $timestamp);
             },
-            'rejected' => function ($reason, $index, $promise) use ($csvManager, $fileToWrite, $timestamp, $urls) {
+            'rejected' => function ($reason, $index, $promise) use ($csvManager, $fileToWrite, $timestamp, $urls, $debug) {
                 // Handle promise rejected here (ie: not existing domains, long timeouts or too many redirects).
-                echo 'rejected: ' . $reason . PHP_EOL . ' ----- ';
-                $siteCrawled = array();
-                $siteCrawled['site_id'] = ($index + 1);
-                $siteCrawled['url'] = $urls[$index + 1];
-                $siteCrawled['statusCode'] = 'rejected';
-                $siteCrawled['size'] = $siteCrawled['footprint'] = 0;
-                $csvManager->writeCsvLine(array($index, 'rejected', 0, 0), $fileToWrite);
-                $this->storage->addResult(
-                    $index,
-                    $siteCrawled['url'],
-                    0,
-                    0,
-                    0,
-                    $timestamp
-                );
+
+                // TODO: Review if this index is correct.
+                if (isset($urls[$index + 1])) {
+                    echo PHP_EOL . 'URL rejected: ' . $urls[$index + 1];
+                    // TODO: log this
+                    if ($debug) {
+                        echo PHP_EOL . 'Exception: ' . $reason;
+                    }
+
+                    $siteCrawled = array();
+                    $siteCrawled['site_id'] = ($index + 1);
+                    $siteCrawled['url'] = $urls[$index + 1];
+                    $siteCrawled['statusCode'] = 'rejected';
+                    $siteCrawled['size'] = $siteCrawled['footprint'] = 0;
+                    $csvManager->writeCsvLine(array($index, 'rejected', 0, 0), $fileToWrite);
+                    $this->storage->addResult(
+                        $index,
+                        $siteCrawled['url'],
+                        0,
+                        0,
+                        0,
+                        $timestamp
+                    );
+                }
+
             }
         ]);
 
