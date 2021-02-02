@@ -111,7 +111,7 @@ Opens the tool on the browser.
 
 `make stop`
 
-### Chainned commands.
+### Chained commands.
 You can run all commands at once, for example the following command will start the containers, build, craw and open the browser.
 
 `make up build crawl open`
