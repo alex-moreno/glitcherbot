@@ -5,22 +5,24 @@ Automating the boring stuff.
 
 Managing a website can be difficult. You can end up with hundreds of pages, and making sure all of them are functional after an event, say a deployment, peaks of traffic, editorial changes, ads or javascripts behaving badly, ... Creating software and maintaining websites and apps is hard... regression testing should not.
 
-# Requirements
+Before you start, Clone / fork this repository and go into the folder.
+There are two ways of using this tool: With [Vagrant](#Vagrant) or [Docker](#Docker).
 
+
+# Vagrant
+Download and install [Vagrant](https://www.vagrantup.com/downloads).
+
+## Requirements
 - PHP 7.4
 - Sqlite
 - A (maybe big) list of urls to crawl. Robots.txt and Sitemaps detected automatically
 
-Alternatively, using the Vagrant machine provided will take care of the sqlite and PHP 7.4 requirements. Keep reading.
+## Installation
 
-# Install
-
-1. Clone / fork this repository.
-
-2. Run:
+1. Run:
 ```composer install```
 
-3. Make a copy of your config.php
+1. Make a copy of your config.php
 
 ```cp config.sample.php config.php```
 
@@ -34,10 +36,10 @@ If using Acquia Site Factory, a command is supplied to generate a list of sites 
 
 ```scp  [subscription][ENV].[ENV]@[subscription][ENV].ssh.enterprise-g1.acquia-sites.com:/mnt/files/[subscription][ENV]/files-private/sites.json ./sites-dev.json```
 
-2. Vagrant up if you want to use the crawler inside the virtual machine (recommended).
+1. Vagrant up if you want to use the crawler inside the virtual machine (recommended).
 
 
-3. Run the crawl against that json
+1. Run the crawl against that json
 
 ```php bin/visual_regression_bot.php acquia:acsf-crawl-sites sites.json```
 
@@ -81,13 +83,37 @@ return [
 
 Note: The higher the concurrency is configured, the more sites it will run on each step, but be careful, php is fast (contrary to popular believ) and can send high load to a site and put it in trouble. Big power means bigger responsibility.
 
-# Docker Web App
+## Docker
+Download [Docker](https://www.docker.com/)
 
-A basic docker compose file is included that will run a web server for viewing results.
+### Starting the Docker container
+This command will start the containers
 
-To run this:
+`make up`
 
-1. Ensure that your dependencies have been installed using composer.
-2. Run the container using 'docker-compose up -d'
+### Building the tool (only need to run once)
+This command will check if the config file exists and create one if needed. Then it will install all Composer 
+dependencies.
 
-The server runs on port 10002 on localhost, so navigate to 'http://localhost:10002' to get started.
+`make build`
+
+### Crawling
+This command will use sample-sites.csv as source of urls to Crawl. You can change this file or alternativelly go inside the container and run the crawl command manually.
+
+`make crawl`
+
+### Web interface
+Opens the tool on the browser.
+
+`make open`
+
+### Stopping the container
+
+`make stop`
+
+### Chained commands.
+You can run all commands at once, for example the following command will start the containers, build, craw and open the browser.
+
+`make up build crawl open`
+
+
