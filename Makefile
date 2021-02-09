@@ -1,5 +1,7 @@
 include .env
 export $(shell sed 's/=.*//' .env)
+SITES_CSV=sample-sites.csv
+export SITES_CSV
 
 up:
 	docker-compose pull
@@ -22,4 +24,5 @@ in: up
 	docker exec -it ${PROJECT_NAME}_app bash
 
 crawl: build
-	docker exec -t ${PROJECT_NAME}_app bash -c 'php bin/visual_regression_bot.php -v bot:crawl-sites sample-sites.csv'
+	echo "Crawling with ${SITES_CSV}"
+	docker exec -t ${PROJECT_NAME}_app bash -c 'php bin/visual_regression_bot.php -v bot:crawl-sites ${SITES_CSV}'

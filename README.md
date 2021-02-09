@@ -98,9 +98,15 @@ dependencies.
 `make build`
 
 ### Crawling
-This command will use sample-sites.csv as source of urls to Crawl. You can change this file or alternativelly go inside the container and run the crawl command manually.
+This command will use sample-sites.csv as source of urls to Crawl by default.
 
 `make crawl`
+
+To run the command with a different file, use the syntax
+
+`make crawl SITES_CSV=path_to_sites_csv`
+
+Keep in mind that the crawl runs within the container, so `path_to_sites_csv` needs to be relative to the container.
 
 ### Web interface
 Opens the tool on the browser.
