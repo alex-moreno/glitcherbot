@@ -9,15 +9,15 @@ Before you start, Clone / fork this repository and go into the folder.
 There are two ways of using this tool: With [Vagrant](#Vagrant) or [Docker](#Docker).
 
 
-# Vagrant
+## Vagrant
 Download and install [Vagrant](https://www.vagrantup.com/downloads).
 
-## Requirements
+### Requirements
 - PHP 7.0
 - Sqlite
 - A (maybe big) list of urls to crawl. Robots.txt and Sitemaps detected automatically
 
-## Installation
+### Installation
 
 1. Run:
 ```composer install```
@@ -26,7 +26,7 @@ Download and install [Vagrant](https://www.vagrantup.com/downloads).
 
 ```cp config.sample.php config.php```
 
-# Usage
+### Usage
 
 Create a .csv which contains a list of urls to iterate over (see example.csv).
 
@@ -58,7 +58,7 @@ Whilst debugging, increase verbosity by adding a number of `-v` flags.
 `-vv` : very verbose
 `-vvv` : debug
 
-# Configuration
+### Configuration
 
 There are some settings that you can configure, like the headers that you'll send to the site or the concurrency that you want to use.
 
