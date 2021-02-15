@@ -63,7 +63,7 @@ class SiteStatsController {
                     }
                 }
             }
-            
+
             $index++;
         }
 

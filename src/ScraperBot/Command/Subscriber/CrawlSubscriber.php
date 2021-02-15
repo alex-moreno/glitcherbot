@@ -6,6 +6,7 @@ namespace ScraperBot\Command\Subscriber;
 
 use ScraperBot\Event\CrawledEvent;
 use ScraperBot\Event\CrawlInitiatedEvent;
+use ScraperBot\Event\CrawlRejectedEvent;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -37,10 +38,16 @@ class CrawlSubscriber implements EventSubscriberInterface {
         $this->output->writeln('Crawled: ' . $event->getUrl());
     }
 
+    public function onCrawlRejected(CrawlRejectedEvent $event) {
+        $this->output->writeln('<error>Crawl rejected: ' . $event->getURL() . '</error>');
+        $this->output->writeln('<error>Reason: ' . $event->getReason() . '</error>', OutputInterface::VERBOSITY_DEBUG);
+    }
+
     public static function getSubscribedEvents() {
         return [
           CrawlInitiatedEvent::NAME => 'onCrawlInitiated',
           CrawledEvent::NAME => 'onCrawled',
+          CrawlRejectedEvent::NAME => 'onCrawlRejected,'
         ];
     }
 

@@ -23,4 +23,11 @@ class CrawledEvent extends Event {
         return isset($this->crawldata['url']) ? $this->crawldata['url'] : NULL;
     }
 
+    /**
+     * @return null
+     */
+    public function getRawCrawldata() {
+        return $this->crawldata;
+    }
+
 }

@@ -4,10 +4,9 @@ declare(strict_types=1);
 namespace ScraperBot\Command;
 
 use GuzzleHttp\Client;
+use ScraperBot\Command\Subscriber\CrawlCsvLoggerSubscriber;
 use ScraperBot\Command\Subscriber\CrawlSubscriber;
 use ScraperBot\Crawler;
-use ScraperBot\CsvManager;
-use ScraperBot\Event\CrawlInitiatedEvent;
 use ScraperBot\Source\CsvSource;
 use ScraperBot\Source\SitesArraySource;
 use ScraperBot\Source\XmlSitemapSource;
@@ -80,6 +79,11 @@ class CrawlSitesCommand extends GlitcherBotCommand {
 
         // Set the crawl global timestamp.
         $timestamp = time();
+
+        // Configure CSV subscriber to capture data.
+        $fileToWrite = date('dmY-His') . '-output.csv';
+        $csv_logger = new CrawlCsvLoggerSubscriber($fileToWrite);
+        $this->eventDispatcher->addSubscriber($csv_logger);
 
         $crawler->crawlSites($source, $client, $default_config, $timestamp);
         $crawler->determineSiteMapURLs($source, $client, $default_config, $timestamp, 0);

@@ -10,6 +10,7 @@ use GuzzleHttp\Promise\EachPromise;
 use GuzzleHttp\Psr7\Response;
 use ScraperBot\Event\CrawledEvent;
 use ScraperBot\Event\CrawlInitiatedEvent;
+use ScraperBot\Event\CrawlRejectedEvent;
 use ScraperBot\Source\SourceInterface;
 use ScraperBot\Source\XmlSitemapSource;
 use ScraperBot\Storage\StorageInterface;
@@ -49,10 +50,6 @@ class Crawler {
 
         $urls = $event->getUrls();
 
-        // Preparing file to be written.
-        $csvManager = new CsvManager();
-        $fileToWrite = date('dmY-His') . '-output.csv';
-
         if (!isset($timestamp)) {
             $timestamp = time();
         }
@@ -75,7 +72,7 @@ class Crawler {
         $eachPromise = new EachPromise($promises, [
             // Concurrency to use.
             'concurrency' => $this->concurrency,
-            'fulfilled' => function (Response $response, $index) use ($csvManager, $fileToWrite, $timestamp, $urls, $debug) {
+            'fulfilled' => function (Response $response, $index) use ($timestamp, $urls, $debug) {
                 $siteCrawled = array();
                 $siteCrawled['site_id'] = ($index + 1);
                 $siteCrawled['url'] = trim($urls[$index]);
@@ -90,8 +87,6 @@ class Crawler {
                 $event = new CrawledEvent($siteCrawled);
                 $this->eventDispatcher->dispatch($event, CrawledEvent::NAME);
 
-                // TODO: event driven logger
-                $csvManager->writeCsvLine($siteCrawled, $fileToWrite);
                 $this->storage->addResult(
                     $siteCrawled['site_id'],
                     $siteCrawled['url'],
@@ -102,25 +97,22 @@ class Crawler {
                 );
                 $this->storage->addTagDistribution($siteCrawled['url'], $tagDistribution, $timestamp);
             },
-            'rejected' => function ($reason, $index, $promise) use ($csvManager, $fileToWrite, $timestamp, $urls, $debug) {
+            'rejected' => function ($reason, $index, $promise) use ($timestamp, $urls, $debug) {
                 // Handle promise rejected here (ie: not existing domains, long timeouts or too many redirects).
 
-                // TODO: fire 'crawl rejected' event.
+                $siteCrawled = [];
 
                 // TODO: Review if this index is correct.
                 if (isset($urls[$index + 1])) {
-                    echo PHP_EOL . 'URL rejected: ' . $urls[$index + 1];
-                    // TODO: log this
-                    if ($debug) {
-                        echo PHP_EOL . 'Exception: ' . $reason;
-                    }
-
                     $siteCrawled = array();
                     $siteCrawled['site_id'] = ($index + 1);
                     $siteCrawled['url'] = $urls[$index + 1];
                     $siteCrawled['statusCode'] = 'rejected';
                     $siteCrawled['size'] = $siteCrawled['footprint'] = 0;
-                    $csvManager->writeCsvLine(array($index, 'rejected', 0, 0), $fileToWrite);
+
+                    $event = new CrawlRejectedEvent($siteCrawled, $reason);
+                    $this->eventDispatcher->dispatch($event, CrawlRejectedEvent::NAME);
+
                     $this->storage->addResult(
                         $index,
                         $siteCrawled['url'],
@@ -131,6 +123,9 @@ class Crawler {
                     );
                 }
 
+                // Fire 'crawl rejected' event.
+                $event = new CrawlRejectedEvent($siteCrawled, $reason);
+                $this->eventDispatcher->dispatch($event, CrawlRejectedEvent::NAME);
             }
         ]);
 
@@ -227,8 +222,11 @@ class Crawler {
             },
             'rejected' => function ($reason, $index, $promise) use ($timestamp, $urls) {
                 // Handle promise rejected here (ie: not existing domains, long timeouts or too many redirects).
-                //TODO: trigger 'crawl rejected' event
-                echo 'rejected: ' . $reason . PHP_EOL . ' ----- ';
+                // Trigger 'crawl rejected' event.
+                $data = [];
+                //TODO: extract data.
+                $event = new CrawlRejectedEvent($data, $reason);
+                $this->eventDispatcher->dispatch($event, CrawlRejectedEvent::NAME);
             }
         ]);
 
@@ -294,14 +292,13 @@ class Crawler {
                         $this->offIndex++;
                     }
                 }
-                else {
-                    echo 'not array';
-                }
             },
             'rejected' => function ($reason, $index, $promise) use ($timestamp, $urls) {
                 // Handle promise rejected here (ie: not existing domains, long timeouts or too many redirects).
-                echo 'rejected: ' . $reason . PHP_EOL . ' ----- ';
-
+                $data = [];
+                //TODO: extract data.
+                $event = new CrawlRejectedEvent($data, $reason);
+                $this->eventDispatcher->dispatch($event, CrawlRejectedEvent::NAME);
             }
         ]);
 

@@ -44,8 +44,6 @@ class CompareCrawlsCommand extends GlitcherBotCommand {
 
         $crawlSites = new CrawlSitesCommand();
 
-        echo 'crawling';
-
         return Command::SUCCESS;
     }
 
@@ -90,7 +88,6 @@ class CompareCrawlsCommand extends GlitcherBotCommand {
                 }
             }
         }
-        echo 'Differences found: ' . $counter;
 
         return $list_differences;
     }
