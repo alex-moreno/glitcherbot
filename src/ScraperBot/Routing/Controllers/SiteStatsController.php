@@ -48,20 +48,22 @@ class SiteStatsController {
             // Get site crawl results for each timestamp.
             $resultsByTimestamp = $resultsStorage->getResultsbyTimestamp($timestamp, $onlyLatest, $url);
 
-            // Get the list of results, per site, for a given timestamp and prepare
-            // array entries representing the rows.
-            foreach ($resultsByTimestamp as $listOfSites) {
-                foreach ($listOfSites as $site) {
-                    $site_id = $site['url'];
+            if (!empty($resultsByTimestamp)) {
+                // Get the list of results, per site, for a given timestamp and prepare
+                // array entries representing the rows.
+                foreach ($resultsByTimestamp as $listOfSites) {
+                    foreach ($listOfSites as $site) {
+                        $site_id = $site['url'];
 
-                    // Initialise the row for the site if it's empty.
-                    if (empty($rows[$site_id][$index])) {
-                        $rows[$site_id][$index] = [];
+                        // Initialise the row for the site if it's empty.
+                        if (empty($rows[$site_id][$index])) {
+                            $rows[$site_id][$index] = [];
+                        }
+                        array_push($rows[$site_id][$index], $site['size'], $site['statusCode'], $site['naughty'], $site['url'], $site['tags']);
                     }
-                    array_push($rows[$site_id][$index], $site['size'], $site['statusCode'], $site['naughty'], $site['url'], $site['tags']);
                 }
             }
-
+            
             $index++;
         }
 
