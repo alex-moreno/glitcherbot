@@ -1,7 +1,9 @@
 include .env
 export $(shell sed 's/=.*//' .env)
 SITES_CSV=sample-sites.csv
+SITES_JSON=sample-sites.json
 export SITES_CSV
+export SITES_JSON
 
 up:
 	docker-compose pull
@@ -26,3 +28,8 @@ in: up
 crawl: build
 	echo "Crawling with ${SITES_CSV}"
 	docker exec -t ${PROJECT_NAME}_app bash -c 'php bin/visual_regression_bot.php -v bot:crawl-sites ${SITES_CSV}'
+
+crawl-acquia: build
+	echo "Crawling with ${SITES_JSON}"
+	docker exec -t ${PROJECT_NAME}_app bash -c 'php bin/visual_regression_bot.php -v acquia:acsf-crawl-sites ${SITES_JSON}'
+    # acquia:acsf-crawl-sites sites.json

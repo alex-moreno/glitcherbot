@@ -73,7 +73,7 @@ class CrawlSitesCommand extends Command {
         $source = $this->getSource($input);
 
         $timestamp = time();
-        $crawler->crawlSites($source, $client, $default_config, $timestamp);
+        $crawler->crawlSites($source, $client, $default_config, $timestamp, TRUE);
         $crawler->crawlSiteMaps($source, $client, $default_config, $timestamp, 0);
 
         $sitemapURLs = $crawler->getListPendingSitemaps(TRUE);
