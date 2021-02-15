@@ -32,4 +32,3 @@ crawl: build
 crawl-acquia: build
 	echo "Crawling with ${SITES_JSON}"
 	docker exec -t ${PROJECT_NAME}_app bash -c 'php bin/visual_regression_bot.php -v acquia:acsf-crawl-sites ${SITES_JSON}'
-    # acquia:acsf-crawl-sites sites.json

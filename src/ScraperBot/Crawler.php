@@ -63,8 +63,6 @@ class Crawler
                         $baseURL = $parsedUrl['scheme'] . '://' . $parsedUrl['host'] . ':' . $parsedUrl['port'] ;
                         // Only add a sitemap for base urls in the list.
                         // ie: avoid urls.com/node/sitemap.xml
-                        echo 'vbase: ' . $baseURL;
-                        echo ' .. $url' . $url;
                         if ($baseURL == rtrim($url,"/")) {
                             // Let's assume there is a sitemap on this url before even checking the robots.
                             $this->storage->addSitemapURL($baseURL . '/sitemap.xml', $this->offIndex, $timestamp);
