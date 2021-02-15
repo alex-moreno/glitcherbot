@@ -4,8 +4,9 @@ declare(strict_types=1);
 namespace ScraperBot\Command;
 
 use GuzzleHttp\Client;
+use ScraperBot\Command\Subscriber\CrawlCsvLoggerSubscriber;
+use ScraperBot\Command\Subscriber\CrawlSubscriber;
 use ScraperBot\Crawler;
-use ScraperBot\CsvManager;
 use ScraperBot\Source\CsvSource;
 use ScraperBot\Source\SitesArraySource;
 use ScraperBot\Source\XmlSitemapSource;
@@ -20,7 +21,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @package Command
  */
-class CrawlSitesCommand extends Command {
+class CrawlSitesCommand extends GlitcherBotCommand {
 
     protected static $defaultName = 'bot:crawl-sites';
 
@@ -41,6 +42,10 @@ class CrawlSitesCommand extends Command {
      */
     protected function execute(InputInterface $input, OutputInterface $output) {
         $this->output = $output;
+
+        $crawl_subscriber = new CrawlSubscriber($this->output);
+        $this->eventDispatcher->addSubscriber($crawl_subscriber);
+
         // $destination = $input->getOption('destination_folder');
         $use_base_uri = $input->getOption('use_base_uri');
 
@@ -62,7 +67,7 @@ class CrawlSitesCommand extends Command {
         $output->writeln("Using headers: " . print_r($headers, TRUE), OutputInterface::VERBOSITY_DEBUG);
 
         $sqlStorage = new \ScraperBot\Storage\SqlLite3Storage();
-        $crawler = new Crawler($sqlStorage, $headers);
+        $crawler = new Crawler($sqlStorage, $headers, $this->eventDispatcher);
         $output->writeln('Starting crawling. Date: ' . date('l jS \of F Y h:i:s A'), OutputInterface::VERBOSITY_VERBOSE);
 
         // Unless configured, do not ask the crawler to use a base URI.
@@ -72,19 +77,29 @@ class CrawlSitesCommand extends Command {
 
         $source = $this->getSource($input);
 
+        // Set the crawl global timestamp.
         $timestamp = time();
+
+        // Configure CSV subscriber to capture data.
+        $fileToWrite = date('dmY-His') . '-output.csv';
+        $csv_logger = new CrawlCsvLoggerSubscriber($fileToWrite);
+        $this->eventDispatcher->addSubscriber($csv_logger);
+
         $crawler->crawlSites($source, $client, $default_config, $timestamp, TRUE);
-        $crawler->crawlSiteMaps($source, $client, $default_config, $timestamp, 0);
+        $crawler->determineSiteMapURLs($source, $client, $default_config, $timestamp, 0);
 
         $sitemapURLs = $crawler->getListPendingSitemaps(TRUE);
         $sourceSitemap = new XmlSitemapSource($sitemapURLs);
 
         // Crawl the sitemaps.
-        $crawler->extractSitemaps($sourceSitemap, $client, $default_config, $timestamp, $source->getCurrentIndex());
+        $crawler->crawlSitemaps($sourceSitemap, $client, $default_config, $timestamp, $source->getCurrentIndex());
 
         $pendingURLs = $sqlStorage->getPendingURLs(TRUE);
-        $pendingSource = new SitesArraySource($pendingURLs);
-        $crawler->crawlSites($pendingSource, $client, $default_config, $timestamp);
+
+        if (!empty($pendingURLs)) {
+            $pendingSource = new SitesArraySource($pendingURLs);
+            $crawler->crawlSites($pendingSource, $client, $default_config, $timestamp);
+        }
 
         $output->writeln('Crawling finished. Date: ' . date('l jS \of F Y h:i:s A'), OutputInterface::VERBOSITY_VERBOSE);
 

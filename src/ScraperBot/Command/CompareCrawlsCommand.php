@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @package Command
  */
-class CompareCrawlsCommand extends Command {
+class CompareCrawlsCommand extends GlitcherBotCommand {
 
     protected static $defaultName = 'bot:compare-crawls';
 
@@ -43,8 +43,6 @@ class CompareCrawlsCommand extends Command {
         $this->StoreCrawlDifferences($listOfDifferences);
 
         $crawlSites = new CrawlSitesCommand();
-
-        echo 'crawling';
 
         return Command::SUCCESS;
     }
@@ -90,7 +88,6 @@ class CompareCrawlsCommand extends Command {
                 }
             }
         }
-        echo 'Differences found: ' . $counter;
 
         return $list_differences;
     }
