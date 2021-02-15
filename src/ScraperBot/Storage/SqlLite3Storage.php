@@ -24,7 +24,7 @@ class SqlLite3Storage implements StorageInterface {
 
         $this->pdo->query("CREATE TABLE IF NOT EXISTS sitemapURLs (
                             timestamp NOT NULL,
-                            site_id INTEGER,
+                            site_id INTEGER type UNIQUE,
                             url TEXT NOT NULL
        );");
 
@@ -349,8 +349,9 @@ class SqlLite3Storage implements StorageInterface {
      */
     public function addSitemapURL($url, $index, $timestamp)
     {
-        $query = sprintf("INSERT INTO sitemapURLs (timestamp, url, site_id) VALUES(%d,%d,\"%s\")", $timestamp, $index, $url);
-        $this->pdo->query($query);
+        echo 'adding sitemap:' . $url;
+            $query = sprintf("INSERT INTO sitemapURLs (timestamp, url, site_id) VALUES(%d,%d,\"%s\")", $timestamp, $index, $url);
+            $this->pdo->query($query);
     }
 
     /**

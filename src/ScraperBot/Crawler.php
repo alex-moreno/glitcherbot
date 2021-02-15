@@ -41,7 +41,7 @@ class Crawler {
      * @param $client
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function crawlSites(SourceInterface $source, Client $client, $default_config = NULL, $timestamp = NULL, $debug = NULL) {
+    public function crawlSites(SourceInterface $source, Client $client, $default_config = NULL, $timestamp = NULL, $assumeTimestamp = FALSE, $debug = NULL) {
         $urls = $source->getLinks();
 
         // Trigger 'crawl initiated event' - chance to modify URLs.
@@ -54,7 +54,7 @@ class Crawler {
             $timestamp = time();
         }
 
-        $promises = (function () use ($urls, $client, $default_config) {
+        $promises = (function () use ($urls, $client, $default_config, $timestamp, $assumeTimestamp) {
             foreach ($urls as $url) {
                 if (!empty($url)) {
                     // If default config is provided, create a new client each time.
@@ -62,6 +62,17 @@ class Crawler {
                         $config = $default_config + ['base_uri' => 'http://' . $url];
                         $url = '';
                         $client = new Client($config);
+                    }
+
+                    if ($assumeTimestamp) {
+                        $parsedUrl = parse_url($url);
+                        $baseURL = $parsedUrl['scheme'] . '://' . $parsedUrl['host'] . ':' . $parsedUrl['port'] ;
+                        // Only add a sitemap for base urls in the list.
+                        // ie: avoid urls.com/node/sitemap.xml
+                        if ($baseURL == rtrim($url,"/")) {
+                            // Let's assume there is a sitemap on this url before even checking the robots.
+                            $this->storage->addSitemapURL($baseURL . '/sitemap.xml', $this->offIndex, $timestamp);
+                        }
                     }
 
                     yield $client->getAsync($url, $this->headers);

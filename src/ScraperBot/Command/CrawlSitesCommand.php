@@ -85,7 +85,7 @@ class CrawlSitesCommand extends GlitcherBotCommand {
         $csv_logger = new CrawlCsvLoggerSubscriber($fileToWrite);
         $this->eventDispatcher->addSubscriber($csv_logger);
 
-        $crawler->crawlSites($source, $client, $default_config, $timestamp);
+        $crawler->crawlSites($source, $client, $default_config, $timestamp, TRUE);
         $crawler->determineSiteMapURLs($source, $client, $default_config, $timestamp, 0);
 
         $sitemapURLs = $crawler->getListPendingSitemaps(TRUE);
