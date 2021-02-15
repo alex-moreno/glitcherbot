@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @package Command
  */
-class CompareCrawlsCommand extends Command {
+class CompareCrawlsCommand extends GlitcherBotCommand {
 
     protected static $defaultName = 'bot:compare-crawls';
 

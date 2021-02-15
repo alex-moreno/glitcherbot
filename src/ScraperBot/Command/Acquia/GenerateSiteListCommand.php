@@ -2,6 +2,7 @@
 
 namespace ScraperBot\Command\Acquia;
 
+use ScraperBot\Command\GlitcherBotCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @package Command\Acquia
  */
-class GenerateSiteListCommand extends Command {
+class GenerateSiteListCommand extends GlitcherBotCommand {
 
     protected static $defaultName = 'acquia:generate-site-list';
 

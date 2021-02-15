@@ -8,12 +8,13 @@ require 'vendor/autoload.php';
 use GuzzleHttp\Client;
 use GuzzleHttp\Promise\EachPromise;
 use GuzzleHttp\Psr7\Response;
+use ScraperBot\Event\CrawlInitiatedEvent;
 use ScraperBot\Source\SourceInterface;
 use ScraperBot\Source\XmlSitemapSource;
 use ScraperBot\Storage\StorageInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class Crawler
-{
+class Crawler {
 
     private $headers = NULL;
 
@@ -21,12 +22,14 @@ class Crawler
 
     private $offIndex = 0;
 
-    public function __construct(StorageInterface $storage, $config)
-    {
+    private $eventDispatcher = NULL;
+
+    public function __construct(StorageInterface $storage, $config, EventDispatcher $eventDispatcher = NULL) {
         $this->headers = $config;
         $this->concurrency = $config['concurrency'];
 
         $this->storage = $storage;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -36,8 +39,7 @@ class Crawler
      * @param $client
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function crawlSites(SourceInterface $source, Client $client, $default_config = NULL, $timestamp = NULL, $debug = NULL)
-    {
+    public function crawlSites(SourceInterface $source, Client $client, $default_config = NULL, $timestamp = NULL, $debug = NULL) {
         $urls = $source->getLinks();
 
         // Preparing file to be written.
@@ -82,6 +84,8 @@ class Crawler
                     echo PHP_EOL . $siteCrawled['url'];
                 }
 
+                // TODO Fire 'crawled url'
+
                 $csvManager->writeCsvLine($siteCrawled, $fileToWrite);
                 $this->storage->addResult(
                     $siteCrawled['site_id'],
@@ -95,6 +99,8 @@ class Crawler
             },
             'rejected' => function ($reason, $index, $promise) use ($csvManager, $fileToWrite, $timestamp, $urls, $debug) {
                 // Handle promise rejected here (ie: not existing domains, long timeouts or too many redirects).
+
+                // TODO: fire 'crawl rejected' event.
 
                 // TODO: Review if this index is correct.
                 if (isset($urls[$index + 1])) {
@@ -160,9 +166,9 @@ class Crawler
      * @param $client
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function crawlSiteMaps(SourceInterface $source, Client $client, $default_config = NULL, $timestamp = NULL, $offIndex = 0)
-    {
+    public function crawlSiteMaps(SourceInterface $source, Client $client, $default_config = NULL, $timestamp = NULL, $offIndex = 0) {
         echo PHP_EOL . 'Sitemaps crawling>>>> ';
+        // TODO: fire 'crawling sitemap' event
 
         $this->offIndex = $offIndex;
 
@@ -185,6 +191,11 @@ class Crawler
     public function triggerThreadedCrawl($source, $client, $default_config, $timestamp) {
         // First read the robots, so we can find the sitemap (if any)
         $urls = $source->getLinks();
+
+        // Trigger 'crawl initiated event' - chance to modify URLs.
+        $event = new CrawlInitiatedEvent($urls);
+        $this->eventDispatcher->dispatch($event, CrawlInitiatedEvent::NAME);
+        $urls = $event->getUrls();
 
         $promises = (function () use ($urls, $client, $default_config) {
             foreach ($urls as $url) {
@@ -212,11 +223,13 @@ class Crawler
                         // Store new links.
                         $this->storage->addSitemapURL($newurl, $this->offIndex, $timestamp);
                     }
+                    //TODO trigger 'crawled site' event
                 }
 
             },
             'rejected' => function ($reason, $index, $promise) use ($timestamp, $urls) {
                 // Handle promise rejected here (ie: not existing domains, long timeouts or too many redirects).
+                //TODO: trigger 'crawl rejected' event
                 echo 'rejected: ' . $reason . PHP_EOL . ' ----- ';
             }
         ]);
@@ -244,6 +257,11 @@ class Crawler
     public function extractSitemaps($source, $client, $default_config, $timestamp, $offIndex) {
         // First read the robots, so we can find the sitemap (if any)
         $urls = $source->getLinks();
+
+        // Trigger 'crawl initiated event' - chance to modify URLs.
+        $event = new CrawlInitiatedEvent($urls);
+        $this->eventDispatcher->dispatch($event, CrawlInitiatedEvent::NAME);
+        $urls = $event->getUrls();
 
         $promises = (function () use ($urls, $client, $default_config, $offIndex) {
             foreach ($urls as $url) {

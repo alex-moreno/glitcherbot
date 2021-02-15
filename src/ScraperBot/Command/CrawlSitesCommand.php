@@ -4,8 +4,10 @@ declare(strict_types=1);
 namespace ScraperBot\Command;
 
 use GuzzleHttp\Client;
+use ScraperBot\Command\Listener\CrawlSubscriber;
 use ScraperBot\Crawler;
 use ScraperBot\CsvManager;
+use ScraperBot\Event\CrawlInitiatedEvent;
 use ScraperBot\Source\CsvSource;
 use ScraperBot\Source\SitesArraySource;
 use ScraperBot\Source\XmlSitemapSource;
@@ -20,7 +22,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @package Command
  */
-class CrawlSitesCommand extends Command {
+class CrawlSitesCommand extends GlitcherBotCommand {
 
     protected static $defaultName = 'bot:crawl-sites';
 
@@ -41,6 +43,10 @@ class CrawlSitesCommand extends Command {
      */
     protected function execute(InputInterface $input, OutputInterface $output) {
         $this->output = $output;
+
+        $crawl_subscriber = new CrawlSubscriber($this->output);
+        $this->eventDispatcher->addSubscriber($crawl_subscriber);
+
         // $destination = $input->getOption('destination_folder');
         $use_base_uri = $input->getOption('use_base_uri');
 
@@ -62,7 +68,7 @@ class CrawlSitesCommand extends Command {
         $output->writeln("Using headers: " . print_r($headers, TRUE), OutputInterface::VERBOSITY_DEBUG);
 
         $sqlStorage = new \ScraperBot\Storage\SqlLite3Storage();
-        $crawler = new Crawler($sqlStorage, $headers);
+        $crawler = new Crawler($sqlStorage, $headers, $this->eventDispatcher);
         $output->writeln('Starting crawling. Date: ' . date('l jS \of F Y h:i:s A'), OutputInterface::VERBOSITY_VERBOSE);
 
         // Unless configured, do not ask the crawler to use a base URI.
