@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace ScraperBot\Command;
 
 use GuzzleHttp\Client;
-use ScraperBot\Command\Listener\CrawlSubscriber;
+use ScraperBot\Command\Subscriber\CrawlSubscriber;
 use ScraperBot\Crawler;
 use ScraperBot\CsvManager;
 use ScraperBot\Event\CrawlInitiatedEvent;
@@ -78,19 +78,24 @@ class CrawlSitesCommand extends GlitcherBotCommand {
 
         $source = $this->getSource($input);
 
+        // Set the crawl global timestamp.
         $timestamp = time();
+
         $crawler->crawlSites($source, $client, $default_config, $timestamp);
-        $crawler->crawlSiteMaps($source, $client, $default_config, $timestamp, 0);
+        $crawler->determineSiteMapURLs($source, $client, $default_config, $timestamp, 0);
 
         $sitemapURLs = $crawler->getListPendingSitemaps(TRUE);
         $sourceSitemap = new XmlSitemapSource($sitemapURLs);
 
         // Crawl the sitemaps.
-        $crawler->extractSitemaps($sourceSitemap, $client, $default_config, $timestamp, $source->getCurrentIndex());
+        $crawler->crawlSitemaps($sourceSitemap, $client, $default_config, $timestamp, $source->getCurrentIndex());
 
         $pendingURLs = $sqlStorage->getPendingURLs(TRUE);
-        $pendingSource = new SitesArraySource($pendingURLs);
-        $crawler->crawlSites($pendingSource, $client, $default_config, $timestamp);
+
+        if (!empty($pendingURLs)) {
+            $pendingSource = new SitesArraySource($pendingURLs);
+            $crawler->crawlSites($pendingSource, $client, $default_config, $timestamp);
+        }
 
         $output->writeln('Crawling finished. Date: ' . date('l jS \of F Y h:i:s A'), OutputInterface::VERBOSITY_VERBOSE);
 

@@ -8,6 +8,7 @@ require 'vendor/autoload.php';
 use GuzzleHttp\Client;
 use GuzzleHttp\Promise\EachPromise;
 use GuzzleHttp\Psr7\Response;
+use ScraperBot\Event\CrawledEvent;
 use ScraperBot\Event\CrawlInitiatedEvent;
 use ScraperBot\Source\SourceInterface;
 use ScraperBot\Source\XmlSitemapSource;
@@ -41,6 +42,12 @@ class Crawler {
      */
     public function crawlSites(SourceInterface $source, Client $client, $default_config = NULL, $timestamp = NULL, $debug = NULL) {
         $urls = $source->getLinks();
+
+        // Trigger 'crawl initiated event' - chance to modify URLs.
+        $event = new CrawlInitiatedEvent(CrawlInitiatedEvent::CRAWL_TYPE_SITE, $urls);
+        $this->eventDispatcher->dispatch($event, CrawlInitiatedEvent::NAME);
+
+        $urls = $event->getUrls();
 
         // Preparing file to be written.
         $csvManager = new CsvManager();
@@ -79,13 +86,11 @@ class Crawler {
 
                 $tagDistribution = $this->getTags($body);
 
-                echo PHP_EOL . 'Crawling: ' . trim($urls[$index]);
-                if ($debug) {
-                    echo PHP_EOL . $siteCrawled['url'];
-                }
+                // Event notification.
+                $event = new CrawledEvent($siteCrawled);
+                $this->eventDispatcher->dispatch($event, CrawledEvent::NAME);
 
-                // TODO Fire 'crawled url'
-
+                // TODO: event driven logger
                 $csvManager->writeCsvLine($siteCrawled, $fileToWrite);
                 $this->storage->addResult(
                     $siteCrawled['site_id'],
@@ -166,17 +171,14 @@ class Crawler {
      * @param $client
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function crawlSiteMaps(SourceInterface $source, Client $client, $default_config = NULL, $timestamp = NULL, $offIndex = 0) {
-        echo PHP_EOL . 'Sitemaps crawling>>>> ';
-        // TODO: fire 'crawling sitemap' event
-
+    public function determineSiteMapURLs(SourceInterface $source, Client $client, $default_config = NULL, $timestamp = NULL, $offIndex = 0) {
         $this->offIndex = $offIndex;
 
         if (!isset($timestamp)) {
             $timestamp = time();
         }
 
-        $this->triggerThreadedCrawl($source, $client, $default_config, $timestamp);
+        $this->gatherSitemapURLs($source, $client, $default_config, $timestamp);
     }
 
     /**
@@ -188,14 +190,10 @@ class Crawler {
      * @param $offIndex
      * @param $timestamp
      */
-    public function triggerThreadedCrawl($source, $client, $default_config, $timestamp) {
+    public function gatherSitemapURLs($source, $client, $default_config, $timestamp) {
         // First read the robots, so we can find the sitemap (if any)
         $urls = $source->getLinks();
-
-        // Trigger 'crawl initiated event' - chance to modify URLs.
-        $event = new CrawlInitiatedEvent($urls);
-        $this->eventDispatcher->dispatch($event, CrawlInitiatedEvent::NAME);
-        $urls = $event->getUrls();
+        // TODO: trigger gather sitemaps event.
 
         $promises = (function () use ($urls, $client, $default_config) {
             foreach ($urls as $url) {
@@ -223,7 +221,7 @@ class Crawler {
                         // Store new links.
                         $this->storage->addSitemapURL($newurl, $this->offIndex, $timestamp);
                     }
-                    //TODO trigger 'crawled site' event
+                    //TODO trigger 'crawl added' event
                 }
 
             },
@@ -254,19 +252,22 @@ class Crawler {
      * @param $offIndex
      * @param $timestamp
      */
-    public function extractSitemaps($source, $client, $default_config, $timestamp, $offIndex) {
+    public function crawlSitemaps($source, $client, $default_config, $timestamp, $offIndex) {
         // First read the robots, so we can find the sitemap (if any)
         $urls = $source->getLinks();
 
+        // If source is empty, return here.
+        if (empty($urls)) {
+            return;
+        }
+
         // Trigger 'crawl initiated event' - chance to modify URLs.
-        $event = new CrawlInitiatedEvent($urls);
+        $event = new CrawlInitiatedEvent(CrawlInitiatedEvent::CRAWL_TYPE_SITEMAP, $urls);
         $this->eventDispatcher->dispatch($event, CrawlInitiatedEvent::NAME);
         $urls = $event->getUrls();
 
         $promises = (function () use ($urls, $client, $default_config, $offIndex) {
             foreach ($urls as $url) {
-                echo PHP_EOL . 'Found sitemap in:: ' . $url;
-
                 // If default config is provided, create a new client each time.
                 if ($default_config != NULL) {
                     $config = $default_config + ['base_uri' => 'http://' . $url];
