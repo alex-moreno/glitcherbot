@@ -2,6 +2,7 @@
 
 namespace ScraperBot\Routing\Controllers;
 
+use ScraperBot\Core\GlitcherBot;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -14,7 +15,7 @@ class ErrorCodesController {
         $headers = [];
         $index = 0;
 
-        $resultsStorage = new \ScraperBot\Storage\SqlLite3Storage('../glitcherbot.sqlite3');
+        $resultsStorage = GlitcherBot::service('glitcherbot.storage');
         $crawls = $resultsStorage->getTimeStamps();
 
         $statusCodes = $resultsStorage->getStatusCodes();
@@ -38,7 +39,7 @@ class ErrorCodesController {
         $data = ['headers' => $headers, 'rows' => $rows, 'tolerance' => $tolerance];
 
         $response = new \Symfony\Component\HttpFoundation\Response();
-        $renderer = new \ScraperBot\Renderer\TwigRenderer();
+        $renderer = GlitcherBot::service('glitcherbot.renderer');
         $content = $renderer->render('results_status.twig', $data);
         $response->setContent($content);
 

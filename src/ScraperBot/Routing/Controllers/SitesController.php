@@ -2,6 +2,7 @@
 
 namespace ScraperBot\Routing\Controllers;
 
+use ScraperBot\Core\GlitcherBot;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -10,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 class SitesController {
 
     public function handle(Request $request) {
-        $resultsStorage = new \ScraperBot\Storage\SqlLite3Storage('../glitcherbot.sqlite3');
+        $resultsStorage = GlitcherBot::service('glitcherbot.storage');
 
         $compare = [];
         if (isset($_GET['date1']) && $_GET['date2']) {
@@ -79,7 +80,7 @@ class SitesController {
             $index++;
         }
 
-        $renderer = new \ScraperBot\Renderer\TwigRenderer();
+        $renderer = GlitcherBot::service('glitcherbot.renderer');
         $content = $renderer->render('results.twig', ['headers' => $headers, 'rows' => $rows, 'tolerance' => $tolerance, 'date1' => $compare['date1'], 'date2' => $compare['date2'], 'persistNaughty' => $persistNaughty, 'persistLatest' => $persistLatest]);
 
         $response = new \Symfony\Component\HttpFoundation\Response();

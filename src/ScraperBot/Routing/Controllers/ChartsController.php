@@ -2,7 +2,7 @@
 
 namespace ScraperBot\Routing\Controllers;
 
-use ScraperBot\Renderer\TwigRenderer;
+use ScraperBot\Core\GlitcherBot;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -14,6 +14,7 @@ class ChartsController {
 
     public function handle(Request $request) {
         $resultsStorage = new \ScraperBot\Storage\SqlLite3Storage('../glitcherbot.sqlite3');
+        $resultsStorage = GlitcherBot::service('glitcherbot.storage');
 
         $options = $resultsStorage->getTimeStamps();
         $codes = [];
@@ -55,7 +56,7 @@ class ChartsController {
             'select2' => $timestamp2,
         ];
 
-        $renderer = new TwigRenderer();
+        $renderer = GlitcherBot::service('glitcherbot.renderer');
         $content = $renderer->render('charts.twig', $data);
         $response->setContent($content);
 

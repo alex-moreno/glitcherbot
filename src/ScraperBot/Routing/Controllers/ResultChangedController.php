@@ -2,8 +2,7 @@
 
 namespace ScraperBot\Routing\Controllers;
 
-use ScraperBot\Renderer\TwigRenderer;
-use ScraperBot\Storage\SqlLite3Storage;
+use ScraperBot\Core\GlitcherBot;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -20,7 +19,7 @@ class ResultChangedController {
      * @throws \Twig\Error\SyntaxError
      */
     public function handle(\Symfony\Component\HttpFoundation\Request $request) {
-        $resultsStorage = new SqlLite3Storage('../glitcherbot.sqlite3');
+        $resultsStorage = GlitcherBot::service('glitcherbot.storage');
 
         $compare = [];
         if (isset($_GET['date1']) && $_GET['date2']) {
@@ -84,7 +83,7 @@ class ResultChangedController {
 
         $data = ['headers' => $headers, 'rows' => $rows, 'tolerance' => $tolerance, 'date1' => $compare['date1'], 'date2' => $compare['date2']];
         $response = new Response();
-        $renderer = new TwigRenderer();
+        $renderer = GlitcherBot::service('glitcherbot.renderer');
         $content = $renderer->render('results_changed_to_errors.twig', $data);
         $response->setContent($content);
 

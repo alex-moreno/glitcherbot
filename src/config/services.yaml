@@ -11,3 +11,6 @@ services:
 
   glitcherbot.event_dispatcher:
     class: Symfony\Component\EventDispatcher\EventDispatcher
+
+  glitcherbot.renderer:
+    class: ScraperBot\Renderer\TwigRenderer

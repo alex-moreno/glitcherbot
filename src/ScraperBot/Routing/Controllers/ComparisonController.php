@@ -2,8 +2,8 @@
 
 namespace ScraperBot\Routing\Controllers;
 
-use ScraperBot\Renderer\TwigRenderer;
-use ScraperBot\Storage\SqlLite3Storage;
+use ScraperBot\Core\GlitcherBot;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -12,8 +12,8 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ComparisonController {
 
-    public function handle(\Symfony\Component\HttpFoundation\Request $request) {
-        $resultsStorage = new SqlLite3Storage('../glitcherbot.sqlite3');
+    public function handle(Request $request) {
+        $resultsStorage = GlitcherBot::service('glitcherbot.storage');
         $crawls = $resultsStorage->getTimeStamps();
 
         $rows = [];
@@ -30,7 +30,7 @@ class ComparisonController {
         $data = ['headers' => $headers, 'rows' => $rows, 'tolerance' => $tolerance];
 
         $response = new Response();
-        $renderer = new TwigRenderer();
+        $renderer = GlitcherBot::service('glitcherbot.renderer');
         $content = $renderer->render('crawls_diffs.twig', $data);
         $response->setContent($content);
 
