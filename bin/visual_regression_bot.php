@@ -5,6 +5,9 @@ require __DIR__.'/../vendor/autoload.php';
 
 use Symfony\Component\Console\Application;
 
+$bootstrap = new \ScraperBot\Core\Bootstrap();
+$bootstrap->init();
+
 $application = new Application("Visual Regression Bot");
 $application->add(new \ScraperBot\Command\CrawlSitesCommand());
 $application->add(new \ScraperBot\Command\CrawlXmlSitemapCommand());

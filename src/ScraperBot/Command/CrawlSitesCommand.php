@@ -6,7 +6,7 @@ namespace ScraperBot\Command;
 use GuzzleHttp\Client;
 use ScraperBot\Command\Subscriber\CrawlCsvLoggerSubscriber;
 use ScraperBot\Command\Subscriber\CrawlSubscriber;
-use ScraperBot\Crawler;
+use ScraperBot\Core\GlitcherBot;
 use ScraperBot\Source\CsvSource;
 use ScraperBot\Source\SitesArraySource;
 use ScraperBot\Source\XmlSitemapSource;
@@ -25,6 +25,16 @@ class CrawlSitesCommand extends GlitcherBotCommand {
 
     protected static $defaultName = 'bot:crawl-sites';
 
+    private $use_base_uri = FALSE;
+
+    private $input = NULL;
+    private $output = NULL;
+
+    private $crawler = NULL;
+
+    private $default_config = NULL;
+    private $default_client = NULL;
+
     /**
      * @inheritDoc
      */
@@ -37,43 +47,50 @@ class CrawlSitesCommand extends GlitcherBotCommand {
             ->addOption('use_base_uri', null, InputOption::VALUE_NONE, 'If specified, ask guzzle to create a new client each time, in order to specify base URI for redirects.');
     }
 
+    private function init($config_file) {
+        $crawl_subscriber = new CrawlSubscriber($this->output);
+        $this->eventDispatcher->addSubscriber($crawl_subscriber);
+
+        $this->use_base_uri = $this->input->getOption('use_base_uri');
+
+        $this->default_config = ['defaults' => [
+            'verify' => false
+        ]];
+
+        // HTTP Client.
+        $this->default_client = new Client($this->default_config);
+
+        // Unless configured, do not ask the crawler to use a base URI.
+        if (empty($this->use_base_uri)) {
+            $this->default_config = NULL;
+        }
+
+        if (!file_exists($config_file)) {
+            $this->output->writeln("<error>Could not locate config file: " . $config_file .  "</error>");
+            return Command::FAILURE;
+        }
+
+        $this->output->writeln("Using config file: " . $config_file, OutputInterface::VERBOSITY_VERBOSE);
+        $config = include('config.php');
+        $this->output->writeln("Using config: " . print_r($config, TRUE), OutputInterface::VERBOSITY_DEBUG);
+
+        $this->crawler = GlitcherBot::service('glitcherbot.crawler');
+        $this->crawler->setHttpConfig($config);
+    }
+
     /**
      * @inheritDoc
      */
     protected function execute(InputInterface $input, OutputInterface $output) {
+        $this->input = $input;
         $this->output = $output;
 
-        $crawl_subscriber = new CrawlSubscriber($this->output);
-        $this->eventDispatcher->addSubscriber($crawl_subscriber);
+        $config_file = $this->input->getOption('config_file');
 
-        // $destination = $input->getOption('destination_folder');
-        $use_base_uri = $input->getOption('use_base_uri');
+        $this->init($config_file);
 
-        $default_config = ['defaults' => [
-            'verify' => false
-        ]];
-        // HTTP Client.
-        $client = new Client($default_config);
-
-        $config_file = $input->getOption('config_file');
-
-        if (!file_exists($config_file)) {
-            $output->writeln("<error>Could not locate config file: " . $config_file .  "</error>");
-            return Command::FAILURE;
-        }
-
-        $output->writeln("Using config file: " . $config_file, OutputInterface::VERBOSITY_VERBOSE);
-        $headers = include('config.php');
-        $output->writeln("Using headers: " . print_r($headers, TRUE), OutputInterface::VERBOSITY_DEBUG);
-
-        $sqlStorage = new \ScraperBot\Storage\SqlLite3Storage();
-        $crawler = new Crawler($sqlStorage, $headers, $this->eventDispatcher);
+        // @todo fire 'crawl command started' event.
         $output->writeln('Starting crawling. Date: ' . date('l jS \of F Y h:i:s A'), OutputInterface::VERBOSITY_VERBOSE);
-
-        // Unless configured, do not ask the crawler to use a base URI.
-        if (empty($use_base_uri)) {
-            $default_config = NULL;
-        }
 
         $source = $this->getSource($input);
 
@@ -85,20 +102,21 @@ class CrawlSitesCommand extends GlitcherBotCommand {
         $csv_logger = new CrawlCsvLoggerSubscriber($fileToWrite);
         $this->eventDispatcher->addSubscriber($csv_logger);
 
-        $crawler->crawlSites($source, $client, $default_config, $timestamp, TRUE);
-        $crawler->determineSiteMapURLs($source, $client, $default_config, $timestamp, 0);
+        $this->crawler->crawlSites($source, $this->default_client, $this->default_config, $timestamp, TRUE);
+        $this->crawler->determineSiteMapURLs($source, $this->default_client, $this->default_config, $timestamp, 0);
 
-        $sitemapURLs = $crawler->getListPendingSitemaps(TRUE);
+        $sitemapURLs = $this->crawler->getListPendingSitemaps(TRUE);
         $sourceSitemap = new XmlSitemapSource($sitemapURLs);
 
         // Crawl the sitemaps.
-        $crawler->crawlSitemaps($sourceSitemap, $client, $default_config, $timestamp, $source->getCurrentIndex());
+        $this->crawler->crawlSitemaps($sourceSitemap, $this->default_client, $this->default_config, $timestamp, $source->getCurrentIndex());
 
-        $pendingURLs = $sqlStorage->getPendingURLs(TRUE);
+        $storage = $this->crawler->getStorage();
+        $pendingURLs = $storage->getPendingURLs(TRUE);
 
         if (!empty($pendingURLs)) {
             $pendingSource = new SitesArraySource($pendingURLs);
-            $crawler->crawlSites($pendingSource, $client, $default_config, $timestamp);
+            $this->crawler->crawlSites($pendingSource, $this->default_client, $this->default_config, $timestamp);
         }
 
         $output->writeln('Crawling finished. Date: ' . date('l jS \of F Y h:i:s A'), OutputInterface::VERBOSITY_VERBOSE);

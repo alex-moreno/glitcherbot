@@ -47,7 +47,7 @@ class CrawlSubscriber implements EventSubscriberInterface {
         return [
           CrawlInitiatedEvent::NAME => 'onCrawlInitiated',
           CrawledEvent::NAME => 'onCrawled',
-          CrawlRejectedEvent::NAME => 'onCrawlRejected,'
+          CrawlRejectedEvent::NAME => 'onCrawlRejected',
         ];
     }
 

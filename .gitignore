@@ -6,3 +6,4 @@ csv
 .vagrant
 glitcherbot.sqlite3
 sites.json
+sites.csv

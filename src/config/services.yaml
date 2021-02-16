@@ -1,0 +1,13 @@
+services:
+  glitcherbot.crawler:
+    class: \ScraperBot\Crawler
+    arguments: ['@glitcherbot.storage', '@glitcherbot.event_dispatcher']
+
+  glitcherbot.storage:
+    alias: glitcherbot.storage.sqlite3
+
+  glitcherbot.storage.sqlite3:
+    class: \ScraperBot\Storage\SqlLite3Storage
+
+  glitcherbot.event_dispatcher:
+    class: Symfony\Component\EventDispatcher\EventDispatcher

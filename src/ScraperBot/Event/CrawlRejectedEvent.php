@@ -6,6 +6,10 @@ namespace ScraperBot\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * Class CrawlRejectedEvent
+ * @package ScraperBot\Event
+ */
 class CrawlRejectedEvent extends Event {
 
     public const NAME = 'glitcherbot.crawl_rejected';
@@ -28,6 +32,10 @@ class CrawlRejectedEvent extends Event {
      */
     public function getReason(): string {
         return $this->reason;
+    }
+
+    public function getRawCrawldata() {
+        return $this->data;
     }
 
 }

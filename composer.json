@@ -28,7 +28,10 @@
         "twig/twig": "^3.1",
       "ext-simplexml": "*",
         "symfony/http-kernel": "^5.2",
-        "symfony/routing": "^5.2"
+        "symfony/routing": "^5.2",
+        "symfony/dependency-injection": "^5.2",
+        "symfony/yaml": "^5.2",
+        "symfony/config": "^5.2"
     },
     "suggest": {
         "ext-sqlite3": "*",
