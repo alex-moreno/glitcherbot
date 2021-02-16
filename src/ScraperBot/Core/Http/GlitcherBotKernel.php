@@ -2,6 +2,7 @@
 
 namespace ScraperBot\Core\Http;
 
+use ScraperBot\Core\Bootstrap;
 use ScraperBot\Core\GlitcherBot;
 use ScraperBot\Routing\RouteManager;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -12,12 +13,20 @@ use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 
+/**
+ * GlitcherBot HTTP Kernel.
+ *
+ * @package ScraperBot\Core\Http
+ */
 class GlitcherBotKernel extends HttpKernel {
 
     /**
      * GlitcherBotKernel constructor.
      */
     public function __construct() {
+        $bootstrap = new Bootstrap();
+        $bootstrap->init();
+
         $dispatcher = GlitcherBot::service('glitcherbot.event_dispatcher');
 
         $resolver = new ControllerResolver();

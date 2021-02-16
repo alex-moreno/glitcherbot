@@ -12,6 +12,9 @@ use Symfony\Component\Config\FileLocator;
  */
 class Bootstrap {
 
+    /**
+     * Perform initial bootstrap.
+     */
     public function init() {
         $containerBuilder = new ContainerBuilder();
         $loader = new YamlFileLoader($containerBuilder, new FileLocator(__DIR__ . '/../../config'));
