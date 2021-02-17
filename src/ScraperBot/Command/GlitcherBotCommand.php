@@ -4,6 +4,7 @@
 namespace ScraperBot\Command;
 
 
+use ScraperBot\Core\GlitcherBot;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -22,15 +23,9 @@ class GlitcherBotCommand extends Command {
      * @param string|null $name
      * @param EventDispatcher|NULL $eventDispatcher
      */
-    public function __construct(string $name = null, EventDispatcher $eventDispatcher = NULL) {
+    public function __construct(string $name = null) {
         parent::__construct($name);
-
-        $this->eventDispatcher = $eventDispatcher;
-
-        // Ensure that glitcher bot commands always have an event dispatcher available
-        if ($this->eventDispatcher == NULL) {
-            $this->eventDispatcher = new EventDispatcher();
-        }
+        $this->eventDispatcher = GlitcherBot::service('glitcherbot.event_dispatcher');
     }
 
 }

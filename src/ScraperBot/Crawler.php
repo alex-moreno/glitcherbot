@@ -16,9 +16,11 @@ use ScraperBot\Source\XmlSitemapSource;
 use ScraperBot\Storage\StorageInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
+/**
+ * Class Crawler
+ * @package ScraperBot
+ */
 class Crawler {
-
-    private $headers = NULL;
 
     private $storage;
 
@@ -26,18 +28,51 @@ class Crawler {
 
     private $eventDispatcher = NULL;
 
-    public function __construct(StorageInterface $storage, $config, EventDispatcher $eventDispatcher = NULL) {
-        $this->headers = $config;
-        $this->concurrency = $config['concurrency'];
+    private $httpConfig = [];
 
+    /**
+     * Crawler constructor.
+     * @param StorageInterface $storage
+     * @param $config
+     * @param EventDispatcher|NULL $eventDispatcher
+     */
+    public function __construct(StorageInterface $storage, EventDispatcher $eventDispatcher = NULL) {
         $this->storage = $storage;
         $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
+     * @param $concurrency
+     */
+    public function setConcurrency($concurrency) {
+        $this->httpConfig['concurrency'] = $concurrency;
+    }
+
+    /**
+     * @return int
+     */
+    public function getConcurrency(): int {
+        return $this->httpConfig['concurrency'];
+    }
+
+    /**
+     * @return null
+     */
+    public function getHeaders() {
+        return $this->httpConfig['headers'];
+    }
+
+    /**
+     * @param null $headers
+     */
+    public function setHeaders($headers): void {
+        $this->httpConfig['headers'] = $headers;
+    }
+
+    /**
      * Crawl sites.
      *
-     * @param $listOfSites
+     * @param $source
      * @param $client
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
@@ -57,10 +92,12 @@ class Crawler {
         $promises = (function () use ($urls, $client, $default_config, $timestamp, $assumeTimestamp) {
             foreach ($urls as $url) {
                 if (!empty($url)) {
+                    $target_url = $url;
+
                     // If default config is provided, create a new client each time.
                     if ($default_config != NULL) {
                         $config = $default_config + ['base_uri' => 'http://' . $url];
-                        $url = '';
+                        $target_url = '';
                         $client = new Client($config);
                     }
 
@@ -75,14 +112,14 @@ class Crawler {
                         }
                     }
 
-                    yield $client->getAsync($url, $this->headers);
+                    yield $client->getAsync($target_url, $this->getHttpConfig());
                 }
             }
         })();
 
         $eachPromise = new EachPromise($promises, [
             // Concurrency to use.
-            'concurrency' => $this->concurrency,
+            'concurrency' => $this->getConcurrency(),
             'fulfilled' => function (Response $response, $index) use ($timestamp, $urls, $debug) {
                 $siteCrawled = array();
                 $siteCrawled['site_id'] = ($index + 1);
@@ -114,10 +151,10 @@ class Crawler {
                 $siteCrawled = [];
 
                 // TODO: Review if this index is correct.
-                if (isset($urls[$index + 1])) {
+                if (isset($urls[$index])) {
                     $siteCrawled = array();
-                    $siteCrawled['site_id'] = ($index + 1);
-                    $siteCrawled['url'] = $urls[$index + 1];
+                    $siteCrawled['site_id'] = ($index);
+                    $siteCrawled['url'] = $urls[$index];
                     $siteCrawled['statusCode'] = 'rejected';
                     $siteCrawled['size'] = $siteCrawled['footprint'] = 0;
 
@@ -210,13 +247,13 @@ class Crawler {
                     $client = new Client($config);
                 }
 
-                yield $client->getAsync($url . '/robots.txt', $this->headers);
+                yield $client->getAsync($url . '/robots.txt', $this->getHttpConfig());
             }
         })();
 
         $eachPromise = new EachPromise($promises, [
             // Concurrency to use.
-            'concurrency' => $this->concurrency,
+            'concurrency' => $this->getConcurrency(),
             'fulfilled' => function (Response $response, $index) use ($timestamp, $urls) {
                 foreach(explode(PHP_EOL, $response->getBody()->getContents()) as $line) {
                     // We want to follow Sitemap: urls.
@@ -284,13 +321,13 @@ class Crawler {
                     $client = new Client($config);
                 }
 
-                yield $client->getAsync($url, $this->headers);
+                yield $client->getAsync($url, $this->getHttpConfig());
             }
         })();
 
         $eachPromise = new EachPromise($promises, [
             // Concurrency to use.
-            'concurrency' => $this->concurrency,
+            'concurrency' => $this->getConcurrency(),
             'fulfilled' => function (Response $response, $index) use ($timestamp, $urls, $offIndex) {
                 // We want to follow Sitemap: urls.
                 // TODO: NEXT: CRAWL CONTENT OF THE SITEMAP AND INSERT IN THE TEMPORARY URLS:
@@ -314,5 +351,26 @@ class Crawler {
         ]);
 
         $eachPromise->promise()->wait();
+    }
+
+    /**
+     * @return StorageInterface
+     */
+    public function getStorage(): StorageInterface {
+        return $this->storage;
+    }
+
+    /**
+     * @return array
+     */
+    public function getHttpConfig() {
+        return $this->httpConfig;
+    }
+
+    /**
+     * @param $config
+     */
+    public function setHttpConfig($config) {
+        $this->httpConfig = $config;
     }
 }

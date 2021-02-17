@@ -2,7 +2,7 @@
 
 namespace ScraperBot\Routing\Controllers;
 
-use ScraperBot\Renderer\TwigRenderer;
+use ScraperBot\Core\GlitcherBot;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -20,7 +20,7 @@ class IndexController {
      */
     public function handle(Request $request) {
         $response = new Response();
-        $renderer = new TwigRenderer();
+        $renderer = GlitcherBot::service('glitcherbot.renderer');
         $content = $renderer->render('index.twig');
         $response->setContent($content);
 

@@ -35,7 +35,7 @@ class CrawlCsvLoggerSubscriber implements EventSubscriberInterface {
         $this->csvManager->writeCsvLine($crawldata, $this->csv_file);
     }
 
-    public function onCrawlRejected(CrawledEvent $event) {
+    public function onCrawlRejected(CrawlRejectedEvent $event) {
         $crawldata = $event->getRawCrawldata();
         $this->csvManager->writeCsvLine($crawldata, $this->csv_file);
     }
