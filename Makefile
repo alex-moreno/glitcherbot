@@ -2,8 +2,11 @@ include .env
 export $(shell sed 's/=.*//' .env)
 SITES_CSV=sample-sites.csv
 SITES_JSON=sample-sites.json
+INCLUDE_SITEMAPS=no
+FORCE_SITEMAPS=no
 export SITES_CSV
 export SITES_JSON
+export INCLUDE_SITEMAPS
 
 up:
 	docker-compose pull
@@ -27,8 +30,8 @@ in: up
 
 crawl: build
 	echo "Crawling with ${SITES_CSV}"
-	docker exec -t ${PROJECT_NAME}_app bash -c 'php bin/visual_regression_bot.php -v bot:crawl-sites ${SITES_CSV}'
+	docker exec -t ${PROJECT_NAME}_app bash -c 'php bin/visual_regression_bot.php -v bot:crawl-sites ${SITES_CSV} --include_sitemaps ${INCLUDE_SITEMAPS} --force_sitemaps ${FORCE_SITEMAPS}'
 
 crawl-acquia: build
 	echo "Crawling with ${SITES_JSON}"
-	docker exec -t ${PROJECT_NAME}_app bash -c 'php bin/visual_regression_bot.php -v acquia:acsf-crawl-sites ${SITES_JSON}'
+	docker exec -t ${PROJECT_NAME}_app bash -c 'php bin/visual_regression_bot.php -v acquia:acsf-crawl-sites ${SITES_JSON} --include_sitemaps ${INCLUDE_SITEMAPS} --force_sitemaps ${FORCE_SITEMAPS}'

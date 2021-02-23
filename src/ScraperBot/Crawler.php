@@ -14,6 +14,7 @@ use ScraperBot\Event\CrawlRejectedEvent;
 use ScraperBot\Source\SourceInterface;
 use ScraperBot\Source\XmlSitemapSource;
 use ScraperBot\Storage\StorageInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
@@ -29,6 +30,8 @@ class Crawler {
     private $eventDispatcher = NULL;
 
     private $httpConfig = [];
+
+    private $output = NULL;
 
     /**
      * Crawler constructor.
@@ -76,7 +79,7 @@ class Crawler {
      * @param $client
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function crawlSites(SourceInterface $source, Client $client, $default_config = NULL, $timestamp = NULL, $assumeTimestamp = FALSE, $debug = NULL) {
+    public function crawlSites(SourceInterface $source, Client $client, $default_config = NULL, $timestamp = NULL, $assumeTimestamp = FALSE, $debug = NULL, $forceSitemaps = FALSE) {
         $urls = $source->getLinks();
 
         // Trigger 'crawl initiated event' - chance to modify URLs.
@@ -100,13 +103,22 @@ class Crawler {
                         $target_url = '';
                         $client = new Client($config);
                     }
-
                     if ($assumeTimestamp) {
+                        // Build a correct url if it does not contain http://.
+                        if ((strpos($url, 'http://') === false) && (strpos($url, 'https://') === false)) {
+                            $url = 'http://' . $url;
+                        }
+
                         $parsedUrl = parse_url($url);
-                        $baseURL = $parsedUrl['scheme'] . '://' . $parsedUrl['host'] . ':' . $parsedUrl['port'] ;
+                        $baseURL = $parsedUrl['scheme'] . '://' . $parsedUrl['host'];
+                        if (!empty($parsedUrl['port'])) {
+                            $baseURL = $baseURL . ':' . $parsedUrl['port'];
+                        }
+
                         // Only add a sitemap for base urls in the list.
-                        // ie: avoid urls.com/node/sitemap.xml
-                        if ($baseURL == rtrim($url,"/")) {
+                        // ie: avoid doing the check for deep urls, like urls.com/node/sitemap.xml
+                        if (rtrim($baseURL,"/") == rtrim($url,"/")) {
+                            $this->output->writeln('Adding sitemap.' . $baseURL . '/sitemap.xml', OutputInterface::VERBOSITY_VERBOSE);
                             // Let's assume there is a sitemap on this url before even checking the robots.
                             $this->storage->addSitemapURL($baseURL . '/sitemap.xml', $this->offIndex, $timestamp);
                         }
@@ -330,8 +342,6 @@ class Crawler {
             'concurrency' => $this->getConcurrency(),
             'fulfilled' => function (Response $response, $index) use ($timestamp, $urls, $offIndex) {
                 // We want to follow Sitemap: urls.
-                // TODO: NEXT: CRAWL CONTENT OF THE SITEMAP AND INSERT IN THE TEMPORARY URLS:
-
                 $sourceSitemap = new XmlSitemapSource();
                 $links = $sourceSitemap->extractLinks($response->getBody()->getContents());
                 if(is_array($links)){
@@ -372,5 +382,10 @@ class Crawler {
      */
     public function setHttpConfig($config) {
         $this->httpConfig = $config;
+    }
+
+
+    public function setOutput($output) {
+        $this->output = $output;
     }
 }
