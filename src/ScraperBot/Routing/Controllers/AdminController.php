@@ -85,13 +85,14 @@ class AdminController {
             ->add('dueDate', DateType::class)
             ->getForm();
 
-        var_dump($twig->render('crawls_delete.twig', [
-            'form' => $form->createView(),
-        ]));
+//        var_dump($twig->render('crawls_delete.twig', [
+//            'form' => $form->createView(),
+//        ]));
 
-//        $content = $twig->render('crawls_delete.twig', ['deleteForm' => $form->createView()]);
+        $content = $twig->render('crawls_delete.twig', ['deleteForm' => $form->createView()]);
 
-//        $response->setContent($content);
+        $response->setContent($content);
+        return $response;
 //        return $twig->render('crawls_delete.twig', [
 //            'form' => $form->createView()]);
 
