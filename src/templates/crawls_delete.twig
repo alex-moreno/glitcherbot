@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+</head>
+
+    {% include 'menu.twig' %}
+
+    <div class="container-fluid">
+        <h1>"Are you sure you want to remove... ?"</h1>
+        <p>
+        <form class="form-inline my-2 my-lg-0">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">DELETE</button>
+        </form>
+        </p>
+    </div>
+
+    {{ form_start(deleteForm) }}
+    {{ form_widget(deleteForm) }}
+
+    <input type="submit"/>
+    {{ form_end(deleteForm) }}
+
+
+    </body>
+</html>
