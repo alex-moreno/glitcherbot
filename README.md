@@ -81,7 +81,7 @@ return [
 
 ```
 
-Note: The higher the concurrency is configured, the more sites it will run on each step, but be careful, php is fast (contrary to popular believ) and can send high load to a site and put it in trouble. Big power means bigger responsibility.
+Note: The higher the concurrency is configured, the more sites it will run on each step, but be careful, php is fast (contrary to popular belief), it could send high load to a site and put it in trouble. Big power means bigger responsibility.
 
 ## Docker
 Download [Docker](https://www.docker.com/)
@@ -106,6 +106,10 @@ To run the command with a different file, use the syntax
 
 `make crawl SITES_CSV=path_to_sites_csv`
 
+or for Acquia json files:
+
+`make crawl-acquia SITES_JSON=sitesd8-prod.json`
+
 Keep in mind that the crawl runs within the container, so `path_to_sites_csv` needs to be relative to the container.
 
 ### Web interface
@@ -123,3 +127,16 @@ You can run all commands at once, for example the following command will start t
 `make up build crawl open`
 
 
+### Parameters
+
+--include_sitemaps=yes
+
+This will include all sitemaps in the website, if they are referenced from the robots.txt
+
+--force_sitemaps=yes
+
+Using makefile and Docker:
+
+`make crawl SITES_CSV=sample-sites.csv INCLUDE_SITEMAPS=yes`
+
+`make crawl SITES_CSV=sample-sites.csv FORCE_SITEMAPS=yes`
