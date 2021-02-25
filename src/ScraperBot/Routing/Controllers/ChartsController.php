@@ -13,7 +13,6 @@ use Symfony\Component\HttpFoundation\Response;
 class ChartsController {
 
     public function handle(Request $request) {
-        $resultsStorage = new \ScraperBot\Storage\SqlLite3Storage('../glitcherbot.sqlite3');
         $resultsStorage = GlitcherBot::service('glitcherbot.storage');
 
         $options = $resultsStorage->getTimeStamps();

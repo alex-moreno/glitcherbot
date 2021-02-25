@@ -118,7 +118,7 @@ class CrawlSitesCommand extends GlitcherBotCommand {
         // Crawl the sitemaps.
         if ($this->include_sitemaps = 'yes' || $this->force_sitemaps = 'yes') {
             $output->writeln('Crawling sitemaps started.', OutputInterface::VERBOSITY_VERBOSE);
-            $this->crawler->crawlSitemaps($sourceSitemap, $this->default_client, $this->default_config, $timestamp, $source->getCurrentIndex());
+            $this->crawler->crawlSitemaps($sourceSitemap, $this->default_client, $this->default_config, $timestamp, $source->getSize());
 
             $storage = $this->crawler->getStorage();
             $pendingURLs = $storage->getPendingURLs(TRUE);

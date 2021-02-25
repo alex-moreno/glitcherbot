@@ -13,8 +13,7 @@ class SitesJsonSource implements SourceInterface {
         $this->file = $file;
     }
 
-    public function getLinks()
-    {
+    public function getLinks() {
         if (($json = file_get_contents($this->file)) == false) {
             throw new \Exception("<error>Could not open file: " . $this->file . "</error>");
         }
@@ -24,9 +23,10 @@ class SitesJsonSource implements SourceInterface {
         return empty($data['sites']) ? [] : array_keys($data['sites']);
     }
 
-    public function addLink($url)
-    {
-        // TODO: Implement addLink() method.
+    /**
+     * @inheritDoc
+     */
+    public function addLink($url) {
         $this->listOfSites[] = $url;
     }
 
@@ -36,7 +36,7 @@ class SitesJsonSource implements SourceInterface {
      * @return |null
      */
     public function readLinks() {
-        return $this->listOfSites;
+        return $this->getLinks();
     }
 
     /**
