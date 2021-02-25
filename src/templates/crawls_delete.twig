@@ -13,12 +13,10 @@
         <ol>{{ id|date }} <strong>ID:</strong> {{ id }}</ol>
 
         <ol>
-
             {{ form_start(deleteForm) }}
             {{ form_widget(deleteForm) }}
             <input type= 'button' onclick='javascript:history.back();return false;' value='Back'> &nbsp;&nbsp; <input type="submit" class="btn-light btn-outline-danger" />
             {{ form_end(deleteForm) }}
-
         </ol>
     </ul>
     </p>
