@@ -44,10 +44,13 @@ class SqlLite3Storage implements StorageInterface {
 
     }
 
-
+    /**
+     * Remove crawl identified by $id timestamp
+     *
+     * @param $id
+     *   Timestamp
+     */
     public function DeleteCrawl($id) {
-        echo 'removing crawl';
-
         $queryString = sprintf("DELETE FROM sites WHERE timestamp='%s';", $id);
         $this->pdo->query( $queryString);
         $queryString = sprintf("DELETE FROM tags WHERE timestamp='%s';", $id);
