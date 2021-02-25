@@ -7,13 +7,20 @@
 <body>
 {% include 'menu.twig' %}
 <div class="container-fluid">
+
     <div class="jumbotron">
         <h1 class="display-4">Administer your GlitcherBot instance!</h1>
         <p class="lead">Caution, this area will allow you to delete and/or alter your data.</p>
         <hr class="my-4">
 
+        <div class="bg-warning text-dark">
+            {% if idDeleted %}
+                Crawl deleted: {{ idDeleted }}
+            {% endif %}
+            <br>
+        </div>
         {% for header in headers %}
-            <br><th style="text-align:center" colspan="3">{{ header|date }}</th> - <a href="/admin/crawl/remove/{{ header }}">Delete</a> - <a href="#">Tag</a> - Current tags: [none], [none2], ...
+            <br><th style="text-align:center" colspan="3">{{ header|date }}</th> - <a href="/admin/crawl/remove/{{ header }}">Delete</a> - <a href="#">Tag (soon)</a>
         {%  endfor %}
 
     </div>
