@@ -42,6 +42,9 @@ class RouteManager {
         $route = new Route('/admin/crawl/remove/{id}', array('_controller' => [\ScraperBot\Routing\Controllers\AdminController::class, 'removeCrawl']));
         $routes->add('remove-crawl', $route);
 
+        $route = new Route('/admin/crawl/taxonomy/{crawlID}', array('_controller' => [\ScraperBot\Routing\Controllers\AdminController::class, 'addTaxonomy']));
+        $routes->add('tag-crawl', $route);
+
         $route = new Route('/stats/result-changes', array('_controller' => [\ScraperBot\Routing\Controllers\ResultChangedController::class, 'handle']));
         $routes->add('result-changes', $route);
 
