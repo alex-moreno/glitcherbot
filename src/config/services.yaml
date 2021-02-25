@@ -14,3 +14,15 @@ services:
 
   glitcherbot.renderer:
     class: ScraperBot\Renderer\TwigRenderer
+
+  glitcherbot.route_manager:
+    class: ScraperBot\Routing\RouteManager
+
+  glitcherbot.controller_resolver:
+    class: Symfony\Component\HttpKernel\Controller\ControllerResolver
+
+  glitcherbot.argument_resolver:
+    class: Symfony\Component\HttpKernel\Controller\ArgumentResolver
+
+  glitcherbot.csv_manager:
+    class: ScraperBot\CsvManager

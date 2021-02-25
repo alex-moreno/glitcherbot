@@ -12,15 +12,17 @@ use Symfony\Component\Config\FileLocator;
  */
 class Bootstrap {
 
+    private static $initialised = FALSE;
+
     /**
      * Perform initial bootstrap.
      */
-    public function init() {
-        $containerBuilder = new ContainerBuilder();
-        $loader = new YamlFileLoader($containerBuilder, new FileLocator(__DIR__ . '/../../config'));
-        $loader->load('services.yaml');
-
-        GlitcherBot::setContainer($containerBuilder);
+    public static function init() {
+        if (!self::$initialised) {
+            // Ensure the container is initialised by simply asking for it.
+            GlitcherBot::getContainer();
+            self::$initialised = TRUE;
+        }
     }
 
 }

@@ -4,6 +4,7 @@
 namespace ScraperBot\Command\Subscriber;
 
 
+use ScraperBot\Core\GlitcherBot;
 use ScraperBot\CsvManager;
 use ScraperBot\Event\CrawledEvent;
 use ScraperBot\Event\CrawlRejectedEvent;
@@ -24,7 +25,7 @@ class CrawlCsvLoggerSubscriber implements EventSubscriberInterface {
      */
     public function __construct($csv_file) {
         $this->csv_file = $csv_file;
-        $this->csvManager = new CsvManager();
+        $this->csvManager = GlitcherBot::service('glitcherbot.csv_manager');
     }
 
     /**

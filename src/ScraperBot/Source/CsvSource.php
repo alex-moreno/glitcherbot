@@ -2,17 +2,22 @@
 
 namespace ScraperBot\Source;
 
-use ScraperBot\CsvManager;
+use ScraperBot\Core\GlitcherBot;
 
+/**
+ * A CSV file as a source of URLs.
+ *
+ * @package ScraperBot\Source
+ */
 class CsvSource implements SourceInterface {
 
-    private $listOfSites = NULL;
+    private array $listOfSites = [];
+    private $file = NULL;
 
     /**
      * CsvSource constructor.
      */
-    public function __construct($file)
-    {
+    public function __construct($file) {
         $this->file = $file;
     }
 
@@ -21,19 +26,20 @@ class CsvSource implements SourceInterface {
      *
      * @return array|string[]
      */
-    public function getLinks()
-    {
-        $csvManager = new CsvManager();
-        $listOfSites = $csvManager->readCsv($this->file);
+    public function getLinks() {
+        if ($this->listOfSites == NULL) {
+            $csvManager = GlitcherBot::service('glitcherbot.csv_manager');
+            $listOfSites = $csvManager->readCsv($this->file);
 
-        $listOfSites = array_map(
-            function($entry) {
-                return empty($entry[0]) ? '' : $entry[0];
-            },
-            $listOfSites
-        );
+            $listOfSites = array_map(
+                function ($entry) {
+                    return empty($entry[0]) ? '' : $entry[0];
+                },
+                $listOfSites
+            );
 
-        $this->listOfSites = $listOfSites;
+            $this->listOfSites = $listOfSites;
+        }
 
         return $listOfSites;
     }
@@ -53,7 +59,7 @@ class CsvSource implements SourceInterface {
      * @return |null
      */
     public function readLinks() {
-        return $this->listOfSites;
+        return $this->getLinks();
     }
 
     /**
@@ -61,7 +67,7 @@ class CsvSource implements SourceInterface {
      *
      * @return int
      */
-    public function getCurrentIndex() {
+    public function getSize() {
         return sizeof($this->listOfSites);
     }
 }
