@@ -63,6 +63,23 @@ class SqlLite3Storage implements StorageInterface {
     }
 
     /**
+     * Get taxonomies for a given crawl.
+     *
+     * @param $timestamp
+     * @return mixed
+     */
+    public function getTaxonomy($timestamp) {
+        $queryString = sprintf("SELECT * FROM taxonomy WHERE timestamp LIKE '%d';", $timestamp);
+
+        $query = $this->pdo->query($queryString);
+        while ($row = $query->fetchArray()) {
+            $taxonomies[$timestamp][] = $row;
+        }
+
+        return $taxonomies;
+    }
+
+    /**
      * Remove crawl identified by $id timestamp
      *
      * @param $id

@@ -37,14 +37,16 @@ class AdminController {
         $resultsStorage = GlitcherBot::service('glitcherbot.storage');
         $crawls = $resultsStorage->getTimeStamps();
 
+        foreach ($crawls as $crawl) {
+            $taxonomies[] = $resultsStorage->getTaxonomy($crawl);
+        }
+
         // Get if we are coming from the delete area.
         $idDeleted = $request->query->get('id');
-
         // Get if we are coming from the delete area.
         $addedTaxonomy = $request->query->get('addedTaxonomy');
 
-
-        $data = ['headers' => $crawls, 'idDeleted' => $idDeleted, 'addedTaxonomy' => $addedTaxonomy];
+        $data = ['headers' => $crawls,'taxonomies' => $taxonomies, 'idDeleted' => $idDeleted, 'addedTaxonomy' => $addedTaxonomy];
 
         $response = new Response();
         $renderer = GlitcherBot::service('glitcherbot.renderer');
@@ -125,7 +127,8 @@ class AdminController {
 
             return $response->send();
         } else {
-            $content = $twig->render('crawls_delete.twig', ['deleteForm' => $form->createView(), 'id' => $id]);
+            $content = $twig->render('crawls_delete.twig',
+                ['deleteForm' => $form->createView(), 'id' => $id, 'message' => "Are you sure you want to remove this crawl ?"]);
 
         }
 
@@ -194,19 +197,17 @@ class AdminController {
 
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
-            // TODO: adapt to work against different db engines, not just sqlite.
-            // Also needs to hook if the db is different to the default one.
-            $db = new SqlLite3Storage();
+            $resultsStorage = GlitcherBot::service('glitcherbot.storage');
 
-            $db->addTaxonomy($crawlID, $data['taxonomy']);
+            $resultsStorage->addTaxonomy($crawlID, $data['taxonomy']);
 
             $response = new RedirectResponse('/admin?addedTaxonomy=' . $crawlID);
             $response->prepare($request);
 
             return $response->send();
         } else {
-            $content = $twig->render('crawls_delete.twig', ['deleteForm' => $form->createView(), 'id' => $crawlID]);
-
+            $content = $twig->render('crawls_delete.twig',
+                ['deleteForm' => $form->createView(), 'id' => $crawlID, 'message' => "Tag your crawls."]);
         }
 
         $response->setContent($content);
