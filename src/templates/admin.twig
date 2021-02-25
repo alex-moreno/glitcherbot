@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+</head>
+<body>
+{% include 'menu.twig' %}
+<div class="container-fluid">
+
+    <div class="jumbotron">
+        <h1 class="display-4">Administer your GlitcherBot instance!</h1>
+        <p class="lead">Caution, this area will allow you to delete and/or alter your data.</p>
+        <hr class="my-4">
+
+        {% if idDeleted %}
+            <div class="bg-warning text-dark">
+                Crawl deleted: {{ idDeleted }}
+            </div>
+            <br>
+        {% endif %}
+        {% for header in headers %}
+            <br><th style="text-align:center" colspan="3">{{ header|date }}</th> - <a href="/admin/crawl/remove/{{ header }}">Delete</a> - <a href="#">Tag (coming soon)</a>
+        {%  endfor %}
+
+    </div>
+
+</div>
+</body>
+</html>
