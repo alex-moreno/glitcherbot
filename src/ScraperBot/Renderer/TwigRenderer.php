@@ -18,9 +18,12 @@ class TwigRenderer {
         // Specify our Twig templates location
         $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/../../templates');
         // Instantiate our Twig
-        $twig = new \Twig\Environment($loader);
+        $twig = new \Twig\Environment($loader, [
+        'debug' => false,]);
+        $twig->addExtension(new \Twig\Extension\DebugExtension());
+
         $template = $twig->load($template);
+
         return $template->render($data);
     }
-
 }

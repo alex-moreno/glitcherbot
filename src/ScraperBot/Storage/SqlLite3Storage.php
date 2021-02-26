@@ -22,6 +22,11 @@ class SqlLite3Storage implements StorageInterface {
                             footprint TEXT
        );");
 
+        $this->pdo->query("CREATE TABLE IF NOT EXISTS taxonomy (
+                            timestamp NOT NULL,
+                            tag TEXT NOT NULL
+       );");
+
         $this->pdo->query("CREATE TABLE IF NOT EXISTS sitemapURLs (
                             timestamp NOT NULL,
                             site_id INTEGER type UNIQUE,
@@ -42,6 +47,36 @@ class SqlLite3Storage implements StorageInterface {
                             
        );");
 
+    }
+
+    /**
+     * Tag a given timestamp with a taxonomy or tag.
+     *
+     * @param $timestamp
+     *   Timestamp to tag
+     * @param $taxonomy
+     *   Taxonomy to use as tag
+     */
+    public function addTaxonomy($timestamp, $taxonomy) {
+        $query = sprintf("INSERT INTO taxonomy (timestamp, tag) VALUES(%d,\"%s\")", $timestamp, $taxonomy);
+        $this->pdo->query($query);
+    }
+
+    /**
+     * Get taxonomies for a given crawl.
+     *
+     * @param $timestamp
+     * @return mixed
+     */
+    public function getTaxonomy($timestamp) {
+        $queryString = sprintf("SELECT * FROM taxonomy WHERE timestamp LIKE '%d';", $timestamp);
+
+        $query = $this->pdo->query($queryString);
+        while ($row = $query->fetchArray()) {
+            $taxonomies[$timestamp][] = $row;
+        }
+
+        return $taxonomies;
     }
 
     /**
@@ -362,9 +397,8 @@ class SqlLite3Storage implements StorageInterface {
      */
     public function addSitemapURL($url, $index, $timestamp)
     {
-        echo 'adding sitemap:' . $url;
-            $query = sprintf("INSERT INTO sitemapURLs (timestamp, url, site_id) VALUES(%d,%d,\"%s\")", $timestamp, $index, $url);
-            $this->pdo->query($query);
+        $query = sprintf("INSERT INTO sitemapURLs (timestamp, url, site_id) VALUES(%d,%d,\"%s\")", $timestamp, $index, $url);
+        $this->pdo->query($query);
     }
 
     /**

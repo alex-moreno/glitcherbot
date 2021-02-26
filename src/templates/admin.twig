@@ -19,8 +19,29 @@
             </div>
             <br>
         {% endif %}
+
+        {% if addedTaxonomy %}
+            <div class="bg-success text-dark">
+                Taxonomy added: {{ addedTaxonomy }}
+            </div>
+            <br>
+        {% endif %}
+
+        <strong>Crawls:</strong>
         {% for header in headers %}
-            <br><th style="text-align:center" colspan="3">{{ header|date }}</th> - <a href="/admin/crawl/remove/{{ header }}">Delete</a> - <a href="#">Tag (coming soon)</a>
+            <br><th style="text-align:center" colspan="3">{{ header }} - {{ header|date }}</th>
+        {%  endfor %}
+
+        <br></br><strong>Tags or groups:</strong>
+        {% for crawled in taxonomies %}
+            {% for key,singlecrawl in crawled %}
+                <br><th style="text-align:center" colspan="3">Crawl: {{ key }} - {{ key|date }}</th> - <a href="/admin/crawl/remove/{{ key }}">Delete</a> - <a href="/admin/crawl/taxonomy/{{ key }}">Add Tag</a>
+
+
+                {%  for tag in singlecrawl %}
+                    {{ tag.1 }}
+                {% endfor %}
+            {%  endfor %}
         {%  endfor %}
 
     </div>
