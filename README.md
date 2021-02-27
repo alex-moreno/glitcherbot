@@ -19,6 +19,13 @@ Download and install [Vagrant](https://www.vagrantup.com/downloads).
 
 ### Installation
 
+0. Download and unzip the package:
+```
+curl -L -# -C - -O "https://github.com/alex-moreno/glitcherbot/archive/main.zip"
+unzip main.zip
+cd glitcherbot-main
+```
+
 1. Run:
 ```composer install```
 
@@ -83,8 +90,25 @@ return [
 
 Note: The higher the concurrency is configured, the more sites it will run on each step, but be careful, php is fast (contrary to popular belief), it could send high load to a site and put it in trouble. Big power means bigger responsibility.
 
+## Stand Alone Tool
+
+To run the regression tool as a stand along interface you need to point your webserver at the html/ directory in the repo.
+
+### PHP Web Server
+
+A composer script has been included to aid with testing of the tool. To run this use the command.
+
+```composer start```
+
+Then navigate to the following address in your browser.
+
+```http://0.0.0.0:8000/```
+
 ## Docker
-Download [Docker](https://www.docker.com/)
+
+A docker setup has been included to aid with the running or the tool.
+
+Download and install [Docker](https://www.docker.com/)
 
 ### Starting the Docker container
 This command will start the containers
