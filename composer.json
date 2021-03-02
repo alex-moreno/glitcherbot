@@ -47,5 +47,8 @@
         "psr-4": {
             "ScraperBot\\": "src/ScraperBot"
         }
+    },
+    "scripts": {
+        "start" : "php -S 0.0.0.0:8000 -t html html/index.php"
     }
 }
