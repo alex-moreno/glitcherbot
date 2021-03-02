@@ -3,6 +3,7 @@
 
 namespace ScraperBot\Core;
 
+use ScraperBot\Plugin\Event\PluginDiscoveryEvent;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
@@ -32,4 +33,18 @@ class GlitcherBot {
         return self::getContainer()->get($name);
     }
 
+    public static function getPluginTypes() {
+        $pluginRegistry = GlitcherBot::service('glitcherbot.plugin_registry');
+        return $pluginRegistry->getPluginTypes();
+    }
+
+    public static function getPlugins() {
+        $pluginRegistry = GlitcherBot::service('glitcherbot.plugin_registry');
+        return $pluginRegistry->getPlugins();
+    }
+
+    public static function getActivePluginList() {
+        $pluginRegistry = GlitcherBot::service('glitcherbot.active_plugin_store');
+        return $pluginRegistry->getActivePluginList();
+    }
 }

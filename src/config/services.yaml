@@ -7,7 +7,7 @@ services:
     alias: glitcherbot.storage.sqlite3
 
   glitcherbot.storage.sqlite3:
-    class: \ScraperBot\Storage\SqlLite3Storage
+    class: \ScraperBot\Storage\Plugin\SqlLite3Storage
 
   glitcherbot.event_dispatcher:
     class: Symfony\Component\EventDispatcher\EventDispatcher
@@ -26,3 +26,10 @@ services:
 
   glitcherbot.csv_manager:
     class: ScraperBot\CsvManager
+
+  glitcherbot.plugin_registry:
+    class: ScraperBot\Plugin\PluginRegistry
+    arguments: ['@glitcherbot.event_dispatcher']
+
+  glitcherbot.active_plugin_store:
+    class: ScraperBot\Plugin\Store\YamlActivePluginStore

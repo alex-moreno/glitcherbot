@@ -1,6 +1,9 @@
 <?php
 
-namespace ScraperBot\Storage;
+namespace ScraperBot\Storage\Plugin;
+
+
+use ScraperBot\Storage\Plugin\Type\StorageInterface;
 
 class SqlLite3Storage implements StorageInterface {
 
@@ -10,7 +13,7 @@ class SqlLite3Storage implements StorageInterface {
      * ResultsService constructor.
      * @param string $db
      */
-    public function __construct($db = __DIR__ . '/../../../glitcherbot.sqlite3') {
+    public function __construct($db = __DIR__ . '/../../../../glitcherbot.sqlite3') {
         $this->pdo = new \SQLite3($db);
 
         $this->pdo->query("CREATE TABLE IF NOT EXISTS sites (

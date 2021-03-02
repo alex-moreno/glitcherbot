@@ -3,6 +3,7 @@
 namespace ScraperBot\Routing\Controllers;
 
 use ScraperBot\Core\GlitcherBot;
+use ScraperBot\Plugin\ActivePluginStoreInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -11,7 +12,16 @@ use Symfony\Component\HttpFoundation\Request;
 class SitesController {
 
     public function handle(Request $request) {
-        $resultsStorage = GlitcherBot::service('glitcherbot.storage');
+        //$resultsStorage = GlitcherBot::service('glitcherbot.storage');
+
+        /**
+         * @type $activePluginStore ActivePluginStoreInterface
+         */
+        $activePluginStore = GlitcherBot::service('glitcherbot.active_plugin_store');
+        $storage_plugins = $activePluginStore->getActivePlugins('storage');
+
+        // Only use the first active storage plugin for now.
+        $resultsStorage = current($storage_plugins);
 
         $compare = [];
         if (isset($_GET['date1']) && $_GET['date2']) {
