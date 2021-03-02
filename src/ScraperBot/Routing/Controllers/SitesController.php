@@ -13,25 +13,30 @@ class SitesController {
     public function handle(Request $request) {
         $resultsStorage = GlitcherBot::service('glitcherbot.storage');
 
-        $compare = [];
+        $compare = [
+            'date1' => NULL,
+            'date2' => NULL,
+        ];
         if (isset($_GET['date1']) && $_GET['date2']) {
             $compare['date1'] = $_GET['date1'];
             $compare['date2'] = $_GET['date2'];
         }
 
         $onlyLatest = NULL;
+        $persistLatest = NULL;
         if (isset($_GET['latest'])) {
             $onlyLatest = $_GET['latest'];
             $persistLatest = 'checked';
         }
+
         $crawls = $resultsStorage->getTimeStamps($compare, $onlyLatest);
 
         $showOnlyNaughty = NULL;
+        $persistNaughty = NULL;
         if (isset($_GET['onlynaughty']) && $_GET['onlynaughty'] == true) {
             $showOnlyNaughty = $_GET['onlynaughty'];
             $persistNaughty = 'checked';
         }
-
 
         $rows = [];
         $headers = [];
@@ -41,7 +46,6 @@ class SitesController {
         if (isset($_GET['tolerance'])) {
             $tolerance = $_GET['tolerance'];
         }
-
 
         // We just use the last two crawls.
         if (sizeof($crawls) > 1) {
@@ -76,12 +80,19 @@ class SitesController {
                     }
                 }
             }
-
             $index++;
         }
 
         $renderer = GlitcherBot::service('glitcherbot.renderer');
-        $content = $renderer->render('results.twig', ['headers' => $headers, 'rows' => $rows, 'tolerance' => $tolerance, 'date1' => $compare['date1'], 'date2' => $compare['date2'], 'persistNaughty' => $persistNaughty, 'persistLatest' => $persistLatest]);
+        $content = $renderer->render('results.twig', [
+            'headers' => $headers,
+            'rows' => $rows,
+            'tolerance' => $tolerance,
+            'date1' => $compare['date1'],
+            'date2' => $compare['date2'],
+            'persistNaughty' => $persistNaughty,
+            'persistLatest' => $persistLatest,
+        ]);
 
         $response = new \Symfony\Component\HttpFoundation\Response();
         $response->setContent($content);

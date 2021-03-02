@@ -37,16 +37,24 @@ class AdminController {
         $resultsStorage = GlitcherBot::service('glitcherbot.storage');
         $crawls = $resultsStorage->getTimeStamps();
 
+        $taxonomies = [];
+
         foreach ($crawls as $crawl) {
             $taxonomies[] = $resultsStorage->getTaxonomy($crawl);
         }
 
         // Get if we are coming from the delete area.
         $idDeleted = $request->query->get('id');
+
         // Get if we are coming from the delete area.
         $addedTaxonomy = $request->query->get('addedTaxonomy');
 
-        $data = ['headers' => $crawls,'taxonomies' => $taxonomies, 'idDeleted' => $idDeleted, 'addedTaxonomy' => $addedTaxonomy];
+        $data = [
+            'headers' => $crawls,
+            'taxonomies' => $taxonomies,
+            'idDeleted' => $idDeleted,
+            'addedTaxonomy' => $addedTaxonomy,
+        ];
 
         $response = new Response();
         $renderer = GlitcherBot::service('glitcherbot.renderer');
@@ -127,9 +135,11 @@ class AdminController {
 
             return $response->send();
         } else {
-            $content = $twig->render('crawls_delete.twig',
-                ['deleteForm' => $form->createView(), 'id' => $id, 'message' => "Are you sure you want to remove this crawl ?"]);
-
+            $content = $twig->render('crawls_delete.twig', [
+                'deleteForm' => $form->createView(),
+                'id' => $id,
+                'message' => "Are you sure you want to remove this crawl ?",
+            ]);
         }
 
         $response->setContent($content);
@@ -206,8 +216,10 @@ class AdminController {
 
             return $response->send();
         } else {
-            $content = $twig->render('crawls_delete.twig',
-                ['deleteForm' => $form->createView(), 'id' => $crawlID, 'message' => "Tag your crawls."]);
+            $content = $twig->render('crawls_delete.twig', [
+                'deleteForm' => $form->createView(),
+                'id' => $crawlID, 'message' => "Tag your crawls.",
+            ]);
         }
 
         $response->setContent($content);

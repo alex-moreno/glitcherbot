@@ -41,7 +41,7 @@ class CsvSource implements SourceInterface {
             $this->listOfSites = $listOfSites;
         }
 
-        return $listOfSites;
+        return $this->listOfSites;
     }
 
     /**

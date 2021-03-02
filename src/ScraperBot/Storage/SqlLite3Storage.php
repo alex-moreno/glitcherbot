@@ -71,6 +71,8 @@ class SqlLite3Storage implements StorageInterface {
     public function getTaxonomy($timestamp) {
         $queryString = sprintf("SELECT * FROM taxonomy WHERE timestamp LIKE '%d';", $timestamp);
 
+        $taxonomies = [];
+
         $query = $this->pdo->query($queryString);
         while ($row = $query->fetchArray()) {
             $taxonomies[$timestamp][] = $row;
@@ -141,7 +143,7 @@ class SqlLite3Storage implements StorageInterface {
      * @return mixed
      */
     public function getTimeStamps($timestamps = NULL, $getLatest = NULL) {
-        if ($timestamps != NULL) {
+        if (($timestamps != NULL) && (!empty($timestamps['date1'])) && (!empty($timestamps['date2']))) {
             $queryString = sprintf("SELECT DISTINCT * FROM sites WHERE timestamp = '%s' OR timestamp = '%s' GROUP BY timestamp order by url", strtotime($timestamps['date1']), strtotime($timestamps['date2']));
         } else {
             $queryString = sprintf("SELECT DISTINCT * FROM sites GROUP by timestamp");
@@ -150,6 +152,8 @@ class SqlLite3Storage implements StorageInterface {
                 $queryString = sprintf("SELECT DISTINCT * FROM sites GROUP by timestamp order by timestamp desc LIMIT 2");
             }
         }
+
+        $results = [];
 
         $query = $this->pdo->query($queryString);
         while ($row = $query->fetchArray()) {
@@ -167,6 +171,9 @@ class SqlLite3Storage implements StorageInterface {
     public function getStatusCodes() {
         $queryString = sprintf("SELECT statusCode FROM sites group by StatusCode");
         $query = $this->pdo->query($queryString);
+
+        $results = [];
+
         while ($row = $query->fetchArray()) {
             $results[] = $row['statusCode'];
         }
