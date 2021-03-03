@@ -27,7 +27,9 @@ class AcsfCrawlSitesCommand extends CrawlSitesCommand {
             ->addOption('config_file', null, InputArgument::OPTIONAL, 'Path to the config file', 'config.php')
             ->addOption('destination_folder', null, InputArgument::OPTIONAL, 'Path to the destination folder for results', '.')
             ->addOption('use_base_uri', null, InputOption::VALUE_NONE, 'If specified, ask guzzle to create a new client each time, in order to specify base URI for redirects.')
-            ->addOption('include_sitemaps', null, InputArgument::OPTIONAL, 'Crawl urls found in sitemaps', FALSE);
+            ->addOption('include_sitemaps', null, InputArgument::OPTIONAL, 'Crawl urls found in sitemaps', FALSE)
+            ->addOption('force_sitemaps', null, InputArgument::OPTIONAL, 'Force indexing sitemaps even if not found in robots.txt', FALSE);
+
     }
 
     /**

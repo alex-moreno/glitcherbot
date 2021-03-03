@@ -25,8 +25,6 @@ class Crawler {
 
     private $storage;
 
-    private $offIndex = 0;
-
     private $eventDispatcher = NULL;
 
     private $httpConfig = [];
@@ -92,7 +90,7 @@ class Crawler {
             $timestamp = time();
         }
 
-        $promises = (function () use ($urls, $client, $default_config, $timestamp, $assumeTimestamp) {
+        $promises = (function () use ($urls, $client, $default_config, $timestamp, $assumeTimestamp, $forceSitemaps) {
             foreach ($urls as $url) {
                 if (!empty($url)) {
                     $target_url = $url;
@@ -118,9 +116,14 @@ class Crawler {
                         // Only add a sitemap for base urls in the list.
                         // ie: avoid doing the check for deep urls, like urls.com/node/sitemap.xml
                         if (rtrim($baseURL,"/") == rtrim($url,"/")) {
-                            $this->output->writeln('Adding sitemap.' . $baseURL . '/sitemap.xml', OutputInterface::VERBOSITY_VERBOSE);
-                            // Let's assume there is a sitemap on this url before even checking the robots.
-                            $this->storage->addSitemapURL($baseURL . '/sitemap.xml', $this->offIndex, $timestamp);
+                            if ($forceSitemaps == 'yes') {
+                                $this->output->writeln('Adding sitemap: ' . $baseURL . '/sitemap.xml', OutputInterface::VERBOSITY_VERBOSE);
+                                // Let's assume there is a sitemap on this url before even checking the robots.
+                                $this->storage->addSitemapURL($baseURL . '/sitemap.xml', $this->offIndex, $timestamp);
+                            }
+                            else {
+                                $this->output->writeln('Sitemap will not be crawled: ' . $baseURL . '/sitemap.xml', OutputInterface::VERBOSITY_VERBOSE);
+                            }
                         }
                     }
 
@@ -226,8 +229,7 @@ class Crawler {
      * @param $client
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function determineSiteMapURLs(SourceInterface $source, Client $client, $default_config = NULL, $timestamp = NULL, $offIndex = 0) {
-        $this->offIndex = $offIndex;
+    public function determineSiteMapURLs(SourceInterface $source, Client $client, $default_config = NULL, $timestamp = NULL) {
 
         if (!isset($timestamp)) {
             $timestamp = time();
@@ -242,7 +244,6 @@ class Crawler {
      * @param $urls
      * @param $client
      * @param $default_config
-     * @param $offIndex
      * @param $timestamp
      */
     public function gatherSitemapURLs($source, $client, $default_config, $timestamp) {
@@ -307,10 +308,9 @@ class Crawler {
      * @param $urls
      * @param $client
      * @param $default_config
-     * @param $offIndex
      * @param $timestamp
      */
-    public function crawlSitemaps($source, $client, $default_config, $timestamp, $offIndex) {
+    public function crawlSitemaps($source, $client, $default_config, $timestamp) {
         // First read the robots, so we can find the sitemap (if any)
         $urls = $source->getLinks();
 
@@ -324,7 +324,7 @@ class Crawler {
         $this->eventDispatcher->dispatch($event, CrawlInitiatedEvent::NAME);
         $urls = $event->getUrls();
 
-        $promises = (function () use ($urls, $client, $default_config, $offIndex) {
+        $promises = (function () use ($urls, $client, $default_config) {
             foreach ($urls as $url) {
                 // If default config is provided, create a new client each time.
                 if ($default_config != NULL) {
@@ -340,7 +340,7 @@ class Crawler {
         $eachPromise = new EachPromise($promises, [
             // Concurrency to use.
             'concurrency' => $this->getConcurrency(),
-            'fulfilled' => function (Response $response, $index) use ($timestamp, $urls, $offIndex) {
+            'fulfilled' => function (Response $response, $index) use ($timestamp, $urls) {
                 // We want to follow Sitemap: urls.
                 $sourceSitemap = new XmlSitemapSource();
                 $links = $sourceSitemap->extractLinks($response->getBody()->getContents());

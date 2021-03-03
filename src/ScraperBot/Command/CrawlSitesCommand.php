@@ -109,16 +109,16 @@ class CrawlSitesCommand extends GlitcherBotCommand {
         $csv_logger = new CrawlCsvLoggerSubscriber($fileToWrite);
         $this->eventDispatcher->addSubscriber($csv_logger);
 
-        $this->crawler->crawlSites($source, $this->default_client, $this->default_config, $timestamp, TRUE, $this->force_sitemaps);
-        $this->crawler->determineSiteMapURLs($source, $this->default_client, $this->default_config, $timestamp, 0);
+        $this->crawler->crawlSites($source, $this->default_client, $this->default_config, $timestamp, TRUE, $this->force_sitemaps || $this->include_sitemaps);
+        $this->crawler->determineSiteMapURLs($source, $this->default_client, $this->default_config, $timestamp);
 
         $sitemapURLs = $this->crawler->getListPendingSitemaps(TRUE);
         $sourceSitemap = new XmlSitemapSource($sitemapURLs);
 
         // Crawl the sitemaps.
-        if ($this->include_sitemaps = 'yes' || $this->force_sitemaps = 'yes') {
+        if ($this->include_sitemaps == 'yes' || $this->force_sitemaps == 'yes') {
             $output->writeln('Crawling sitemaps started.', OutputInterface::VERBOSITY_VERBOSE);
-            $this->crawler->crawlSitemaps($sourceSitemap, $this->default_client, $this->default_config, $timestamp, $source->getSize());
+            $this->crawler->crawlSitemaps($sourceSitemap, $this->default_client, $this->default_config, $timestamp);
 
             $storage = $this->crawler->getStorage();
             $pendingURLs = $storage->getPendingURLs(TRUE);
@@ -127,7 +127,7 @@ class CrawlSitesCommand extends GlitcherBotCommand {
                 $output->writeln('Crawling sites in the sitemaps.', OutputInterface::VERBOSITY_VERBOSE);
 
                 $pendingSource = new SitesArraySource($pendingURLs);
-                $this->crawler->crawlSites($pendingSource, $this->default_client, $this->default_config, $timestamp, FALSE, $this->force_sitemaps);
+                $this->crawler->crawlSites($pendingSource, $this->default_client, $this->default_config, $timestamp, FALSE, $this->force_sitemaps || $this->include_sitemaps);
             }
         }
 
