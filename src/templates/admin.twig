@@ -28,16 +28,15 @@
         {% endif %}
 
         <strong>Crawls:</strong>
-        {% for header in headers %}
-            <br><th style="text-align:center" colspan="3">{{ header }} - {{ header|date }}</th>
+        {% for crawl in headers %}
+            <br><th style="text-align:center" colspan="3">{{ crawl }} - {{ crawl|date }} - <a href="/admin/crawl/remove/{{ crawl }}">Delete</a> - <a href="/admin/crawl/taxonomy/{{ crawl }}">Add Tag</a></th>
         {%  endfor %}
 
-        <br></br><strong>Tags or groups:</strong>
+        <br></br><strong>Tags / groups:</strong>
         {% for crawled in taxonomies %}
             {% for key,singlecrawl in crawled %}
-                <br><th style="text-align:center" colspan="3">Crawl: {{ key }} - {{ key|date }}</th> - <a href="/admin/crawl/remove/{{ key }}">Delete</a> - <a href="/admin/crawl/taxonomy/{{ key }}">Add Tag</a>
-
-
+                <br><th style="text-align:center" colspan="3">Crawl: {{ key }} - {{ key|date }}</th>
+                <strong>Tags:</strong>
                 {%  for tag in singlecrawl %}
                     {{ tag.1 }}
                 {% endfor %}
