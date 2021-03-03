@@ -123,7 +123,6 @@ class SqlLite3Storage implements StorageInterface {
         }
     }
 
-
     /**
      * @return SQLite3Result
      */
