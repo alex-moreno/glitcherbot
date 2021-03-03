@@ -1,12 +1,13 @@
 #!/usr/bin/env php
 <?php
 
-require __DIR__.'/../vendor/autoload.php';
+$autoloader = require __DIR__.'/../vendor/autoload.php';
+GlitcherBot::setAutoloader($autoloader);
 
+use ScraperBot\Core\Bootstrap;
 use Symfony\Component\Console\Application;
 
-$bootstrap = new \ScraperBot\Core\Bootstrap();
-$bootstrap->init();
+Bootstrap::init();
 
 $application = new Application("Visual Regression Bot");
 $application->add(new \ScraperBot\Command\CrawlSitesCommand());

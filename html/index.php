@@ -1,9 +1,14 @@
 <?php
 
+use ScraperBot\Core\GlitcherBot;
 use ScraperBot\Core\Http\GlitcherBotKernel;
 use Symfony\Component\HttpFoundation\Request;
 
-require_once __DIR__.'/../vendor/autoload.php';
+/**
+ * @type $autoloader \Composer\Autoload\ClassLoader
+ */
+$autoloader = require_once __DIR__.'/../vendor/autoload.php';
+GlitcherBot::setAutoloader($autoloader);
 
 $request = Request::createFromGlobals();
 

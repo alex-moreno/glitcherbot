@@ -13,6 +13,15 @@ class PluginType {
     private $type = NULL;
     private $human_name = NULL;
 
+    /**
+     * PluginType constructor.
+     * @param $type
+     *  The plugin type.
+     * @param $human_name
+     *  The human readable name of the plugin.
+     * @param $interface
+     *  The fully qualified interface name that plugins of this type should implement.
+     */
     public function __construct($type, $human_name, $interface) {
         $this->type = $type;
         $this->human_name = $human_name;
@@ -20,7 +29,8 @@ class PluginType {
     }
 
     /**
-     * @return null
+     * @return string
+     *  The interface that should be implemented by plugins of this type.
      */
     public function getInterface() {
         return $this->interface;

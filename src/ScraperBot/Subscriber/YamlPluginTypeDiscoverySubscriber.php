@@ -15,14 +15,14 @@ class YamlPluginTypeDiscoverySubscriber implements EventSubscriberInterface {
     private $base_folder = __DIR__ . '/../../';
     private $custom_folder = __DIR__ . '/../../../custom';
 
-    private $pattern = '*.plugin.type.yml';
+    private $pattern = '*.plugin.type.yaml';
 
     public function onPluginTypeDiscovery(PluginTypeDiscoveryEvent $event) {
         $this->scanForPlugins($this->base_folder, $event);
         $this->scanForPlugins($this->custom_folder, $event);
     }
 
-    private function scanForPlugins($folder, $event) {
+    private function scanForPlugins($folder, PluginTypeDiscoveryEvent $event) {
         // Search folders to discover *.plugin.type.yml files
         $finder = new Finder();
 

@@ -25,11 +25,12 @@ class PluginController {
         $active_list = GlitcherBot::getActivePluginList();
 
         foreach ($plugin_definitions as $type => $plugins) {
+
             foreach ($plugins as $id => $plugin) {
-                $plugin_data[$type]['id'] = $id;
-                $plugin_data[$type]['name'] = $plugin->getDescription();
-                $plugin_data[$type]['interface'] = $plugin->getClass();
-                $plugin_data[$type]['active'] = in_array($id, $active_list[$type]) ? "YES" : "NO";
+                $plugin_data[$type][$id]['id'] = $id;
+                $plugin_data[$type][$id]['name'] = $plugin->getDescription();
+                $plugin_data[$type][$id]['interface'] = $plugin->getClass();
+                $plugin_data[$type][$id]['active'] = in_array($id, $active_list[$type]) ? "YES" : "NO";
             }
         }
 

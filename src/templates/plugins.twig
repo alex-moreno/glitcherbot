@@ -48,17 +48,19 @@
         </thead>
         <tbody>
         {%  for type,meta in plugins %}
+            {%  for values in meta %}
             <tr>
                 <td style="text-align:center">
                     {{ type }}
                 </td>
 
-                {%  for value in meta %}
+                    {% for value in values %}
                     <td style="text-align:center">
                         {{ value }}
                     </td>
-                {% endfor %}
+                    {% endfor %}
             </tr>
+            {% endfor %}
         {% endfor %}
         </tbody>
     </table>

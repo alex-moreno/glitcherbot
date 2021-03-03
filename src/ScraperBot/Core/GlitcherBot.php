@@ -3,7 +3,8 @@
 
 namespace ScraperBot\Core;
 
-use ScraperBot\Plugin\Event\PluginDiscoveryEvent;
+use Composer\Autoload\ClassLoader;
+use ScraperBot\Plugin\PluginRegistryInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
@@ -11,6 +12,7 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 class GlitcherBot {
 
     private static $container = NULL;
+    private static $autoloader = NULL;
 
     /**
      * @return null
@@ -39,6 +41,9 @@ class GlitcherBot {
     }
 
     public static function getPlugins() {
+        /**
+         * @type $pluginRegistry PluginRegistryInterface
+         */
         $pluginRegistry = GlitcherBot::service('glitcherbot.plugin_registry');
         return $pluginRegistry->getPlugins();
     }
@@ -47,4 +52,23 @@ class GlitcherBot {
         $pluginRegistry = GlitcherBot::service('glitcherbot.active_plugin_store');
         return $pluginRegistry->getActivePluginList();
     }
+
+    public static function addNamespace($namespace, $src_path) {
+        self::getAutoloader()->addPsr4($namespace, [$src_path]);
+    }
+
+    /**
+     * @return ClassLoader
+     */
+    public static function getAutoloader() {
+        return self::$autoloader;
+    }
+
+    /**
+     * @param null $autoloader
+     */
+    public static function setAutoloader($autoloader): void {
+        self::$autoloader = $autoloader;
+    }
+
 }

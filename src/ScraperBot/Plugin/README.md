@@ -29,3 +29,48 @@ Once you have this information, you need to do two things.
 
 1. Create a class which implements the interface, and add the path in the file defined in (1)
 2. Define a <type>/plugins.yml file and reference your new class there
+
+Plugins in this file are keyed by ID, and you can define multiple instances.
+
+For example, the core storage plugin is defined in `storage.plugins.yml` and looks like
+
+```
+sqlite3:
+  class: ScraperBot\Storage\Plugin\SqlLite3Storage
+  description: SqlLite3 storage plugin
+```
+
+When adding custom plugins under the 'custom' folder, the autoloader is automatically updated based on the location of
+the discovered `*.plugins.yaml` file.
+
+The parent folder of your *.plugins.yaml file will be used as
+part of the namespace for loading of your custom classes. There should be a 'src' folder alongside your yaml file that
+contains your classes.
+
+For example, your structure might be
+
+`custom/MySqlStorage/storage.plugins.yaml`
+
+The contents might be
+
+```
+mysql:
+  class: ScraperBot\MySqlStorage\Plugin\Storage\MySqlStorage
+  description: MySQL storage plugin
+```
+
+Notice the namespace of the class. Such namespaces always use `ScraperBot\` as a prefix, followed by the folder name.
+Anything in this namespace must live in the 'src' folder alongside the *.plugins.yaml file.
+
+So, given the namespace above, our class would exist in
+
+`custom/MySqlStorage/src/Plugin/Storage/MySqlStorage.php`
+
+# Core Plugin Types
+
+TODO
+
+# Listing Available Plugin Types
+
+TODO - /plugins, via plugin registry code or finding files
+

@@ -12,8 +12,6 @@ use Symfony\Component\HttpFoundation\Request;
 class SitesController {
 
     public function handle(Request $request) {
-        //$resultsStorage = GlitcherBot::service('glitcherbot.storage');
-
         /**
          * @type $activePluginStore ActivePluginStoreInterface
          */

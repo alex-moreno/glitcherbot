@@ -11,56 +11,93 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 class PluginRegistry implements PluginRegistryInterface {
 
     private $dispatcher = NULL;
-    private $pluginTypes = [];
-    private $implementations = [];
+    private $plugin_types = [];
+    private $plugin_instances = [];
 
     public function __construct(EventDispatcher $dispatcher) {
         $this->dispatcher = $dispatcher;
     }
 
+    /**
+     * Return a list of known plugin types.
+     *
+     * If the existing list is empty, the method will attempt
+     * to discover types.
+     *
+     * @return array|mixed
+     */
     public function getPluginTypes() {
-        if (empty($this->pluginTypes)) {
+        if (empty($this->plugin_types)) {
             // Discover plugin list.
             $event = new PluginTypeDiscoveryEvent();
             $this->dispatcher->dispatch($event, PluginTypeDiscoveryEvent::NAME);
 
-            $this->pluginTypes = $event->getPluginTypes();
+            $this->plugin_types = $event->getPluginTypes();
         }
 
-        return $this->pluginTypes;
+        return $this->plugin_types;
     }
 
+    /**
+     * Discover plugin instances for all known types.
+     *
+     * @inheritDoc
+     */
     public function getPlugins() {
+        // Get the list of registered plugin types.
         $types = $this->getPluginTypes();
 
+        // Discover plugin instances for each type.
         foreach ($types as $type) {
-            $this->getImplementations($type->getType());
+            $this->discoverInstances($type->getType());
         }
 
-        return $this->implementations;
+        return $this->plugin_instances;
     }
 
-    private function getImplementations($type) {
-        if (empty($this->implementations)) {
+    /**
+     * Discover plugin instances.
+     *
+     * @param $type
+     */
+    private function discoverInstances($type) {
+        if (empty($this->plugin_instances)) {
             $event = new PluginDiscoveryEvent($type);
             $this->dispatcher->dispatch($event, PluginDiscoveryEvent::NAME);
-            $this->implementations[$event->getType()] = $event->getPlugins();
+            $this->plugin_instances[$event->getType()] = $event->getPlugins();
         }
-
-        return $this->implementations;
     }
 
+    /**
+     * Get an instance of a plugin.
+     *
+     * This method will instantiate the requested plugin, if it exists.
+     *
+     * @param $type
+     * @param $id
+     * @return mixed|null
+     */
     public function getPlugin($type, $id) {
+        static $map = [];
+
+        // Return an instance from static cache, if it exists.
+        if (isset($map[$type][$id])) {
+            return $map[$type][$id];
+        }
+
         $this->getPlugins();
 
-        if (isset($this->implementations[$type])) {
-            foreach ($this->implementations[$type] as $plugin) {
+        if (isset($this->plugin_instances[$type])) {
+            foreach ($this->plugin_instances[$type] as $plugin) {
                 /**
                  * @type $plugin Plugin
                  */
                 if ($plugin->getId() == $id) {
                     $plugin_class = $plugin->getClass();
-                    return new $plugin_class();
+                    $instance = new $plugin_class();
+
+                    $map[$type][$id] = $instance;
+                    return $map[$type][$id];
                 }
             }
         }
