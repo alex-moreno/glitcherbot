@@ -1,11 +1,12 @@
 #!/usr/bin/env php
 <?php
 
+use ScraperBot\Core\Bootstrap;
+use ScraperBot\Core\GlitcherBot;
+use Symfony\Component\Console\Application;
+
 $autoloader = require __DIR__.'/../vendor/autoload.php';
 GlitcherBot::setAutoloader($autoloader);
-
-use ScraperBot\Core\Bootstrap;
-use Symfony\Component\Console\Application;
 
 Bootstrap::init();
 

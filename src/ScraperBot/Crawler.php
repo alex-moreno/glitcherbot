@@ -13,7 +13,7 @@ use ScraperBot\Event\CrawlInitiatedEvent;
 use ScraperBot\Event\CrawlRejectedEvent;
 use ScraperBot\Source\SourceInterface;
 use ScraperBot\Source\XmlSitemapSource;
-use ScraperBot\Storage\StorageInterface;
+use ScraperBot\Storage\Plugin\Type\StorageInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 

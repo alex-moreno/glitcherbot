@@ -28,16 +28,21 @@ class PluginController {
         $warnings = [];
 
         foreach ($plugin_definitions as $type => $plugins) {
-
-            if ($types[$type]['singleton'] && count($plugins) > 1) {
-                $warnings[$type]['message'] = "You have more than one active plugin of type '" . $type . "' but it is intended to be used as a singleton.";
-            }
+            $active_count = 0;
 
             foreach ($plugins as $id => $plugin) {
                 $plugin_data[$type][$id]['id'] = $id;
                 $plugin_data[$type][$id]['name'] = $plugin->getDescription();
                 $plugin_data[$type][$id]['class'] = $plugin->getClass();
                 $plugin_data[$type][$id]['active'] = in_array($id, $active_list[$type]) ? "YES" : "NO";
+
+                if ($plugin_data[$type][$id]['active'] == "YES") {
+                    $active_count++;
+                }
+            }
+
+            if ($types[$type]['singleton'] && $active_count > 1) {
+                $warnings[$type]['message'] = "You have more than one active plugin of type '" . $type . "' but it is intended to be used as a singleton.";
             }
         }
 
