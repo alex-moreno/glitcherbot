@@ -14,6 +14,14 @@ Core uses plugins, but 3rd party plugins can also be created.
 Without going into too much detail, the core discovery mechanism for plugins is itself driven by the event dispatcher.
 In most cases, you won't need to worry about this detail, unless you plan on creating your own plugin types.
 
+# Event System
+
+TODO
+
+## Registering custom event subscribers
+
+TODO describe the *.subscribers.yaml file format, and discovery mechanism.
+
 # Plugin System
 
 ## Overview
