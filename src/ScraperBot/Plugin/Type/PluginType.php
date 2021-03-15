@@ -12,6 +12,7 @@ class PluginType {
     private $interface = NULL;
     private $type = NULL;
     private $human_name = NULL;
+    private bool $singleton = FALSE;
 
     /**
      * PluginType constructor.
@@ -21,11 +22,14 @@ class PluginType {
      *  The human readable name of the plugin.
      * @param $interface
      *  The fully qualified interface name that plugins of this type should implement.
+     * @param $singleton
+     *  TRUE if there can be only one active instance of this plugin.
      */
-    public function __construct($type, $human_name, $interface) {
+    public function __construct($type, $human_name, $interface, $singleton = FALSE) {
         $this->type = $type;
         $this->human_name = $human_name;
         $this->interface = $interface;
+        $this->singleton = $singleton;
     }
 
     /**
@@ -69,6 +73,13 @@ class PluginType {
      */
     public function setHumanName($human_name): void {
         $this->human_name = $human_name;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSingleton(): bool {
+        return $this->singleton;
     }
 
 }

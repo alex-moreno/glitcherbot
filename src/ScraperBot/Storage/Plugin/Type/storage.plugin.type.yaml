@@ -1,3 +1,4 @@
 type: storage
 name: ScraperBot Storage Plugin Type
 interface: ScraperBot\Storage\StorageInterface
+singleton: true

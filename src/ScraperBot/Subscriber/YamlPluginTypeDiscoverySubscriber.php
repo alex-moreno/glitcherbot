@@ -34,7 +34,9 @@ class YamlPluginTypeDiscoverySubscriber implements EventSubscriberInterface {
         foreach ($finder->files()->in($folder)->name($this->pattern) as $file) {
             $definition = Yaml::parse($file->getContents());
 
-            $type = new PluginType($definition['type'], $definition['name'], $definition['interface']);
+            $singleton = isset($definition['singleton']) ? $definition['singleton'] : FALSE;
+
+            $type = new PluginType($definition['type'], $definition['name'], $definition['interface'], $singleton);
             $event->addPlugin($type);
         }
     }

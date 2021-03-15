@@ -16,6 +16,7 @@
             <th style="text-align:center" colspan="1">Type</th>
             <th style="text-align:center" colspan="1">Name</th>
             <th style="text-align:center" colspan="1">Interface</th>
+            <th style="text-align:center" colspan="1">Singleton?</th>
         </tr>
         </thead>
         <tbody>
@@ -25,11 +26,17 @@
                     {{ storage }}
                 </td>
 
-                {%  for value in keys %}
-                    <td style="text-align:center">
-                        {{ value }}
-                    </td>
-                {% endfor %}
+                <td style="text-align:center">
+                    {{ keys.name }}
+                </td>
+
+                <td style="text-align:center">
+                    {{ keys.interface }}
+                </td>
+
+                <td style="text-align:center">
+                    {{ keys.interface ? 'YES' : 'NO' }}
+                </td>
             </tr>
         {% endfor %}
         </tbody>
@@ -49,22 +56,41 @@
         <tbody>
         {%  for type,meta in plugins %}
             {%  for values in meta %}
+
+                {% if warnings[ type ] %}
+            <tr class="table-danger">
+                {% else %}
             <tr>
+                {% endif %}
                 <td style="text-align:center">
                     {{ type }}
                 </td>
-
-                    {% for value in values %}
-                    <td style="text-align:center">
-                        {{ value }}
-                    </td>
-                    {% endfor %}
+                <td style="text-align:center">
+                    {{ values.id }}
+                </td>
+                <td style="text-align:center">
+                    {{ values.name }}
+                </td>
+                <td style="text-align:center">
+                    {{ values.class }}
+                </td>
+                <td style="text-align:center">
+                    {{ values.active }}
+                </td>
             </tr>
             {% endfor %}
         {% endfor %}
         </tbody>
     </table>
 
+    {% if warnings %}
+    <h3>Warnings</h3>
+        <ul>
+            {% for type,data in warnings %}
+            <li>{{ data.message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 </div>
 
 {% include 'footer.twig' %}

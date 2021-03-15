@@ -44,7 +44,7 @@ class YamlActivePluginStore implements ActivePluginStoreInterface {
      */
     public function getActivePluginList() {
         if (empty($this->activeList)) {
-            $this->activeList = Yaml::parseFile($this->filepath);
+            $this->loadActivePlugins();
         }
 
         return $this->activeList;
@@ -70,25 +70,26 @@ class YamlActivePluginStore implements ActivePluginStoreInterface {
      */
     private function loadActivePlugins() {
         if (!file_exists($this->filepath)) {
-            $this->plugins = [];
+            // TODO throw a warning.
+            // Default to SQLite3 storage plugin.
+            $this->activeList = ['storage' => ['sqlite3']];
         }
-        else {
-            if (empty($this->activeList)) {
-                $this->activeList = Yaml::parseFile($this->filepath);
-            }
 
-            /**
-             * @type $registry PluginRegistryInterface
-             */
-            $registry = GlitcherBot::service('glitcherbot.plugin_registry');
+        if (empty($this->activeList)) {
+            $this->activeList = Yaml::parseFile($this->filepath);
+        }
 
-            foreach ($this->activeList as $type => $implementations) {
-                foreach ($implementations as $name) {
-                    $plugin = $registry->getPlugin($type, $name);
+        /**
+         * @type $registry PluginRegistryInterface
+         */
+        $registry = GlitcherBot::service('glitcherbot.plugin_registry');
 
-                    if (!empty($plugin)) {
-                        $this->plugins[$type][$name] = $plugin;
-                    }
+        foreach ($this->activeList as $type => $implementations) {
+            foreach ($implementations as $name) {
+                $plugin = $registry->getPlugin($type, $name);
+
+                if (!empty($plugin)) {
+                    $this->plugins[$type][$name] = $plugin;
                 }
             }
         }
