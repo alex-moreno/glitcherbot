@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+</head>
+<body>
+{% include 'menu.twig' %}
+<div class="container-fluid">
+
+    <div class="jumbotron">
+        <h1 class="display-4">Administer your GlitcherBot instance!</h1>
+        <p class="lead">Caution, this area will allow you to delete and/or alter your data.</p>
+        <hr class="my-4">
+
+        {% if idDeleted %}
+            <div class="bg-warning text-dark">
+                Crawl deleted: {{ idDeleted }}
+            </div>
+            <br>
+        {% endif %}
+
+        {% if addedTaxonomy %}
+            <div class="bg-success text-dark">
+                Taxonomy added: {{ addedTaxonomy }}
+            </div>
+            <br>
+        {% endif %}
+
+        <strong>Crawls:</strong>
+        {% for crawl in headers %}
+            <br><th style="text-align:center" colspan="3">{{ crawl }} - {{ crawl|date }} - <a href="/admin/crawl/remove/{{ crawl }}">Delete</a> - <a href="/admin/crawl/taxonomy/{{ crawl }}">Add Tag</a></th>
+        {%  endfor %}
+
+        <br></br><strong>Tags / groups:</strong>
+        {% for crawled in taxonomies %}
+            {% for key,singlecrawl in crawled %}
+                <br><th style="text-align:center" colspan="3">Crawl: {{ key }} - {{ key|date }}</th>
+                <strong>Tags:</strong>
+                {%  for tag in singlecrawl %}
+                    {{ tag.1 }}
+                {% endfor %}
+            {%  endfor %}
+        {%  endfor %}
+
+    </div>
+
+</div>
+</body>
+</html>

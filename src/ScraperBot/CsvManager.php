@@ -11,6 +11,8 @@ class CsvManager {
      * @return mixed
      */
     public function readCsv($source) {
+        $array_from_csv = [];
+
         $file = fopen($source, 'r');
         while (($line = fgetcsv($file)) !== FALSE) {
             //$line is an array of the csv elements
@@ -40,7 +42,6 @@ class CsvManager {
 
     }
 
-
     /**
      * Write array into destination csv
      * @param $destination
@@ -54,5 +55,4 @@ class CsvManager {
         $fp = fopen($folder . '/' . $outputCSV, 'a');
         fputcsv($fp, $array);
     }
-
 }

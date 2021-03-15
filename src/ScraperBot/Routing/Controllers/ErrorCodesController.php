@@ -16,9 +16,8 @@ class ErrorCodesController {
         $index = 0;
 
         $resultsStorage = GlitcherBot::service('glitcherbot.storage');
-        $crawls = $resultsStorage->getTimeStamps();
-
         $statusCodes = $resultsStorage->getStatusCodes();
+
         // Add manually the total of sites
         array_push($statusCodes, 'Total');
 
@@ -36,7 +35,10 @@ class ErrorCodesController {
             }
         }
 
-        $data = ['headers' => $headers, 'rows' => $rows, 'tolerance' => $tolerance];
+        $data = [
+            'headers' => $headers,
+            'rows' => $rows,
+        ];
 
         $response = new \Symfony\Component\HttpFoundation\Response();
         $renderer = GlitcherBot::service('glitcherbot.renderer');

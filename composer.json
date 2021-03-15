@@ -33,7 +33,10 @@
         "symfony/yaml": "^5.2",
         "symfony/config": "^5.2",
         "symfony/finder": "^5.2",
-        "symfony/expression-language": "^5.2"
+        "symfony/expression-language": "^5.2",
+        "symfony/form": "^5.2",
+        "symfony/twig-bridge": "^5.2",
+        "symfony/translation": "^5.2"
     },
     "suggest": {
         "ext-sqlite3": "*",
@@ -46,5 +49,8 @@
         "psr-4": {
             "ScraperBot\\": "src/ScraperBot"
         }
+    },
+    "scripts": {
+        "start" : "php -S 0.0.0.0:8000 -t html html/index.php"
     }
 }

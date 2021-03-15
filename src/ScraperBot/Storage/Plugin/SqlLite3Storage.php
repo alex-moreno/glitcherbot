@@ -25,6 +25,11 @@ class SqlLite3Storage implements StorageInterface {
                             footprint TEXT
        );");
 
+        $this->pdo->query("CREATE TABLE IF NOT EXISTS taxonomy (
+                            timestamp NOT NULL,
+                            tag TEXT NOT NULL
+       );");
+
         $this->pdo->query("CREATE TABLE IF NOT EXISTS sitemapURLs (
                             timestamp NOT NULL,
                             site_id INTEGER type UNIQUE,
@@ -45,6 +50,51 @@ class SqlLite3Storage implements StorageInterface {
                             
        );");
 
+    }
+
+    /**
+     * Tag a given timestamp with a taxonomy or tag.
+     *
+     * @param $timestamp
+     *   Timestamp to tag
+     * @param $taxonomy
+     *   Taxonomy to use as tag
+     */
+    public function addTaxonomy($timestamp, $taxonomy) {
+        $query = sprintf("INSERT INTO taxonomy (timestamp, tag) VALUES(%d,\"%s\")", $timestamp, $taxonomy);
+        $this->pdo->query($query);
+    }
+
+    /**
+     * Get taxonomies for a given crawl.
+     *
+     * @param $timestamp
+     * @return mixed
+     */
+    public function getTaxonomy($timestamp) {
+        $queryString = sprintf("SELECT * FROM taxonomy WHERE timestamp LIKE '%d';", $timestamp);
+
+        $taxonomies = [];
+
+        $query = $this->pdo->query($queryString);
+        while ($row = $query->fetchArray()) {
+            $taxonomies[$timestamp][] = $row;
+        }
+
+        return $taxonomies;
+    }
+
+    /**
+     * Remove crawl identified by $id timestamp
+     *
+     * @param $id
+     *   Timestamp
+     */
+    public function DeleteCrawl($id) {
+        $queryString = sprintf("DELETE FROM sites WHERE timestamp='%s';", $id);
+        $this->pdo->query( $queryString);
+        $queryString = sprintf("DELETE FROM tags WHERE timestamp='%s';", $id);
+        $this->pdo->query( $queryString);
     }
 
     /**
@@ -76,7 +126,6 @@ class SqlLite3Storage implements StorageInterface {
         }
     }
 
-
     /**
      * @return SQLite3Result
      */
@@ -96,7 +145,7 @@ class SqlLite3Storage implements StorageInterface {
      * @return mixed
      */
     public function getTimeStamps($timestamps = NULL, $getLatest = NULL) {
-        if ($timestamps != NULL) {
+        if (($timestamps != NULL) && (!empty($timestamps['date1'])) && (!empty($timestamps['date2']))) {
             $queryString = sprintf("SELECT DISTINCT * FROM sites WHERE timestamp = '%s' OR timestamp = '%s' GROUP BY timestamp order by url", strtotime($timestamps['date1']), strtotime($timestamps['date2']));
         } else {
             $queryString = sprintf("SELECT DISTINCT * FROM sites GROUP by timestamp");
@@ -105,6 +154,8 @@ class SqlLite3Storage implements StorageInterface {
                 $queryString = sprintf("SELECT DISTINCT * FROM sites GROUP by timestamp order by timestamp desc LIMIT 2");
             }
         }
+
+        $results = [];
 
         $query = $this->pdo->query($queryString);
         while ($row = $query->fetchArray()) {
@@ -122,6 +173,9 @@ class SqlLite3Storage implements StorageInterface {
     public function getStatusCodes() {
         $queryString = sprintf("SELECT statusCode FROM sites group by StatusCode");
         $query = $this->pdo->query($queryString);
+
+        $results = [];
+
         while ($row = $query->fetchArray()) {
             $results[] = $row['statusCode'];
         }
@@ -352,9 +406,8 @@ class SqlLite3Storage implements StorageInterface {
      */
     public function addSitemapURL($url, $index, $timestamp)
     {
-        echo 'adding sitemap:' . $url;
-            $query = sprintf("INSERT INTO sitemapURLs (timestamp, url, site_id) VALUES(%d,%d,\"%s\")", $timestamp, $index, $url);
-            $this->pdo->query($query);
+        $query = sprintf("INSERT INTO sitemapURLs (timestamp, url, site_id) VALUES(%d,%d,\"%s\")", $timestamp, $index, $url);
+        $this->pdo->query($query);
     }
 
     /**

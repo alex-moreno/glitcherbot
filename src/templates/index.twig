@@ -14,12 +14,23 @@
         <p>To run your first crawl:</p>
         <ul>
             <li>Using a csv with the list of sites:
-                <ol><code>php bin/visual_regression_bot.php bot:crawl-sites all-errors.csv</code></ol>
+                <ol><code>php bin/visual_regression_bot.php bot:crawl-sites list-of-sites.csv</code></ol>
             </li>
             <li>Using Acquia's json:
                 <ol><code>php bin/visual_regression_bot.php acquia:acsf-crawl-sites sites.json</code></ol>
             </li>
         </ul>
+        
+        <p>RECOMMENDED: Using docker:</p>
+        <ul>
+            <li>Using a csv with the list of sites:
+                <ol><code>make crawl SITES_CSV=sitesd8-prod.json</code></ol>
+            </li>
+            <li>Using Acquia's json:
+                <ol><code>make crawl-acquia SITES_JSON=sitesd8-prod.json</code></ol>
+            </li>
+        </ul>
+        
         <p class="lead">
             Visit the project for the latest updates on the documentation <a class="btn btn-primary btn-sm" href="https://github.com/alex-moreno/glitcherbot" role="button">GlitcherBot</a>
         </p>
