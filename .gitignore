@@ -7,3 +7,4 @@ csv
 glitcherbot.sqlite3
 sites.json
 sites.csv
+active_plugin_store.yaml

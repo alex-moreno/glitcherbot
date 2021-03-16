@@ -1,0 +1,3 @@
+sqlite3:
+  class: ScraperBot\Storage\Plugin\SqlLite3Storage
+  description: SqlLite3 storage plugin

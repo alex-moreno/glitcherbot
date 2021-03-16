@@ -1,6 +1,6 @@
 <?php
 
-namespace ScraperBot\Storage;
+namespace ScraperBot\Storage\Plugin\Type;
 
 interface StorageInterface {
 

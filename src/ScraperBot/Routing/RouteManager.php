@@ -48,6 +48,9 @@ class RouteManager {
         $route = new Route('/stats/result-changes', array('_controller' => [\ScraperBot\Routing\Controllers\ResultChangedController::class, 'handle']));
         $routes->add('result-changes', $route);
 
+        $route = new Route('/plugins', array('_controller' => [\ScraperBot\Routing\Controllers\PluginController::class, 'handle']));
+        $routes->add('plugins', $route);
+
         return $routes;
     }
 

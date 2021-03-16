@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+</head>
+<body>
+{% include 'menu.twig' %}
+<div class="container-fluid">
+    <h1>Plugins</h1>
+
+    <h2>Plugin Types</h2>
+    <table class="table table-striped" style="text-align:center">
+        <thead class="thead-dark">
+        <tr>
+            <th style="text-align:center" colspan="1">Type</th>
+            <th style="text-align:center" colspan="1">Name</th>
+            <th style="text-align:center" colspan="1">Interface</th>
+            <th style="text-align:center" colspan="1">Singleton?</th>
+        </tr>
+        </thead>
+        <tbody>
+        {%  for storage,keys in plugin_types %}
+            <tr>
+                <td style="text-align:center">
+                    {{ storage }}
+                </td>
+
+                <td style="text-align:center">
+                    {{ keys.name }}
+                </td>
+
+                <td style="text-align:center">
+                    {{ keys.interface }}
+                </td>
+
+                <td style="text-align:center">
+                    {{ keys.interface ? 'YES' : 'NO' }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Available Plugins</h2>
+    <table class="table table-striped" style="text-align:center">
+        <thead class="thead-dark">
+        <tr>
+            <th style="text-align:center" colspan="1">Type</th>
+            <th style="text-align:center" colspan="1">ID</th>
+            <th style="text-align:center" colspan="1">Name</th>
+            <th style="text-align:center" colspan="1">Class</th>
+            <th style="text-align:center" colspan="1">Active?</th>
+        </tr>
+        </thead>
+        <tbody>
+        {%  for type,meta in plugins %}
+            {%  for values in meta %}
+
+                {% if warnings[ type ] %}
+            <tr class="table-danger">
+                {% else %}
+            <tr>
+                {% endif %}
+                <td style="text-align:center">
+                    {{ type }}
+                </td>
+                <td style="text-align:center">
+                    {{ values.id }}
+                </td>
+                <td style="text-align:center">
+                    {{ values.name }}
+                </td>
+                <td style="text-align:center">
+                    {{ values.class }}
+                </td>
+                <td style="text-align:center">
+                    {{ values.active }}
+                </td>
+            </tr>
+            {% endfor %}
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {% if warnings %}
+    <h3>Warnings</h3>
+        <ul>
+            {% for type,data in warnings %}
+            <li>{{ data.message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>
+
+{% include 'footer.twig' %}
+</body>
+</html>
