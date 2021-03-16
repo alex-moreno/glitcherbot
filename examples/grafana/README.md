@@ -14,4 +14,6 @@ Navigate to configuration/datasources and choose to add a sqlite data source.
 
 Give the source a name (or leave default) and set the path to the DB file to `/mnt/glitcherbot/glitcherbot.sqlite3`.
 
-You can now use your Glitcherbot data when configuring panels etc. 
+You can now use queries to grab your Glitcherbot data when configuring panels etc. 
+
+Full explanation of configuring Grafana is outside of the scope of this README.
