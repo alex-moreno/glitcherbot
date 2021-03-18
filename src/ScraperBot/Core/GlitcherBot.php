@@ -54,6 +54,10 @@ class GlitcherBot {
     }
 
     public static function addNamespace($namespace, $src_path) {
+        if (strpos($namespace, '-') != FALSE) {
+            $namespace = str_replace('-', '', ucwords($namespace, '-'));
+        }
+
         self::getAutoloader()->addPsr4($namespace, [$src_path]);
     }
 
