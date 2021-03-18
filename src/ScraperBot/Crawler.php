@@ -8,6 +8,7 @@ require 'vendor/autoload.php';
 use GuzzleHttp\Client;
 use GuzzleHttp\Promise\EachPromise;
 use GuzzleHttp\Psr7\Response;
+use ScraperBot\Event\CrawlCompleteEvent;
 use ScraperBot\Event\CrawledEvent;
 use ScraperBot\Event\CrawlInitiatedEvent;
 use ScraperBot\Event\CrawlRejectedEvent;
@@ -193,6 +194,9 @@ class Crawler {
         ]);
 
         $eachPromise->promise()->wait();
+
+        $event = new CrawlCompleteEvent();
+        $this->eventDispatcher->dispatch($event, CrawlCompleteEvent::NAME);
     }
 
     /**
@@ -361,6 +365,9 @@ class Crawler {
         ]);
 
         $eachPromise->promise()->wait();
+
+        $event = new CrawlCompleteEvent();
+        $this->eventDispatcher->dispatch($event, CrawlCompleteEvent::NAME);
     }
 
     /**
