@@ -1,3 +1,0 @@
-mysql:
-  class: ScraperBot\MySqlStorage\Plugin\Storage\MySqlStorage
-  description: MySQL storage plugin

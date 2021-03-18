@@ -8,3 +8,5 @@ glitcherbot.sqlite3
 sites.json
 sites.csv
 active_plugin_store.yaml
+.DS_Store
+src/custom
