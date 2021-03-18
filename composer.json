@@ -1,11 +1,12 @@
-{ 
-   
+{
     "name": "alex-moreno/glitcherbot",
     "type": "library",
     "description": "Visual regression testing made easy",
     "keywords": ["visual regression","visual regression testing", "regression testing"],
     "homepage": "https://alexmoreno.net",
     "license": "AGPL-3.0-or-later",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "authors": [
         {
             "name": "Alejandro Moreno",
@@ -36,7 +37,8 @@
         "symfony/expression-language": "^5.2",
         "symfony/form": "^5.2",
         "symfony/twig-bridge": "^5.2",
-        "symfony/translation": "^5.2"
+        "symfony/translation": "^5.2",
+        "oomphinc/composer-installers-extender": "^2.0"
     },
     "suggest": {
         "ext-sqlite3": "*",
@@ -52,5 +54,13 @@
     },
     "scripts": {
         "start" : "php -S 0.0.0.0:8000 -t html html/index.php"
+    },
+    "extra": {
+      "installer-types": [
+        "glitcherbot-package"
+      ],
+      "installer-paths": {
+        "src/custom/{$name}": ["type:glitcherbot-package"]
+      }
     }
 }
