@@ -75,7 +75,7 @@ class ResultChangedController {
 
         // Get the list of results, per site, for a given timestamp and prepare
         // array entries representing the rows.
-        if (sizeof($crawlResults[$crawls[1]]) > 1) {
+        if (!empty($crawls[1]) && sizeof($crawlResults[$crawls[1]]) > 1) {
             foreach ($crawlResults[$crawls[0]] as $url => $site) {
                 if ($crawlResults[$crawls[1]][$site['url']]['statusCode'] != $site['statusCode']) {
 
