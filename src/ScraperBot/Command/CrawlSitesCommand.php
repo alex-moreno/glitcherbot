@@ -48,7 +48,8 @@ class CrawlSitesCommand extends GlitcherBotCommand {
             ->addOption('destination_folder', null, InputArgument::OPTIONAL, 'Path to the destination folder for results', '.')
             ->addOption('use_base_uri', null, InputOption::VALUE_NONE, 'If specified, ask guzzle to create a new client each time, in order to specify base URI for redirects.')
             ->addOption('include_sitemaps', null, InputArgument::OPTIONAL, 'Crawl urls found in sitemaps', FALSE)
-            ->addOption('force_sitemaps', null, InputArgument::OPTIONAL, 'Force indexing sitemaps even if not found in robots.txt', FALSE);
+            ->addOption('force_sitemaps', null, InputArgument::OPTIONAL, 'Force indexing sitemaps even if not found in robots.txt', FALSE)
+            ->addOption('cache_buster', null, InputArgument::OPTIONAL, 'Adds an argument on urls to force cache busting', FALSE);
     }
 
     private function init($config_file) {
@@ -58,6 +59,7 @@ class CrawlSitesCommand extends GlitcherBotCommand {
         $this->use_base_uri = $this->input->getOption('use_base_uri');
         $this->include_sitemaps = $this->input->getOption('include_sitemaps');
         $this->force_sitemaps = $this->input->getOption('force_sitemaps');
+        $this->cache_buster = $this->input->getOption('cache_buster');
 
         $this->default_config = ['defaults' => [
             'verify' => false
@@ -109,7 +111,10 @@ class CrawlSitesCommand extends GlitcherBotCommand {
         $csv_logger = new CrawlCsvLoggerSubscriber($fileToWrite);
         $this->eventDispatcher->addSubscriber($csv_logger);
 
-        $this->crawler->crawlSites($source, $this->default_client, $this->default_config, $timestamp, TRUE, $this->force_sitemaps || $this->include_sitemaps);
+        if ($this->force_sitemaps  == 'yes' || $this->include_sitemaps == 'yes') {
+            $sitemaps = 'yes';
+        }
+        $this->crawler->crawlSites($source, $this->default_client, $this->default_config, $timestamp, TRUE, $sitemaps, $this->cache_buster);
         $this->crawler->determineSiteMapURLs($source, $this->default_client, $this->default_config, $timestamp);
 
         $sitemapURLs = $this->crawler->getListPendingSitemaps(TRUE);
@@ -127,7 +132,8 @@ class CrawlSitesCommand extends GlitcherBotCommand {
                 $output->writeln('Crawling sites in the sitemaps.', OutputInterface::VERBOSITY_VERBOSE);
 
                 $pendingSource = new SitesArraySource($pendingURLs);
-                $this->crawler->crawlSites($pendingSource, $this->default_client, $this->default_config, $timestamp, FALSE, $this->force_sitemaps || $this->include_sitemaps);
+
+                $this->crawler->crawlSites($pendingSource, $this->default_client, $this->default_config, $timestamp, FALSE, $sitemaps);
             }
         }
 

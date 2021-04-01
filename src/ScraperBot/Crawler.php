@@ -71,6 +71,16 @@ class Crawler {
         $this->httpConfig['headers'] = $headers;
     }
 
+    private function generateCacheBuster($length = 10) {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[rand(0, $charactersLength - 1)];
+        }
+        return $randomString;
+    }
+
     /**
      * Crawl sites.
      *
@@ -78,7 +88,7 @@ class Crawler {
      * @param $client
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function crawlSites(SourceInterface $source, Client $client, $default_config = NULL, $timestamp = NULL, $assumeTimestamp = FALSE, $debug = NULL, $forceSitemaps = FALSE) {
+    public function crawlSites(SourceInterface $source, Client $client, $default_config = NULL, $timestamp = NULL, $assumeTimestamp = FALSE, $debug = NULL, $forceSitemaps = 'no', $cacheBuster = FALSE) {
         $urls = $source->getLinks();
 
         // Trigger 'crawl initiated event' - chance to modify URLs.
@@ -87,14 +97,20 @@ class Crawler {
 
         $urls = $event->getUrls();
 
+        $cacheBuster = '';
+        if ($cacheBuster == 'yes') {
+            $cacheBuster = '?' . $this->generateCacheBuster();
+        }
+
         if (!isset($timestamp)) {
             $timestamp = time();
         }
 
-        $promises = (function () use ($urls, $client, $default_config, $timestamp, $assumeTimestamp, $forceSitemaps) {
+        $promises = (function () use ($urls, $client, $default_config, $timestamp, $assumeTimestamp, $forceSitemaps, $cacheBuster) {
             foreach ($urls as $url) {
                 if (!empty($url)) {
-                    $target_url = $url;
+                    // Add a cache buster.
+                    $target_url = $url . $cacheBuster;
 
                     // If default config is provided, create a new client each time.
                     if ($default_config != NULL) {
@@ -117,7 +133,7 @@ class Crawler {
                         // Only add a sitemap for base urls in the list.
                         // ie: avoid doing the check for deep urls, like urls.com/node/sitemap.xml
                         if (rtrim($baseURL,"/") == rtrim($url,"/")) {
-                            if ($forceSitemaps == 'yes') {
+                            if ($forceSitemaps) {
                                 $this->output->writeln('Adding sitemap: ' . $baseURL . '/sitemap.xml', OutputInterface::VERBOSITY_VERBOSE);
                                 // Let's assume there is a sitemap on this url before even checking the robots.
                                 $this->storage->addSitemapURL($baseURL . '/sitemap.xml', $this->offIndex, $timestamp);
