@@ -13,7 +13,7 @@ There are two ways of using this tool: With [Vagrant](#Vagrant) or [Docker](#Doc
 Download and install [Vagrant](https://www.vagrantup.com/downloads).
 
 ### Requirements
-- PHP 7.0
+- PHP 7.4
 - Sqlite
 - A (maybe big) list of urls to crawl. Robots.txt and Sitemaps detected automatically
 
