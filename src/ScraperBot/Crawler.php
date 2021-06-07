@@ -32,6 +32,8 @@ class Crawler {
 
     private $output = NULL;
 
+    private $offIndex = 0;
+
     /**
      * Crawler constructor.
      * @param StorageInterface $storage
@@ -97,20 +99,20 @@ class Crawler {
 
         $urls = $event->getUrls();
 
-        $cacheBuster = '';
+        $cacheBusterString = '';
         if ($cacheBuster == 'yes') {
-            $cacheBuster = '?' . $this->generateCacheBuster();
+            $cacheBusterString = '?' . $this->generateCacheBuster();
         }
 
         if (!isset($timestamp)) {
             $timestamp = time();
         }
 
-        $promises = (function () use ($urls, $client, $default_config, $timestamp, $assumeTimestamp, $forceSitemaps, $cacheBuster) {
+        $promises = (function () use ($urls, $client, $default_config, $timestamp, $assumeTimestamp, $forceSitemaps, $cacheBusterString) {
             foreach ($urls as $url) {
                 if (!empty($url)) {
                     // Add a cache buster.
-                    $target_url = $url . $cacheBuster;
+                    $target_url = $url . $cacheBusterString;
 
                     // If default config is provided, create a new client each time.
                     if ($default_config != NULL) {

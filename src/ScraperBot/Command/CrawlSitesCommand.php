@@ -28,6 +28,7 @@ class CrawlSitesCommand extends GlitcherBotCommand {
     private $use_base_uri = FALSE;
     private $include_sitemaps = FALSE;
     private $force_sitemaps = FALSE;
+    private $cache_buster = FALSE;
 
     private $input = NULL;
     private $output = NULL;
@@ -133,7 +134,7 @@ class CrawlSitesCommand extends GlitcherBotCommand {
 
                 $pendingSource = new SitesArraySource($pendingURLs);
 
-                $this->crawler->crawlSites($pendingSource, $this->default_client, $this->default_config, $timestamp, FALSE, $sitemaps);
+                $this->crawler->crawlSites($pendingSource, $this->default_client, $this->default_config, $timestamp, FALSE, $sitemaps, $this->cache_buster);
             }
         }
 
