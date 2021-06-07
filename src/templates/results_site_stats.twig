@@ -24,7 +24,7 @@
                 <th>url</th>
                 <th>Size</th>
                 <th>Status Code</th>
-                <th style="width: 60%">Tags</th>
+                <th style="width: 50%">Tags</th>
             {%  endfor %}
         </tr>
         </thead>
@@ -46,6 +46,8 @@
                     </td>
 
                     <td style="text-align:left" {% if column.2 %}class="table-danger"{% endif %}>
+                        <b>Total tags: {{ column.4['total'] }}</b>
+                        <br><br>
                         {%  for key, tag in column.4 %}
                             {% if key != 'total' %}
                                 <b>&lt;{{ key }}&gt;</b> {{ tag }}<br>
