@@ -35,8 +35,8 @@
                     {{ loop.index }}
                 </td>
                 {%  for column in row %}
-                    <td {% if column.2 %}class="table-danger"{% endif %}>
-                        <a href="{{ column.3 }}" target="_blank">{{ column.3 }}</a>
+                    <td {% if column.2 %}class="table-danger"{% endif %} style="text-align: left; width: 50%;">
+                        <a href="/stats/site?url={{ column.3 }}" target="_blank">{{ column.3 }}</a>
                     </td>
                     <td {% if column.2 %}class="table-danger"{% endif %}>
                         {{ column.0 }}

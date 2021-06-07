@@ -3,7 +3,7 @@
 namespace ScraperBot\Routing\Controllers;
 
 use ScraperBot\Core\GlitcherBot;
-use ScraperBot\Storage\SqlLite3Storage;
+use ScraperBot\Storage\Plugin\SqlLite3Storage;
 use Symfony\Bridge\Twig\Extension\FormExtension;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine;
